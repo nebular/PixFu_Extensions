@@ -12,18 +12,9 @@
 
 namespace rgl {
 
-	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale) {
-
-		glm::mat4 matrix = glm::identity<glm::mat4>();
-
-		matrix = glm::translate(matrix, translation);
-		matrix = glm::rotate(matrix, rxrads, {1, 0, 0});
-		matrix = glm::rotate(matrix, ryrads, {0, 1, 0});
-		matrix = glm::rotate(matrix, rzrads, {0, 0, 1});
-		matrix = glm::scale(matrix, {scale, scale, scale});
-		return matrix;
-	}
-
+	constexpr Perspective_t Planet::PERSP_FOV90_LOW;
+	constexpr Perspective_t Planet::PERSP_FOV90_MID;
+	constexpr Perspective_t Planet::PERSP_FOV90_FAR;
 
 	std::string Planet::TAG = "Planet";
 
@@ -34,7 +25,17 @@ namespace rgl {
 
 	};
 
-	void Planet::add(Terrain *world) {
+	 Planet::~Planet() {
+
+		if (DBG) LogE(TAG, "Destroying planet");
+		for (Terrain *terrain : vTerrains) {
+			delete terrain;
+		}
+		vTerrains.clear();
+	}
+
+	void Planet::add(TerrainConfig_t terrainConfig) {
+		Terrain *world = new Terrain(CONFIG, terrainConfig);
 		vTerrains.push_back(world);
 	}
 
@@ -64,6 +65,8 @@ namespace rgl {
 		pShader->use();
 		pShader->loadViewMatrix(pCamera);
 
+		pCamera->move();
+		
 		for (Terrain *terrain:vTerrains) {
 			terrain->render(pShader);
 		}

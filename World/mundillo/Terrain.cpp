@@ -6,9 +6,12 @@
 //  Copyright © 2020 rodo. All rights reserved.
 //
 
-#include "Terrain.hpp"
+#include "Planet.hpp"
 
 namespace rgl {
+
+std::string Terrain::TAG = "Terrain";
+
 Terrain::Terrain(rgl::Drawable *text) {
 	x = 0 * text->width;
 	z = 0 * text->height;

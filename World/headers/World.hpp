@@ -14,6 +14,7 @@
 #include "Surface.hpp"
 #include "TerrainShader.hpp"
 #include "Camera.hpp"
+#include "Planet.hpp"
 
 namespace rgl {
 
@@ -26,15 +27,7 @@ namespace rgl {
 	} WorldConfig_t;
 
 
-	class World : public Layer {
-
-		static constexpr Perspective_t PERSP_FOV90_LOW = {90, 0.005, 0.03};
-		static constexpr Perspective_t PERSP_FOV90_MID = {90, 0.005, 100.0};
-		static constexpr Perspective_t PERSP_FOV90_FAR = {90, 0.005, 1000.0};
-
-		const float FOV = 90;
-		const float NEAR_PLANE = 0.005;    //0.1f;
-		const float FAR_PLANE = .03;    // 1000;
+	class World : public PixFuExtension, public Layer {
 
 		const Perspective_t PERSPECTIVE;
 		const WorldConfig_t CONFIG;
@@ -55,7 +48,8 @@ namespace rgl {
 
 
 	public:
-		World(WorldConfig_t config, Perspective_t perspective = PERSP_FOV90_LOW);
+
+		World(WorldConfig_t config, Perspective_t perspective = Planet::PERSP_FOV90_LOW);
 
 		Camera *camera();
 	};

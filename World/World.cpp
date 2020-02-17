@@ -9,23 +9,10 @@
 #include "World.hpp"
 
 #include "glm.hpp"
-#include "Planet.hpp"
 
 namespace rgl {
 
-
-	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale) {
-
-		glm::mat4 matrix = glm::identity<glm::mat4>();
-
-		matrix = glm::translate(matrix, translation);
-		matrix = glm::rotate(matrix, rxrads, {1,0,0});
-		matrix = glm::rotate(matrix, ryrads, {0,1,0});
-		matrix = glm::rotate(matrix, rzrads, {0,0,1});
-		matrix = glm::scale(matrix, {scale,scale,scale});
-		return matrix;
-	}
-
+	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale);
 
 	World::World(WorldConfig_t config, Perspective_t perspective)
 			: PERSPECTIVE(perspective), CONFIG(config) {

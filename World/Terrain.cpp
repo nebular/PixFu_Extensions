@@ -6,7 +6,7 @@
 //  Copyright © 2020 rodo. All rights reserved.
 //
 
-#include "Terrain.hpp"
+#include "Planet.hpp"
 
 #include "glm.hpp"
 
@@ -35,6 +35,12 @@ namespace rgl {
 		if (DBG) LogV(TAG, SF("Created terrain %s", config.name.c_str()));
 
 	};
+
+	Terrain::~Terrain() {
+		delete pTexture;
+		pTexture = nullptr;
+		if (DBG) LogV(TAG, SF("Destroyed terrain %s", CONFIG.name.c_str()));
+	}
 
 	void Terrain::initMesh(uint vertexCount, uint twidth, uint theight) {
 
