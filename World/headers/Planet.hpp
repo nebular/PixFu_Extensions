@@ -7,6 +7,7 @@
 
 #include "ext.hpp"
 #include "TerrainShader.hpp"
+#include "ObjectShader.hpp"
 #include "Camera.hpp"
 #include <vector>
 
@@ -25,10 +26,42 @@ namespace rgl {
 		const glm::vec3 lightColor = {0.8, 0.8, 0.93};
 	} PlanetConfig_t;
 
+	typedef struct sObjectConfig {
+		const std::string name;
+		const glm::vec2 position = {0, 0};
+		const float mass = 1.0;
+	} ObjectConfig_t;
+
 	typedef struct sTerrainConfig {
 		const std::string name;
 		const glm::vec2 origin = {0, 0};
 	} TerrainConfig_t;
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+
+	class Object : public Layer {
+
+		static std::string TAG;
+
+		Texture2D *pTexture;
+
+		bool bInited = false;
+
+
+	public:
+
+		const ObjectConfig_t CONFIG;
+		const PlanetConfig_t PLANET;
+
+		Object(PlanetConfig_t planetConfig, ObjectConfig_t config);
+		virtual ~Object();
+
+		void init();
+
+		void render(ObjectShader *shader);
+	};
+
+	//////////////////////////////////////////////////////////////////////////////////////////
 
 	class Terrain : public Layer {
 
@@ -39,11 +72,6 @@ namespace rgl {
 		bool bInited = false;
 
 		void initMesh(uint vertexCount, uint twidth, uint theight);
-
-		bool init(PixFu *engine);
-
-		void tick(PixFu *engine, float fElapsedTime);
-
 
 	public:
 
@@ -58,11 +86,15 @@ namespace rgl {
 		void render(TerrainShader *shader);
 	};
 
+
+	//////////////////////////////////////////////////////////////////////////////////////////
+
 	class Planet : public PixFuExtension {
 
 		static std::string TAG;
 
 		TerrainShader *pShader;
+		ObjectShader *pShaderObjects;
 
 		glm::mat4 projectionMatrix;
 
@@ -70,6 +102,7 @@ namespace rgl {
 		Camera *pCamera;
 
 		std::vector<Terrain *> vTerrains;
+		std::vector<Terrain *> vObjects;
 
 		bool init(PixFu *engine);
 

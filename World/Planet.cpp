@@ -22,6 +22,7 @@ namespace rgl {
 			: PERSPECTIVE(perspective), CONFIG(config) {
 
 		pShader = new TerrainShader(CONFIG.shaderName);
+		pShaderObjects = new ObjectShader(CONFIG.shaderName+"_objects");
 
 	};
 
@@ -39,6 +40,10 @@ namespace rgl {
 		vTerrains.push_back(world);
 	}
 
+	void Planet::add(ObjectConfig_t objectConfig) {
+		Object *object = new Object(CONFIG, objectConfig);
+		vObjects.push_back(object);
+	}
 
 	bool Planet::init(PixFu *engine) {
 
