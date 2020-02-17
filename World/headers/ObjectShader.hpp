@@ -6,8 +6,8 @@
 //  Copyright © 2020 rodo. All rights reserved.
 //
 
-#ifndef TerrainShader_hpp
-#define TerrainShader_hpp
+#ifndef ObjectShader_hpp
+#define ObjectShader_hpp
 
 #include "Camera.hpp"
 #include "Texture2D.hpp"

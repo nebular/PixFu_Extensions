@@ -55,10 +55,18 @@ namespace rgl {
 		// load projection matrix
 		float aspectRatio = (float) engine->screenWidth() / (float) engine->screenHeight();
 		projectionMatrix = glm::perspective(PERSPECTIVE.FOV, aspectRatio, PERSPECTIVE.NEAR_PLANE, PERSPECTIVE.FAR_PLANE);
+
 		pShader->loadProjectionMatrix(projectionMatrix);
 		pShader->loadLight(pLight);
 
 		pShader->stop();
+
+		if (pShaderObjects != nullptr) {
+			pShaderObjects->use();
+			pShaderObjects->loadProjectionMatrix(projectionMatrix);
+			pShaderObjects->loadLight(pLight);
+			pShaderObjects->stop();
+		}
 
 		if (DBG) LogV(TAG, SF("Init Planet, FOV %f, aspectRatio %f", PERSPECTIVE.FOV, aspectRatio));
 		return true;
@@ -77,7 +85,16 @@ namespace rgl {
 		}
 
 		pShader->stop();
-		OpenGlUtils::glError("terrain tick");
+
+		if (vObjects.size()==0) return;
+
+		pShaderObjects->use();
+		for (Object *object:vObjects) {
+			object->render(pShaderObjects);
+		}
+		pShaderObjects->stop();
+
+		if (DBG) OpenGlUtils::glError("terrain tick");
 
 	}
 

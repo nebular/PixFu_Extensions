@@ -9,6 +9,7 @@
 #include "TerrainShader.hpp"
 #include "ObjectShader.hpp"
 #include "Camera.hpp"
+#include "Obj_Loader.hpp"
 #include <vector>
 
 namespace rgl {
@@ -28,7 +29,9 @@ namespace rgl {
 
 	typedef struct sObjectConfig {
 		const std::string name;
-		const glm::vec2 position = {0, 0};
+		glm::vec3 position = {0, 0, 0};
+		glm::vec3 rotation = {0, 0, 0};
+		float scale = 1.0;
 		const float mass = 1.0;
 	} ObjectConfig_t;
 
@@ -46,7 +49,8 @@ namespace rgl {
 		Texture2D *pTexture;
 
 		bool bInited = false;
-
+		const bool bMyTexture;
+		objl::Loader *pLoader;
 
 	public:
 
@@ -54,6 +58,11 @@ namespace rgl {
 		const PlanetConfig_t PLANET;
 
 		Object(PlanetConfig_t planetConfig, ObjectConfig_t config);
+
+		// cloned objects share texture (todo this automatically with a texture dictionary)
+		Object(Object *clonable, ObjectConfig_t config);
+		Object *clone(ObjectConfig_t config);
+
 		virtual ~Object();
 
 		void init();
@@ -79,6 +88,7 @@ namespace rgl {
 		const PlanetConfig_t PLANET;
 
 		Terrain(PlanetConfig_t planetConfig, TerrainConfig_t config);
+
 		virtual ~Terrain();
 
 		void init();
@@ -102,7 +112,7 @@ namespace rgl {
 		Camera *pCamera;
 
 		std::vector<Terrain *> vTerrains;
-		std::vector<Terrain *> vObjects;
+		std::vector<Object *> vObjects;
 
 		bool init(PixFu *engine);
 
@@ -118,10 +128,15 @@ namespace rgl {
 		static constexpr Perspective_t PERSP_FOV90_MID = {90, 0.005, 100.0};
 		static constexpr Perspective_t PERSP_FOV90_FAR = {90, 0.005, 1000.0};
 
+		Planet(PlanetConfig_t config, Perspective_t perspective = PERSP_FOV90_LOW);
+
+		virtual ~Planet();
+
+
 		void add(TerrainConfig_t terrainConfig);
 
-		Planet(PlanetConfig_t config, Perspective_t perspective = PERSP_FOV90_LOW);
-		virtual ~Planet();
+		void add(ObjectConfig_t objectConfig);
+
 		Camera *camera();
 	};
 

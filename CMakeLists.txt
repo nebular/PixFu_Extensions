@@ -36,6 +36,8 @@ add_library(pixFu_ext SHARED
         World/Planet.cpp
         World/Terrain.cpp
         World/TerrainShader.cpp
+        World/Object.cpp
+        World/ObjectShader.cpp
         World/Camera.cpp
         )
 
