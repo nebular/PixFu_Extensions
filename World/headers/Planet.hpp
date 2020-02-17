@@ -135,7 +135,9 @@ namespace rgl {
 
 		void add(TerrainConfig_t terrainConfig);
 
-		void add(ObjectConfig_t objectConfig);
+		Object *add(ObjectConfig_t objectConfig);
+		
+		void add(Object *object);
 
 		Camera *camera();
 	};

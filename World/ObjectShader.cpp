@@ -6,9 +6,11 @@
 //  Copyright © 2020 rodo. All rights reserved.
 //
 
-#include "ObjectShader.cpp"
+#include "ObjectShader.hpp"
 
 namespace rgl {
+	
+	glm::mat4 createViewMatrix(Camera *camera);
 
 	ObjectShader::ObjectShader(std::string name) : Shader(name) {}
 

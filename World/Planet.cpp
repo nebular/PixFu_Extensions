@@ -8,7 +8,6 @@
 
 #include "Planet.hpp"
 #include "PixFu.hpp"
-#include "glm.hpp"
 
 namespace rgl {
 
@@ -40,8 +39,13 @@ namespace rgl {
 		vTerrains.push_back(world);
 	}
 
-	void Planet::add(ObjectConfig_t objectConfig) {
+	Object *Planet::add(ObjectConfig_t objectConfig) {
 		Object *object = new Object(CONFIG, objectConfig);
+		vObjects.push_back(object);
+		return object;
+	}
+
+	void Planet::add(Object *object) {
 		vObjects.push_back(object);
 	}
 

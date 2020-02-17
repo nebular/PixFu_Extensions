@@ -10,7 +10,6 @@
 #define World_hpp
 
 #include "glm.hpp"
-#include "ext.hpp"
 #include "Keyboard.hpp"
 
 namespace rgl {
@@ -62,8 +61,11 @@ namespace rgl {
 		if (Keyboard::isHeld(Keys::RIGHT))
 			position.x += s;
 
-		if (Keyboard::isHeld(Keys::UP))
-			if (isShift) position.z -= s; else position.y -= s;
+		if (Keyboard::isHeld(Keys::UP)) {
+			if (isShift) position.z -= s;
+		} else {
+			position.y -= s;
+		}
 
 		if (Keyboard::isHeld(Keys::DOWN))
 			if (isShift) position.z += s; else position.y += s;

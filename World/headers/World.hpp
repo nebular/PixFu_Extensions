@@ -9,12 +9,11 @@
 #ifndef MundiPeke_hpp
 #define MundiPeke_hpp
 
-#include "ext.hpp"
 #include "Layer.hpp"
-#include "Surface.hpp"
-#include "TerrainShader.hpp"
 #include "Camera.hpp"
 #include "Planet.hpp"
+
+class TerrainShader;
 
 namespace rgl {
 

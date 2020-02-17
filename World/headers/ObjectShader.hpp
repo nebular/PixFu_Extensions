@@ -10,10 +10,8 @@
 #define ObjectShader_hpp
 
 #include "Camera.hpp"
-#include "Texture2D.hpp"
 #include "Shader.hpp"
 #include "glm.hpp"
-#include "ext.hpp"
 
 namespace rgl {
 

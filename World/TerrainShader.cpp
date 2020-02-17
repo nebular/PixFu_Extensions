@@ -7,10 +7,10 @@
 //
 
 #include "TerrainShader.hpp"
+#include "Camera.hpp"
+#include "ext.hpp"
 
 namespace rgl {
-
-
 
 glm::mat4 createViewMatrix(Camera *camera) {
 	glm::mat4 matrix = glm::identity<glm::mat4>();

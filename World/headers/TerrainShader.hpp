@@ -9,13 +9,14 @@
 #ifndef TerrainShader_hpp
 #define TerrainShader_hpp
 
-#include "Camera.hpp"
-#include "Texture2D.hpp"
 #include "Shader.hpp"
 #include "glm.hpp"
-#include "ext.hpp"
 
 namespace rgl {
+
+
+class Camera;
+class Light;
 
 	class TerrainShader : public Shader {
 

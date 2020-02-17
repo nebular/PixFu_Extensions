@@ -121,8 +121,8 @@ namespace rgl {
 		std::vector<unsigned int> indices = pLoader->LoadedIndices;
 
 		Layer::setup(
-				(float *)&meshes[0], meshes.size(),
-				&indices[0], indices.size());
+				(float *)&meshes[0], (int)meshes.size(),
+				&indices[0], (int)indices.size());
 
 		if (bMyTexture) pTexture->upload();
 

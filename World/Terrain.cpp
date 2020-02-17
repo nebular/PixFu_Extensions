@@ -8,8 +8,6 @@
 
 #include "Planet.hpp"
 
-#include "glm.hpp"
-
 namespace rgl {
 
 
