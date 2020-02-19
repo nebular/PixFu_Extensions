@@ -75,6 +75,8 @@ namespace rgl {
 
 	bool World::init(PixFu *engine) {
 
+	glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
 
 //	initMesh(10, pTexture->width(), pTexture->height());
 
@@ -101,7 +103,7 @@ namespace rgl {
 
 		pShader->loadProjectionMatrix(projectionMatrix);
 		pLight = new Light(CONFIG.lightPosition, {1, 1, 1});
-		pCamera = new Camera();
+		pCamera = new NewCamera();
 		pShader->loadShineVariables(1, 0.7);
 		pShader->loadLight(pLight);
 		pShader->loadViewMatrix(pCamera);
@@ -111,8 +113,8 @@ namespace rgl {
 
 	void World::tick(PixFu *engine, float fElapsedTime) {
 		pShader->use();
-//	pShader->loadLight(pLight);
-		pCamera->move();
+//		pShader->loadLight(pLight);
+		pCamera->move(fElapsedTime);
 //		pShader->loadProjectionMatrix(projectionMatrix);
 		pShader->loadViewMatrix(pCamera);
 		draw();

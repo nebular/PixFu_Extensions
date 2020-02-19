@@ -6,8 +6,7 @@
 //  Copyright © 2020 rodo. All rights reserved.
 //
 
-#ifndef TerrainShader_hpp
-#define TerrainShader_hpp
+#pragma once
 
 #include "Shader.hpp"
 #include "glm.hpp"
@@ -15,7 +14,7 @@
 namespace rgl {
 
 
-class Camera;
+class NewCamera;
 class Light;
 
 	class TerrainShader : public Shader {
@@ -31,9 +30,8 @@ class Light;
 
 		void loadLight(Light *light);
 
-		void loadViewMatrix(Camera *camera);
+		void loadViewMatrix(NewCamera *camera);
 
 		void loadProjectionMatrix(glm::mat4 &projection);
 	};
 }
-#endif /* TerrainShader_hpp */

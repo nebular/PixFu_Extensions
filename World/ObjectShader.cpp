@@ -10,14 +10,14 @@
 
 namespace rgl {
 	
-	glm::mat4 createViewMatrix(Camera *camera);
+	glm::mat4 createViewMatrix(NewCamera *camera);
 
 	ObjectShader::ObjectShader(std::string name) : Shader(name) {}
 
 	void ObjectShader::bindAttributes() {
 		bindAttribute(0, "position");
-		bindAttribute(1, "textureCoordinates");
-		bindAttribute(2, "normal");
+		bindAttribute(1, "normal");
+		bindAttribute(2, "textureCoordinates");
 	}
 
 	void ObjectShader::loadShineVariables(float damper, float reflectivity) {
@@ -36,8 +36,8 @@ namespace rgl {
 		setVec3("lightColour", c.x, c.y, c.z);
 	}
 
-	void ObjectShader::loadViewMatrix(Camera *camera) {
-		glm::mat4 viewMatrix = createViewMatrix(camera);
+	void ObjectShader::loadViewMatrix(NewCamera *camera) {
+		glm::mat4 viewMatrix = camera->getViewMatrix();
 		setMat4("viewMatrix", (float *) &viewMatrix);
 	}
 

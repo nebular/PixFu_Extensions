@@ -7,12 +7,13 @@
 //
 
 #include "TerrainShader.hpp"
+#include "NewCamera.hpp"
 #include "Camera.hpp"
 #include "ext.hpp"
 
 namespace rgl {
 
-glm::mat4 createViewMatrix(Camera *camera) {
+glm::mat4 createViewMatrix(NewCamera *camera) {
 	glm::mat4 matrix = glm::identity<glm::mat4>();
 	
 	matrix = glm::rotate(matrix, camera->getPitch(), {1,0,0});
@@ -31,8 +32,8 @@ TerrainShader::TerrainShader(std::string name):Shader(name) {}
 
 void TerrainShader::bindAttributes() {
 	bindAttribute(0, "position");
-	bindAttribute(1, "textureCoordinates");
-	bindAttribute(2, "normal");
+	bindAttribute(1, "normal");
+	bindAttribute(2, "textureCoordinates");
 }
 
 void TerrainShader::loadShineVariables(float damper,float reflectivity){
@@ -51,8 +52,9 @@ void TerrainShader::loadLight(Light *light){
 	setVec3("lightColour", c.x,c.y,c.z);
 }
 
-void  TerrainShader::loadViewMatrix(Camera *camera){
-	glm::mat4 viewMatrix = createViewMatrix(camera);
+void  TerrainShader::loadViewMatrix(NewCamera *camera){
+//	glm::mat4 viewMatrix = createViewMatrix(camera);
+	glm::mat4 viewMatrix = camera->getViewMatrix();
 	setMat4("viewMatrix", (float *)&viewMatrix);
 }
 

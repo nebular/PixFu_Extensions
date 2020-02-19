@@ -5,35 +5,55 @@
 //  Created by rodo on 16/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
 //
+#pragma once
 
-#ifndef World_hpp
-#define World_hpp
-
+#include <cmath>
 #include "glm.hpp"
 #include "Keyboard.hpp"
 
 namespace rgl {
+
 	class Camera {
 
-		glm::vec3 position = {0, 0, -0.02};
-		float pitch = 2.5;
+		static float constexpr DEFAULT_HEIGHT = 0.2;
+		static float constexpr STEP = 0.0001 * 5;
+		static float constexpr VSTEP = 1;
+
+		glm::vec3 position = {0, -DEFAULT_HEIGHT, 0};
+
+		float pitch = M_PI;
 		float yaw = 0.0;
 		float roll = 0;
 
-		float t = 0;
-
 	public:
-		void moveWhat();
 
-		void moveRight();
+		// absolute camera movement
+		
+		void lookForward(float step=STEP);
+		void lookBackward(float step=STEP);
+		void lookRight(float step=STEP);
+		void lookLeft(float step=STEP);
+		void lookUp(float step=STEP);
+		void lookDown(float step=STEP);
 
-		void moveLeft();
+		void moveForward(float step=STEP);
+		void moveBackward(float step=STEP);
 
-		void moveUp();
+		void setX(float xpos);
+		void setZ(float ypos);
+		void setHeight(float height);
+
+		// camera rotation
+		
+		void stepYaw(float rads);
+		void stepPitch(float rads);
+		void stepRoll(float rads);
+
+		void setPitch(float ang);
+		void setRoll(float ang);
+		void setYaw(float ang);
 
 		void move();
-
-		void moveDown();
 
 		glm::vec3 &getPosition();
 
@@ -42,69 +62,74 @@ namespace rgl {
 		float getYaw();
 
 		float getRoll();
+		
 
 	};
 
-
+	inline void Camera::setX(float xpos) 	{ position.x = xpos;}
+	inline void Camera::setZ(float zpos) 	{ position.z = zpos;}
+	inline void Camera::setHeight(float h)	{ position.y = -h;}
+	inline void Camera::setPitch(float p) 	{ pitch = p;}
+	inline void Camera::setRoll(float r) 	{ roll = r;}
+	inline void Camera::setYaw(float y) 	{ yaw = y;}
 	inline void Camera::move() {
-
-		t += 0.0001;
-
-		float s = 0.0001;
 
 		bool isShift = Keyboard::isHeld(Keys::SPACE);
 
-		// eje x: left right
-		if (Keyboard::isHeld(Keys::LEFT))
-			position.x -= s;
-
-		if (Keyboard::isHeld(Keys::RIGHT))
-			position.x += s;
-
-		if (Keyboard::isHeld(Keys::UP)) {
-			if (isShift) position.z -= s;
+		if (Keyboard::isHeld(Keys::ALT)) {
+			if (Keyboard::isHeld(Keys::UP)) 	stepPitch(-STEP*2);
+			if (Keyboard::isHeld(Keys::DOWN)) 	stepPitch(STEP*2);
+			if (Keyboard::isHeld(Keys::LEFT)) 	stepYaw(STEP*5);
+			if (Keyboard::isHeld(Keys::RIGHT)) 	stepYaw(-STEP*5);
+		} else if (Keyboard::isHeld(Keys::COMMAND)) {
+			// walk mode
+			if (Keyboard::isHeld(Keys::UP)) 	moveForward();
+			if (Keyboard::isHeld(Keys::DOWN)) 	moveBackward();
+			if (Keyboard::isHeld(Keys::LEFT)) 	stepYaw(STEP*5);
+			if (Keyboard::isHeld(Keys::RIGHT)) 	stepYaw(-STEP*5);
 		} else {
-			position.y -= s;
+
+			// eje x: left right
+			if (Keyboard::isHeld(Keys::LEFT))
+				lookLeft();
+
+			if (Keyboard::isHeld(Keys::RIGHT))
+				lookRight();
+
+			if (Keyboard::isHeld(Keys::UP)) {
+				if (isShift) lookUp();
+				else lookForward();
+			}
+
+			if (Keyboard::isHeld(Keys::DOWN)) {
+				if (isShift) lookDown();
+				else lookBackward();
+			}
 		}
-
-		if (Keyboard::isHeld(Keys::DOWN))
-			if (isShift) position.z += s; else position.y += s;
-
-		if (Keyboard::isHeld(Keys::P))
-			pitch += s * (isShift ? -1 : 1);
-
-		if (Keyboard::isHeld(Keys::R))
-			roll += s * 10 * (isShift ? -1 : 1);
-
-		if (Keyboard::isHeld(Keys::Y))
-			yaw += s * (isShift ? -1 : 1);
-
-
-
-		//	pitch = t; // (random()%3140)/1000.0;
-		//	yaw = (random()%3140)/1000.0;
-		//	roll = (random()%3140)/1000.0;
 	}
-
-
-	inline void Camera::moveWhat() { position.z -= 0.2f; }
-
-	inline void Camera::moveRight() { position.x += 0.2f; }
-
-	inline void Camera::moveLeft() { position.x -= 0.2f; }
-
-	inline void Camera::moveUp() { position.y += 0.2f; }
-
-	inline void Camera::moveDown() { position.y -= 0.2f; }
-
+	inline void Camera::moveForward(float step) {
+		
+		position.x += step * sinf(yaw);
+		position.z += step * cosf(yaw);
+		
+	}
+	inline void Camera::moveBackward(float step) {
+		moveForward(-step);
+	}
+	inline void Camera::lookForward(float step) { position.z += step; }
+	inline void Camera::lookBackward(float step) { position.z -= step; }
+	inline void Camera::lookRight(float step) { position.x += step; }
+	inline void Camera::lookLeft(float step) { position.x -= step; }
+	inline void Camera::lookUp(float step) { position.y -= step; }
+	inline void Camera::lookDown(float step) { position.y += step; }
+	inline void Camera::stepPitch(float rads) { pitch += rads; }
+	inline void Camera::stepRoll(float rads) { roll += rads; }
+	inline void Camera::stepYaw(float rads) { yaw += rads; }
 	inline glm::vec3 &Camera::getPosition() { return position; }
 
 	inline float Camera::getPitch() { return pitch; }
-
 	inline float Camera::getYaw() { return yaw; }
-
 	inline float Camera::getRoll() { return roll; }
-
 
 	class Light {
 
@@ -150,5 +175,3 @@ namespace rgl {
 
 }
 
-
-#endif /* World_hpp */

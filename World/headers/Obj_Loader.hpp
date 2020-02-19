@@ -543,6 +543,8 @@ namespace objl
 					algorithm::split(algorithm::tail(curline), spos, " ");
 
 					vpos.X = std::stof(spos[0]);
+//					vpos.Z = -std::stof(spos[1]);
+//					vpos.Y = std::stof(spos[2]);
 					vpos.Y = std::stof(spos[1]);
 					vpos.Z = std::stof(spos[2]);
 
@@ -740,7 +742,7 @@ namespace objl
 			for (int i = 0; i < int(sface.size()); i++)
 			{
 				// See What type the vertex is.
-				int vtype;
+				int vtype = -1;
 
 				algorithm::split(sface[i], svert, "/");
 

@@ -5,9 +5,7 @@
 //  Created by rodo on 17/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
 //
-
-#ifndef MundiPeke_hpp
-#define MundiPeke_hpp
+#pragma once
 
 #include "Layer.hpp"
 #include "Camera.hpp"
@@ -37,7 +35,7 @@ namespace rgl {
 		Texture2D *pTexture;
 
 		Light *pLight;
-		Camera *pCamera;
+		NewCamera *pCamera;
 
 		void initMesh(uint vertexCount, uint twidth, uint theight);
 
@@ -50,10 +48,9 @@ namespace rgl {
 
 		World(WorldConfig_t config, Perspective_t perspective = Planet::PERSP_FOV90_LOW);
 
-		Camera *camera();
+		NewCamera *camera();
 	};
 
-	inline Camera *World::camera() { return pCamera; }
+	inline NewCamera *World::camera() { return pCamera; }
 }
 
-#endif /* MundiPeke_hpp */
