@@ -10,7 +10,7 @@
 
 #include "glm.hpp"
 #include "Layer.hpp"
-#include "ObjectLoader.hpp"
+#include "ObjLoader.hpp"
 
 namespace rgl {
 
@@ -25,7 +25,7 @@ namespace rgl {
 
 		pTexture = new Texture2D("objects/" + NAME + ".png");
 
-		pLoader = new ObjectLoader("objects/" + NAME + ".obj");
+		pLoader = new ObjLoader("objects/" + NAME + ".obj");
 
 		mPlacer = createTransformationMatrix(
 				PLACER.position, //CONFIG.position,

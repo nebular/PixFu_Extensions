@@ -17,13 +17,13 @@ namespace objl {
 
 namespace rgl {
 
-	class ObjectLoader {
+	class ObjLoader {
 
 		objl::Loader *pLoader;
 
 	public:
 
-		ObjectLoader(std::string name);
+		ObjLoader(std::string name);
 
 		float *vertices();
 

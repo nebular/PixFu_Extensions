@@ -7,6 +7,7 @@
 //
 
 #include "Camera.hpp"
+#include "matrix_transform.hpp"
 
 namespace rgl {
 
