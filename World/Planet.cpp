@@ -9,6 +9,7 @@
 #include "Planet.hpp"
 #include "PixFu.hpp"
 #include "OpenGL.h"
+
 namespace rgl {
 
 constexpr Perspective_t Planet::PERSP_FOV90_LOW;
@@ -102,6 +103,7 @@ bool Planet::init(PixFu *engine) {
 
 void Planet::tick(PixFu *engine, float fElapsedTime) {
 	
+	glClearColor(CONFIG.backgroundColor.x, CONFIG.backgroundColor.y, CONFIG.backgroundColor.z, 1.0);
 	glEnable(GL_DEPTH_TEST);
 	
 	pShader->use();

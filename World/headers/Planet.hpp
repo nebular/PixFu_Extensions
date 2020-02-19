@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "ext.hpp"
 #include "TerrainShader.hpp"
 #include "ObjectShader.hpp"
 #include "Camera.hpp"
@@ -13,6 +12,7 @@
 #include <vector>
 #include <map>
 #include <cmath>
+#include "ext.hpp"
 
 namespace rgl {
 
@@ -26,6 +26,7 @@ typedef struct sPerspective {
 
 typedef struct sPlanetConfig {
 	const std::string shaderName = "world";
+	const glm::vec3 backgroundColor = {0.8,0.8,1};
 	const glm::vec3 lightPosition = {20000, 20000, 2000};
 	const glm::vec3 lightColor = {0.8, 0.8, 0.93};
 } PlanetConfig_t;
