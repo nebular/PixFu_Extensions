@@ -6,10 +6,11 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma once
 
+#include "Camera.hpp"
+#include "Layer.hpp"
 #include "TerrainShader.hpp"
 #include "ObjectShader.hpp"
-#include "Camera.hpp"
-#include "ObjectLoader.hpp"
+#include "ObjLoader.hpp"
 
 #include <vector>
 #include <map>
@@ -54,7 +55,7 @@ class ObjectCluster : public Layer {
 	Texture2D *pTexture;
 	
 	bool bInited = false;
-	ObjectLoader *pLoader;
+	ObjLoader *pLoader;
 
 	std::vector<ObjectConfig_t> vInstances;
 	glm::mat4 mPlacer;
@@ -95,7 +96,7 @@ class Terrain : public Layer {
 	};
 
 	Texture2D *pTexture;
-	ObjectLoader *pLoader;
+	ObjLoader *pLoader;
 
 	bool bInited = false;
 	
