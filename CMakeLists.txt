@@ -34,7 +34,7 @@ include_directories(World/headers)
 add_library(pixFu_ext SHARED
         World/Camera.cpp
         World/ObjectCluster.cpp
-        World/ObjectLoader.cpp
+        World/ObjLoader.cpp
         World/ObjectShader.cpp
         World/Terrain.cpp
         World/TerrainShader.cpp
