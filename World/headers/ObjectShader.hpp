@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "NewCamera.hpp"
 #include "Camera.hpp"
 #include "Shader.hpp"
 #include "glm.hpp"
@@ -18,6 +17,7 @@ namespace rgl {
 	class ObjectShader : public Shader {
 
 	public:
+
 		ObjectShader(std::string name);
 
 		void bindAttributes();
@@ -28,7 +28,7 @@ namespace rgl {
 
 		void loadLight(Light *light);
 
-		void loadViewMatrix(NewCamera *camera);
+		void loadViewMatrix(Camera *camera);
 
 		void loadProjectionMatrix(glm::mat4 &projection);
 	};

@@ -9,10 +9,8 @@
 #include "ObjectShader.hpp"
 
 namespace rgl {
-	
-	glm::mat4 createViewMatrix(NewCamera *camera);
 
-	ObjectShader::ObjectShader(std::string name) : Shader(name) {}
+	ObjectShader::ObjectShader(std::string name) : Shader(std::move(name)) {}
 
 	void ObjectShader::bindAttributes() {
 		bindAttribute(0, "position");
@@ -36,7 +34,7 @@ namespace rgl {
 		setVec3("lightColour", c.x, c.y, c.z);
 	}
 
-	void ObjectShader::loadViewMatrix(NewCamera *camera) {
+	void ObjectShader::loadViewMatrix(Camera *camera) {
 		glm::mat4 viewMatrix = camera->getViewMatrix();
 		setMat4("viewMatrix", (float *) &viewMatrix);
 	}

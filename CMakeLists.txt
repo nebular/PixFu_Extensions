@@ -32,18 +32,18 @@ include_directories(World/headers)
 ## PIXENGINE
 
 add_library(pixFu_ext SHARED
-        World/World.cpp
-        World/Planet.cpp
+        World/Camera.cpp
+        World/ObjectCluster.cpp
+        World/ObjectLoader.cpp
+        World/ObjectShader.cpp
         World/Terrain.cpp
         World/TerrainShader.cpp
-        World/Object.cpp
-        World/ObjectShader.cpp
-        World/Camera.cpp
+        World/World.cpp
         )
 
 
 # Include libraries needed for gles3jni lib
 
 target_link_libraries(pixFu_ext
-       pixFu
+        pixFu
         m)

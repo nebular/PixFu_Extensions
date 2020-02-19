@@ -7,119 +7,142 @@
 //
 
 #include "World.hpp"
+#include "PixFu.hpp"
+#include "OpenGL.h"
 
-#include "glm.hpp"
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 namespace rgl {
 
-	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale);
+	constexpr Perspective_t World::PERSP_FOV90_LOW;
+	constexpr Perspective_t World::PERSP_FOV90_MID;
+	constexpr Perspective_t World::PERSP_FOV90_FAR;
+	constexpr Perspective_t World::PERSP_FOV60_LOW;
+	constexpr Perspective_t World::PERSP_FOV60_MID;
+	constexpr Perspective_t World::PERSP_FOV60_FAR;
+
+	std::string World::TAG = "World";
 
 	World::World(WorldConfig_t config, Perspective_t perspective)
 			: PERSPECTIVE(perspective), CONFIG(config) {
 
-		// initialize texture and shader
-		pTexture = new Texture2D("maps/"+config.name+".png");
-		pShader = new TerrainShader(config.shaderName);
+		pShader = new TerrainShader(CONFIG.shaderName);
+		pShaderObjects = new ObjectShader(CONFIG.shaderName + "_objects");
 
 	};
 
-	void World::initMesh(uint vertexCount, uint twidth, uint theight) {
+	World::~World() {
 
-		const uint count = vertexCount * vertexCount;
-		const uint verticesSize = count * 3;
-		const uint normalsSize = count * 3;
-		const uint texturesSize = count * 2;
+		if (DBG) LogE(TAG, "Destroying planet");
+		for (Terrain *terrain : vTerrains) {
+			delete terrain;
+		}
+		vTerrains.clear();
+	}
 
-		const uint compsize = verticesSize + normalsSize + texturesSize;
+	void World::add(TerrainConfig_t terrainConfig) {
+		Terrain *world = new Terrain(CONFIG, terrainConfig);
+		vTerrains.push_back(world);
+	}
 
-		const uint indicesSize = 6 * (vertexCount - 1) * (vertexCount - 1);
+	void World::add(const char *name, ObjectConfig_t objectConfig, ObjectConfig_t initialTransform) {
 
-		float *tortilla = new float[compsize]{0};
+		auto clusterItem = mCluesters.find(name);
+		ObjectCluster *cluster;
 
-		GLuint *indices = new GLuint[indicesSize]{0};
-		int vertexPointer = 0;
-
-		for (uint i = 0; i < vertexCount; i++) {
-			for (uint j = 0; j < vertexCount; j++) {
-				tortilla[vertexPointer * 3] = (float) j / ((float) vertexCount - 1) * twidth;
-				tortilla[vertexPointer * 3 + 1] = 0; // i / (float)vertexCount; // (random()%100)/100.0 - 2;
-				tortilla[vertexPointer * 3 + 2] = (float) i / ((float) vertexCount - 1) * theight;
-				tortilla[vertexPointer * 3 + 3] = 0;
-				tortilla[vertexPointer * 3 + 4] = 1;
-				tortilla[vertexPointer * 3 + 5] = 0;
-				tortilla[vertexPointer * 3 + 6] = (float) j / ((float) vertexCount - 1);
-				tortilla[vertexPointer * 3 + 7] = (float) i / ((float) vertexCount - 1);
-				vertexPointer++;
-			}
+		if (clusterItem == mCluesters.end()) {
+			// create object cluster
+			cluster = new ObjectCluster(name, CONFIG, initialTransform);
+			vObjects.push_back(cluster);
+			mCluesters[name] = cluster;
+		} else {
+			cluster = clusterItem->second;
 		}
 
-		int pointer = 0;
-		for (unsigned int gz = 0; gz < vertexCount - 1; gz++) {
-			for (uint gx = 0; gx < vertexCount - 1; gx++) {
-				uint topLeft = (gz * vertexCount) + gx;
-				uint topRight = topLeft + 1;
-				uint bottomLeft = ((gz + 1) * vertexCount) + gx;
-				uint bottomRight = bottomLeft + 1;
-				indices[pointer++] = topLeft;
-				indices[pointer++] = bottomLeft;
-				indices[pointer++] = topRight;
-				indices[pointer++] = topRight;
-				indices[pointer++] = bottomLeft;
-				indices[pointer++] = bottomRight;
-			}
-		}
-		Layer::setup(tortilla, compsize,
-					 indices, indicesSize);
-
+		cluster->add(objectConfig);
 	}
 
 	bool World::init(PixFu *engine) {
 
-	glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+		pLight = new Light(CONFIG.lightPosition, CONFIG.lightColor);
+		pCamera = new Camera();
 
-//	initMesh(10, pTexture->width(), pTexture->height());
-
-		Layer::setup((float *) Surface::VERTICES, sizeof(Surface::VERTICES),
-					 (unsigned int *) Surface::INDICES, sizeof(Surface::INDICES));
+		pCamera->setHeight(PERSPECTIVE.C_HEIGHT);
+		pCamera->setPitch(PERSPECTIVE.C_PITCH);
 
 		pShader->use();
+		pShader->bindAttributes();
 
-		pTexture->upload();
-
-		pShader->textureUnit("modelTexture", pTexture);
-
-
-		glm::mat4 tmatrix = createTransformationMatrix(
-				{CONFIG.origin.x, 0, CONFIG.origin.y},
-				0, 0, 0, 1
-		);
-
-		pShader->loadTransformationMatrix(tmatrix);
-
-		float aspectRatio = (float) pTexture->width() / (float) pTexture->height();
-
+		// load projection matrix
+		float aspectRatio = (float) engine->screenWidth() / (float) engine->screenHeight();
 		projectionMatrix = glm::perspective(PERSPECTIVE.FOV, aspectRatio, PERSPECTIVE.NEAR_PLANE, PERSPECTIVE.FAR_PLANE);
 
 		pShader->loadProjectionMatrix(projectionMatrix);
-		pLight = new Light(CONFIG.lightPosition, {1, 1, 1});
-		pCamera = new NewCamera();
-		pShader->loadShineVariables(1, 0.7);
-		pShader->loadLight(pLight);
-		pShader->loadViewMatrix(pCamera);
+		//		pShader->loadLight(pLight);
+
+		pShader->stop();
+
+		if (pShaderObjects != nullptr) {
+
+			for (ObjectCluster *object:vObjects) {
+				object->init();
+			}
+
+			pShaderObjects->use();
+			pShaderObjects->bindAttributes();
+			pShaderObjects->loadProjectionMatrix(projectionMatrix);
+			//			pShaderObjects->loadLight(pLight);
+			pShaderObjects->stop();
+		}
+
+//	pGrid->build();
+
+		if (DBG)
+			LogV(TAG, SF("Init World, FOV %f, aspectRatio %f",
+						 PERSPECTIVE.FOV, aspectRatio));
 
 		return true;
 	}
 
 	void World::tick(PixFu *engine, float fElapsedTime) {
-		pShader->use();
-//		pShader->loadLight(pLight);
-		pCamera->move(fElapsedTime);
-//		pShader->loadProjectionMatrix(projectionMatrix);
-		pShader->loadViewMatrix(pCamera);
-		draw();
-	}
 
+		glClearColor(CONFIG.backgroundColor.x, CONFIG.backgroundColor.y, CONFIG.backgroundColor.z, 1.0);
+		glEnable(GL_DEPTH_TEST);
+
+		pShader->use();
+		pShader->loadViewMatrix(pCamera);
+		pShader->loadLight(pLight); //
+
+		pCamera->move(fElapsedTime);
+
+		for (Terrain *terrain:vTerrains) {
+			terrain->render(pShader);
+		}
+
+//	pGrid->draw();
+
+		pShader->stop();
+
+
+		if (vObjects.size() == 0) return;
+
+		pShaderObjects->use();
+		pShaderObjects->loadViewMatrix(pCamera);
+		pShaderObjects->loadLight(pLight); //
+		pShaderObjects->loadProjectionMatrix(projectionMatrix); //
+
+		for (ObjectCluster *object:vObjects) {
+			object->render(pShaderObjects);
+		}
+
+		pShaderObjects->stop();
+		if (DBG) OpenGlUtils::glError("terrain tick");
+
+		glDisable(GL_DEPTH_TEST);
+
+	}
 
 };
 
+#pragma clang diagnostic pop

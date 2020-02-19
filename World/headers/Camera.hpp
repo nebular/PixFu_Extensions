@@ -1,135 +1,156 @@
 //
-//  World.hpp
+//  Camera.hpp
 //  PixEngine
 //
-//  Created by rodo on 16/02/2020.
+//  Created by rodo on 19/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
 //
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma once
 
-#include <cmath>
 #include "glm.hpp"
+#include "gtc/matrix_transform.hpp"
 #include "Keyboard.hpp"
+
+#include <vector>
+#include <cmath>
 
 namespace rgl {
 
+// Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
+	enum Camera_Movement {
+		CM_FORWARD,
+		CM_BACKWARD,
+		CM_LEFT,
+		CM_RIGHT,
+		CM_UP,
+		CM_DOWN
+	};
+
+
+// An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
 	class Camera {
 
-		static float constexpr DEFAULT_HEIGHT = 0.2;
-		static float constexpr STEP = 0.0001 * 5;
-		static float constexpr VSTEP = 1;
+		static constexpr glm::vec3 DEF_UPVECTOR = glm::vec3(0.0f, 1.0f, 0.0f);
+		static constexpr glm::vec3 DEF_FRONTVECTOR = glm::vec3(0.0f, 0.0f, -1.0f);
 
-		glm::vec3 position = {0, -DEFAULT_HEIGHT, 0};
+		static constexpr float STEP = 0.0001f * 5.0f;
+		static constexpr float VSTEP = 0.1;
 
-		float pitch = M_PI;
-		float yaw = 0.0;
-		float roll = 0;
+		// Default camera values
+		static constexpr float DEF_YAW = 0;
+		static constexpr float DEF_PITCH = 0; // M_PI;
+		static constexpr float DEF_HEIGHT = 0.2f;
+		static constexpr float DEF_SPEED = 2.5f;
+		static constexpr float DEF_MOUSE_SENS = 0.1f;
+		static constexpr float DEF_ZOOM = 45.0f;
+
+		const glm::vec3 UPVECTOR;
+
+		// Camera Attributes
+		glm::vec3 mPosition;
+		glm::vec3 mFrontVector;
+		glm::vec3 mUpVector;
+		glm::vec3 mRightVector;
+
+		// Euler Angles
+		float fYaw;
+		float fPitch;
+		float fRoll;
+
+		// Camera options
+		float mMouseSensitivity;
+		float mMouseZoom;
 
 	public:
 
-		// absolute camera movement
-		
-		void lookForward(float step=STEP);
-		void lookBackward(float step=STEP);
-		void lookRight(float step=STEP);
-		void lookLeft(float step=STEP);
-		void lookUp(float step=STEP);
-		void lookDown(float step=STEP);
+		// Constructor with vectors
+		Camera(
+				glm::vec3 position = glm::vec3(0.0f, -DEF_HEIGHT, 0.0f),
+				float yaw = DEF_YAW,
+				float pitch = DEF_PITCH,
+				glm::vec3 up = DEF_UPVECTOR
+		);
 
-		void moveForward(float step=STEP);
-		void moveBackward(float step=STEP);
+		// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
+		glm::mat4 getViewMatrix();
+
+		// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
+		void inputMovement(Camera_Movement direction, float speed = STEP, float fElapsedTime = 1);
+
+		// Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
+		void inputMouse(float xoffset, float yoffset, bool constrainPitch = true);
+
+		// Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
+		void inputMouseWheel(float yoffset);
+
+		void move(float fElapsedTime);
+
+		// getters
+		glm::vec3 &getPosition();
 
 		void setX(float xpos);
+
 		void setZ(float ypos);
+
 		void setHeight(float height);
-
-		// camera rotation
-		
-		void stepYaw(float rads);
-		void stepPitch(float rads);
-		void stepRoll(float rads);
-
-		void setPitch(float ang);
-		void setRoll(float ang);
-		void setYaw(float ang);
-
-		void move();
-
-		glm::vec3 &getPosition();
 
 		float getPitch();
 
 		float getYaw();
 
 		float getRoll();
-		
+
+		void setPitch(float ang);
+
+		void setRoll(float ang);
+
+		void setYaw(float ang);
+
+		void stepYaw(float rads);
+
+		void stepPitch(float rads);
+
+		void stepRoll(float rads);
+
+	private:
+
+		// Calculates the front vector from the Camera's (updated) Euler Angles
+		void updateCameraVectors();
 
 	};
 
-	inline void Camera::setX(float xpos) 	{ position.x = xpos;}
-	inline void Camera::setZ(float zpos) 	{ position.z = zpos;}
-	inline void Camera::setHeight(float h)	{ position.y = -h;}
-	inline void Camera::setPitch(float p) 	{ pitch = p;}
-	inline void Camera::setRoll(float r) 	{ roll = r;}
-	inline void Camera::setYaw(float y) 	{ yaw = y;}
-	inline void Camera::move() {
 
-		bool isShift = Keyboard::isHeld(Keys::SPACE);
+// main getters / setters
 
-		if (Keyboard::isHeld(Keys::ALT)) {
-			if (Keyboard::isHeld(Keys::UP)) 	stepPitch(-STEP*2);
-			if (Keyboard::isHeld(Keys::DOWN)) 	stepPitch(STEP*2);
-			if (Keyboard::isHeld(Keys::LEFT)) 	stepYaw(STEP*5);
-			if (Keyboard::isHeld(Keys::RIGHT)) 	stepYaw(-STEP*5);
-		} else if (Keyboard::isHeld(Keys::COMMAND)) {
-			// walk mode
-			if (Keyboard::isHeld(Keys::UP)) 	moveForward();
-			if (Keyboard::isHeld(Keys::DOWN)) 	moveBackward();
-			if (Keyboard::isHeld(Keys::LEFT)) 	stepYaw(STEP*5);
-			if (Keyboard::isHeld(Keys::RIGHT)) 	stepYaw(-STEP*5);
-		} else {
+	inline glm::vec3 &Camera::getPosition() { return mPosition; }
 
-			// eje x: left right
-			if (Keyboard::isHeld(Keys::LEFT))
-				lookLeft();
+	inline float Camera::getPitch() { return fPitch; }
 
-			if (Keyboard::isHeld(Keys::RIGHT))
-				lookRight();
+	inline float Camera::getYaw() { return fYaw; }
 
-			if (Keyboard::isHeld(Keys::UP)) {
-				if (isShift) lookUp();
-				else lookForward();
-			}
+	inline float Camera::getRoll() { return fRoll; }
 
-			if (Keyboard::isHeld(Keys::DOWN)) {
-				if (isShift) lookDown();
-				else lookBackward();
-			}
-		}
-	}
-	inline void Camera::moveForward(float step) {
-		
-		position.x += step * sinf(yaw);
-		position.z += step * cosf(yaw);
-		
-	}
-	inline void Camera::moveBackward(float step) {
-		moveForward(-step);
-	}
-	inline void Camera::lookForward(float step) { position.z += step; }
-	inline void Camera::lookBackward(float step) { position.z -= step; }
-	inline void Camera::lookRight(float step) { position.x += step; }
-	inline void Camera::lookLeft(float step) { position.x -= step; }
-	inline void Camera::lookUp(float step) { position.y -= step; }
-	inline void Camera::lookDown(float step) { position.y += step; }
-	inline void Camera::stepPitch(float rads) { pitch += rads; }
-	inline void Camera::stepRoll(float rads) { roll += rads; }
-	inline void Camera::stepYaw(float rads) { yaw += rads; }
-	inline glm::vec3 &Camera::getPosition() { return position; }
+	inline void Camera::setPitch(float p) { fPitch = p; }
 
-	inline float Camera::getPitch() { return pitch; }
-	inline float Camera::getYaw() { return yaw; }
-	inline float Camera::getRoll() { return roll; }
+	inline void Camera::setRoll(float r) { fRoll = r; }
+
+	inline void Camera::setYaw(float y) { fYaw = y; }
+
+	inline void Camera::stepPitch(float rads) { fPitch += rads; }
+
+	inline void Camera::stepRoll(float rads) { fRoll += rads; }
+
+	inline void Camera::stepYaw(float rads) { fYaw += rads; }
+
+	inline void Camera::setHeight(float h) { mPosition.y = h; }
+
+	inline void Camera::setX(float xpos) { mPosition.x = xpos; }
+
+	inline void Camera::setZ(float zpos) { mPosition.z = zpos; }
+
 
 	class Light {
 
@@ -157,21 +178,14 @@ namespace rgl {
 		mColour = colour;
 	}
 
-	inline glm::vec3 &Light::position() {
-		return mPosition;
-	}
+	inline glm::vec3 &Light::position() { return mPosition; }
 
-	inline void Light::setPosition(glm::vec3 position) {
-		mPosition = position;
-	}
+	inline void Light::setPosition(glm::vec3 position) { mPosition = position; }
 
-	inline glm::vec3 Light::getColour() {
-		return mColour;
-	}
+	inline glm::vec3 Light::getColour() { return mColour; }
 
-	inline void Light::setColour(glm::vec3 colour) {
-		mColour = colour;
-	}
+	inline void Light::setColour(glm::vec3 colour) { mColour = colour; }
 
 }
 
+#pragma clang diagnostic pop

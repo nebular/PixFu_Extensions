@@ -14,8 +14,9 @@
 namespace rgl {
 
 
-class NewCamera;
-class Light;
+	class Camera;
+
+	class Light;
 
 	class TerrainShader : public Shader {
 
@@ -30,7 +31,7 @@ class Light;
 
 		void loadLight(Light *light);
 
-		void loadViewMatrix(NewCamera *camera);
+		void loadViewMatrix(Camera *camera);
 
 		void loadProjectionMatrix(glm::mat4 &projection);
 	};

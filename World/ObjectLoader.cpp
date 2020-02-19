@@ -10,25 +10,27 @@
 #include "Obj_Loader.hpp"
 
 namespace rgl {
-ObjectLoader::ObjectLoader(std::string filename) {
-	pLoader = new objl::Loader();
-	if (!pLoader->LoadFile(filename))
-		throw std::runtime_error("Problem loading object "+filename);
-}
 
-float *ObjectLoader::vertices() {
-	return (float*)&pLoader->LoadedVertices[0];
-}
-unsigned *ObjectLoader::indices() {
-	return (unsigned*)&pLoader->LoadedIndices[0];
-}
+	ObjectLoader::ObjectLoader(std::string filename) {
+		pLoader = new objl::Loader();
+		if (!pLoader->LoadFile(filename))
+			throw std::runtime_error("Problem loading object " + filename);
+	}
 
-unsigned ObjectLoader::verticesCount() {
-	return (unsigned)pLoader->LoadedVertices.size();
-}
+	float *ObjectLoader::vertices() {
+		return (float *) &pLoader->LoadedVertices[0];
+	}
 
-unsigned ObjectLoader::indicesCount() {
-	return (unsigned)pLoader->LoadedIndices.size();
-}
+	unsigned *ObjectLoader::indices() {
+		return &pLoader->LoadedIndices[0];
+	}
+
+	unsigned ObjectLoader::verticesCount() {
+		return pLoader->LoadedVertices.size();
+	}
+
+	unsigned ObjectLoader::indicesCount() {
+		return  pLoader->LoadedIndices.size();
+	}
 
 }

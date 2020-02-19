@@ -7,21 +7,30 @@
 //
 
 #pragma once
+
 #include <vector>
+#include <string>
 
 namespace objl {
 	class Loader;
 }
 
 namespace rgl {
-class ObjectLoader {
 
-	objl::Loader *pLoader;
-public:
-	ObjectLoader(std::string name);
-	float *vertices();
-	unsigned verticesCount();
-	unsigned *indices();
-	unsigned indicesCount();
-};
+	class ObjectLoader {
+
+		objl::Loader *pLoader;
+
+	public:
+
+		ObjectLoader(std::string name);
+
+		float *vertices();
+
+		unsigned verticesCount();
+
+		unsigned *indices();
+
+		unsigned indicesCount();
+	};
 }

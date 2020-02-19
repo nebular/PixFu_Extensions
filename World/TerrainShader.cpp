@@ -7,60 +7,43 @@
 //
 
 #include "TerrainShader.hpp"
-#include "NewCamera.hpp"
 #include "Camera.hpp"
 #include "ext.hpp"
 
 namespace rgl {
 
-glm::mat4 createViewMatrix(NewCamera *camera) {
-	glm::mat4 matrix = glm::identity<glm::mat4>();
-	
-	matrix = glm::rotate(matrix, camera->getPitch(), {1,0,0});
-	matrix = glm::rotate(matrix, camera->getYaw(), {0,1,0});
-	matrix = glm::rotate(matrix, camera->getRoll(), {0,0,1});
+	TerrainShader::TerrainShader(std::string name) : Shader(name) {}
 
-	glm::vec3 cameraPos = camera->getPosition();
-	glm::vec3 negativeCameraPos = {-cameraPos.x,-cameraPos.y,-cameraPos.z};
-	matrix = glm::translate(matrix, negativeCameraPos);
-	
-	return matrix;
-}
+	void TerrainShader::bindAttributes() {
+		bindAttribute(0, "position");
+		bindAttribute(1, "normal");
+		bindAttribute(2, "textureCoordinates");
+	}
 
+	void TerrainShader::loadShineVariables(float damper, float reflectivity) {
+		setFloat("shineDamper", damper);
+		setFloat("reflectivity", reflectivity);
+	}
 
-TerrainShader::TerrainShader(std::string name):Shader(name) {}
+	void TerrainShader::loadTransformationMatrix(glm::mat4 &matrix) {
+		setMat4("transformationMatrix", (float *) &matrix);
+	}
 
-void TerrainShader::bindAttributes() {
-	bindAttribute(0, "position");
-	bindAttribute(1, "normal");
-	bindAttribute(2, "textureCoordinates");
-}
+	void TerrainShader::loadLight(Light *light) {
+		glm::vec3 l = light->position();
+		glm::vec3 c = light->getColour();
+		setVec3("lightPosition", l.x, l.y, l.z);
+		setVec3("lightColour", c.x, c.y, c.z);
+	}
 
-void TerrainShader::loadShineVariables(float damper,float reflectivity){
-	setFloat("shineDamper", damper);
-	setFloat("reflectivity", reflectivity);
-}
+	void TerrainShader::loadViewMatrix(Camera *camera) {
+		glm::mat4 viewMatrix = camera->getViewMatrix();
+		setMat4("viewMatrix", (float *) &viewMatrix);
+	}
 
-void TerrainShader::loadTransformationMatrix(glm::mat4 &matrix){
-	setMat4("transformationMatrix", (float *)&matrix);
-}
-
-void TerrainShader::loadLight(Light *light){
-	glm::vec3 l = light->position();
-	glm::vec3 c = light->getColour();
-	setVec3("lightPosition",  l.x, l.y, l.z);
-	setVec3("lightColour", c.x,c.y,c.z);
-}
-
-void  TerrainShader::loadViewMatrix(NewCamera *camera){
-//	glm::mat4 viewMatrix = createViewMatrix(camera);
-	glm::mat4 viewMatrix = camera->getViewMatrix();
-	setMat4("viewMatrix", (float *)&viewMatrix);
-}
-
-void  TerrainShader::loadProjectionMatrix(glm::mat4 &projection){
-	setMat4("projectionMatrix", (float *)&projection);
-}
+	void TerrainShader::loadProjectionMatrix(glm::mat4 &projection) {
+		setMat4("projectionMatrix", (float *) &projection);
+	}
 
 
 }
