@@ -105,10 +105,11 @@ namespace rgl {
 	void Camera::updateCameraVectors() {
 
 		// Calculate the new Front vector
-		glm::vec3 front;
-		front.x = cosf(fYaw) * cosf(fPitch); // ojo
-		front.y = sinf(fPitch);
-		front.z = sinf(fYaw) * cosf(fPitch); // ojo
+		glm::vec3 front = {
+			cosf(fYaw) * cosf(fPitch),
+			sinf(fPitch),
+			sinf(fYaw) * cosf(fPitch)
+		};
 
 		// Re-calculate the Front, Right and Up vector
 		mFrontVector = glm::normalize(front);
@@ -119,18 +120,16 @@ namespace rgl {
 	void Camera::move(float fElapsedTime) {
 
 		if (Keyboard::isHeld(Keys::ALT)) {
+			if (Keyboard::isHeld(Keys::UP)) 	stepPitch(-STEP * 2);
+			if (Keyboard::isHeld(Keys::DOWN)) 	stepPitch(STEP * 2);
+			if (Keyboard::isHeld(Keys::LEFT)) 	stepYaw(STEP * 5);
+			if (Keyboard::isHeld(Keys::RIGHT)) 	stepYaw(-STEP * 5);
 
-			if (Keyboard::isHeld(Keys::UP)) stepPitch(-STEP * 2);
-			if (Keyboard::isHeld(Keys::DOWN)) stepPitch(STEP * 2);
-			if (Keyboard::isHeld(Keys::LEFT)) stepYaw(STEP * 5);
-			if (Keyboard::isHeld(Keys::RIGHT)) stepYaw(-STEP * 5);
 			updateCameraVectors();
 
 		} else if (Keyboard::isHeld(Keys::COMMAND)) {
-
 			if (Keyboard::isHeld(Keys::UP)) mPosition.y -= VSTEP * fElapsedTime;
 			if (Keyboard::isHeld(Keys::DOWN)) mPosition.y += VSTEP * fElapsedTime;
-
 		} else {
 			// walk mode
 			if (Keyboard::isHeld(Keys::UP)) inputMovement(CM_FORWARD, VSTEP, fElapsedTime);
