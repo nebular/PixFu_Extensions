@@ -101,7 +101,7 @@ public:
 	// each direction, plus a mode to set the arrwos meaning: move camera, adjust position,
 	// adjust pitch/yaw
 
-	void inputKey(CameraKeyControlMode_t mode, bool left, bool right, bool up, bool down, float fElapsedTime);
+	void inputKey(CameraKeyControlMode_t mode, bool up, bool down, bool left, bool right, float fElapsedTime);
 	
 	void stepYaw(float deltaRads);
 	

@@ -32,6 +32,7 @@ namespace rgl {
 
 		pTexture = new Texture2D("maps/" + config.name + ".png");
 		pLoader = new ObjLoader("maps/" + config.name + ".obj");
+		pHeightMap = Drawable::fromFile("maps/" + config.name + ".heights.png");
 
 		if (DBG) LogV(TAG, SF("Created terrain %s", config.name.c_str()));
 

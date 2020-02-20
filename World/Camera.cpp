@@ -84,7 +84,7 @@ namespace rgl {
 	// each direction, plus a mode to set the arrwos meaning: move camera, adjust position,
 	// adjust pitch/yaw
 
-	void Camera::inputKey(CameraKeyControlMode_t mode, bool left, bool right, bool up, bool down, float fElapsedTime) {
+	void Camera::inputKey(CameraKeyControlMode_t mode, bool up, bool down, bool left, bool right, float fElapsedTime) {
 
 		switch (mode) {
 			case MOVE:

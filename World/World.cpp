@@ -118,7 +118,7 @@ namespace rgl {
 			Keyboard::isHeld(Keys::ALT) ? rgl::ADJUST_ANGLES :
 			Keyboard::isHeld(Keys::COMMAND) ? rgl::ADJUST_POSITION : rgl::MOVE;
 		
-		pCamera->inputKeys(
+		pCamera->inputKey(
 					  mode,
 					  Keyboard::isHeld(Keys::UP),
 					  Keyboard::isHeld(Keys::DOWN),
