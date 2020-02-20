@@ -105,6 +105,17 @@ namespace rgl {
 		return true;
 	}
 
+	float World::getHeight(glm::vec2 posWorld) {
+
+		if (vTerrains.size()==1)
+			return vTerrains[0]->getHeight(posWorld);
+
+		for (Terrain *terrain:vTerrains) {
+			if (terrain->contains(posWorld))
+				return terrain->getHeight(posWorld);
+		}
+	}
+
 	void World::tick(PixFu *engine, float fElapsedTime) {
 
 		glClearColor(CONFIG.backgroundColor.x, CONFIG.backgroundColor.y, CONFIG.backgroundColor.z, 1.0);
