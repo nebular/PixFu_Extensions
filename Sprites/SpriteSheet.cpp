@@ -191,17 +191,27 @@ namespace rgl {
 		init();
 		lStartTime = nowms();
 
-		bool success = pTexture->upload();
-
-		if (success) {
+		if (pTexture->upload()) {
 			// the spritesheet (all sprites in one image)
 			// aqui no va pero deberia ir
-			//		pShader->setInt("sampler", 1); // RLP
-			//		pShader->setVec4("iSpriteSheet", pTexture->width(), pTexture->height(), NUMX, NUMY);
-			//		pShader->setMat4("projection", &mProjection[0][0]);
+			pShader->use();
+
+			// projecyion matrix
+			pShader->setMat4("projection", (float *) &mProjection);
+			// spritesheet metrics
+
+			pShader->setVec4("iSpriteSheet", pTexture->width(), pTexture->height(), getNumX(),
+							 getNumY());
+			// chroma key
+			pShader->setVec4("iColorKey", (float) oChromaKey.r / 255, (float) oChromaKey.g / 255,
+							 (float) oChromaKey.b / 255, (float) oChromaKey.a / 255);
+
+
+			pShader->stop();
+
 			return true;
 		} else {
-			std::cerr << "Spritesheet not found" << std::endl;
+			if (DBG) LogE(TAG, SF("Spritesheet not found or error uploading texture"));
 			return false;
 		}
 
@@ -215,27 +225,15 @@ namespace rgl {
 
 		// all these things are common, ideally should be sent in onUserCreate
 		// but I can't get it working !
-
-
 		// projecyion matrix
-		pShader->setMat4("projection", (float *) &mProjection);
+		// pShader->setMat4("projection", (float *) &mProjection);
 		// spritesheet metrics
-		pShader->setVec4("iSpriteSheet", pTexture->width(), pTexture->height(), getNumX(),
-						 getNumY());
+		// pShader->setVec4("iSpriteSheet", pTexture->width(), pTexture->height(), getNumX(), getNumY());
 		// chroma key
-		pShader->setVec4("iColorKey", (float) oChromaKey.r / 255, (float) oChromaKey.g / 255,
-						 (float) oChromaKey.b / 255, (float) oChromaKey.a / 255);
+		// pShader->setVec4("iColorKey", (float) oChromaKey.r / 255, (float) oChromaKey.g / 255, (float) oChromaKey.b / 255, (float) oChromaKey.a / 255);
 
 		// send time
 		pShader->setFloat("iTime", ((float) (ms - lStartTime)) / 1000);
-
-		// ground sampler
-		if (SpriteSheets::pGroundTexture != nullptr) {
-			Texture2D *g = SpriteSheets::pGroundTexture;
-			pShader->setVec2("iMapSize", g->width(), g->height());
-			pShader->setInt("ground", SpriteSheets::pGroundTexture->unit());
-			SpriteSheets::pGroundTexture->bind();
-		}
 
 		// texture sampler
 		pShader->setInt("sampler", pTexture->unit());
