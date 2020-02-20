@@ -114,7 +114,17 @@ namespace rgl {
 		pShader->loadViewMatrix(pCamera);
 		pShader->loadLight(pLight); //
 
-		pCamera->move(fElapsedTime);
+		CameraKeyControlMode_t mode =
+			Keyboard::isHeld(Keys::ALT) ? rgl::ADJUST_ANGLES :
+			Keyboard::isHeld(Keys::COMMAND) ? rgl::ADJUST_POSITION : rgl::MOVE;
+		
+		pCamera->inputKeys(
+					  mode,
+					  Keyboard::isHeld(Keys::UP),
+					  Keyboard::isHeld(Keys::DOWN),
+					  Keyboard::isHeld(Keys::LEFT),
+					  Keyboard::isHeld(Keys::RIGHT),
+					  fElapsedTime);
 
 		for (Terrain *terrain:vTerrains) {
 			terrain->render(pShader);

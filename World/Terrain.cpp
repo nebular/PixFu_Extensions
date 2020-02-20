@@ -7,7 +7,7 @@
 //
 
 #include "World.hpp"
-#include "Layer.hpp"
+#include "LayerVao.hpp"
 
 
 namespace rgl {
@@ -31,7 +31,7 @@ namespace rgl {
 			: CONFIG(config), PLANET(planetConfig) {
 
 		pTexture = new Texture2D("maps/" + config.name + ".png");
-		pLoader = new ObjectLoader("maps/" + config.name + ".obj");
+		pLoader = new ObjLoader("maps/" + config.name + ".obj");
 
 		if (DBG) LogV(TAG, SF("Created terrain %s", config.name.c_str()));
 
@@ -63,7 +63,7 @@ namespace rgl {
 
 	void Terrain::init() {
 
-		Layer::setup(
+		LayerVao::setup(
 				pLoader->vertices(), pLoader->verticesCount(),
 				pLoader->indices(), pLoader->indicesCount());
 
