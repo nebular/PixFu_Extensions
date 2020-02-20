@@ -19,11 +19,11 @@ cmake_minimum_required(VERSION 3.4.1)
 #                    detection.
 #   [24, infinite)   ES2 & ES3 & Vulkan
 
-include_directories(../pixFu/src/thirdparty/glm)
 include_directories(../pixFu/src)
 include_directories(../pixFu/src/core/headers)
 include_directories(../pixFu/src/items/headers)
 include_directories(../pixFu/src/input/headers)
+include_directories(../pixFu/src/thirdparty/glm)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
@@ -33,12 +33,15 @@ include_directories(World/headers)
 
 add_library(pixFu_ext SHARED
         World/Camera.cpp
+        World/ObjLoader.cpp
         World/ObjectCluster.cpp
-        World/ObjectLoader.cpp
         World/ObjectShader.cpp
         World/Terrain.cpp
         World/TerrainShader.cpp
         World/World.cpp
+
+        Sprites/SpriteSheets.cpp
+        Sprites/SpriteSheet.cpp
         )
 
 

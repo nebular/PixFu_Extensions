@@ -7,7 +7,12 @@
 //
 
 #include "Camera.hpp"
-#include "matrix_transform.hpp"
+#include "gtc/matrix_transform.hpp"
+#include "gtx/fast_square_root.hpp"
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "err_typecheck_invalid_operands"
+// glm warnngs in idea
 
 namespace rgl {
 
@@ -19,11 +24,11 @@ namespace rgl {
 	constexpr float Camera::DEF_YAW;
 	constexpr float Camera::DEF_PITCH;
 	constexpr float Camera::DEF_HEIGHT;
-	constexpr float Camera::DEF_SPEED;
 	constexpr float Camera::DEF_MOUSE_SENS;
 	constexpr float Camera::DEF_ZOOM;
 
 	// Constructor with vectors
+
 	Camera::Camera(
 			glm::vec3 position,
 			float yaw,
@@ -42,12 +47,16 @@ namespace rgl {
 	}
 
 	// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
+
 	glm::mat4 Camera::getViewMatrix() {
 		return glm::lookAt(mPosition, mPosition + mFrontVector, mUpVector);
 	}
 
-	// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-	void Camera::inputMovement(Camera_Movement direction, float speed, float fElapsedTime) {
+	// Processes input received from any keyboard-like input system. Accepts input parameter
+	// in the form of camera defined ENUM (to abstract it from windowing systems)
+
+	void Camera::inputMovement(CameraMovement_t direction, float speed, float fElapsedTime) {
+
 		GLfloat velocity = speed * fElapsedTime;
 		switch (direction) {
 			case CM_FORWARD:
@@ -71,7 +80,9 @@ namespace rgl {
 		}
 	}
 
-	// Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
+	// Processes input received from a mouse input system. Expects the offset value in both
+	// the x and y direction.
+
 	void Camera::inputMouse(float xoffset, float yoffset, bool constrainPitch) {
 
 		xoffset *= mMouseSensitivity;
@@ -92,7 +103,9 @@ namespace rgl {
 		updateCameraVectors();
 	}
 
-// Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
+	// Processes input received from a mouse scroll-wheel event. Only requires input on the
+	// vertical wheel-axis
+
 	void Camera::inputMouseWheel(float yoffset) {
 		if (mMouseZoom >= 1.0f && mMouseZoom <= 45.0f)
 			mMouseZoom -= yoffset;
@@ -106,30 +119,36 @@ namespace rgl {
 
 		// Calculate the new Front vector
 		glm::vec3 front = {
-			cosf(fYaw) * cosf(fPitch),
-			sinf(fPitch),
-			sinf(fYaw) * cosf(fPitch)
+				cosf(fYaw) * cosf(fPitch),
+				sinf(fPitch),
+				sinf(fYaw) * cosf(fPitch)
 		};
 
 		// Re-calculate the Front, Right and Up vector
-		mFrontVector = glm::normalize(front);
-		mRightVector = glm::normalize(glm::cross(mFrontVector, UPVECTOR));  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-		mUpVector = glm::normalize(glm::cross(mRightVector, mFrontVector));
+		// Normalize the vectors, because their length gets closer to 0 the more you look up or down
+		// which results in slower movement.
+
+		// todo this fancy fastnormalize is supposedly much less accurate but is it enough?
+		mFrontVector = glm::fastNormalize(front);
+		mRightVector = glm::fastNormalize(glm::cross(mFrontVector, UPVECTOR));
+		mUpVector = glm::fastNormalize(glm::cross(mRightVector, mFrontVector));
 	}
 
 	void Camera::move(float fElapsedTime) {
 
 		if (Keyboard::isHeld(Keys::ALT)) {
-			if (Keyboard::isHeld(Keys::UP)) 	stepPitch(-STEP * 2);
-			if (Keyboard::isHeld(Keys::DOWN)) 	stepPitch(STEP * 2);
-			if (Keyboard::isHeld(Keys::LEFT)) 	stepYaw(STEP * 5);
-			if (Keyboard::isHeld(Keys::RIGHT)) 	stepYaw(-STEP * 5);
 
+			if (Keyboard::isHeld(Keys::UP)) stepPitch(-STEP * 2);
+			if (Keyboard::isHeld(Keys::DOWN)) stepPitch(STEP * 2);
+			if (Keyboard::isHeld(Keys::LEFT)) stepYaw(STEP * 5);
+			if (Keyboard::isHeld(Keys::RIGHT)) stepYaw(-STEP * 5);
 			updateCameraVectors();
 
 		} else if (Keyboard::isHeld(Keys::COMMAND)) {
+
 			if (Keyboard::isHeld(Keys::UP)) mPosition.y -= VSTEP * fElapsedTime;
 			if (Keyboard::isHeld(Keys::DOWN)) mPosition.y += VSTEP * fElapsedTime;
+
 		} else {
 			// walk mode
 			if (Keyboard::isHeld(Keys::UP)) inputMovement(CM_FORWARD, VSTEP, fElapsedTime);
@@ -140,3 +159,5 @@ namespace rgl {
 	};
 
 }
+
+#pragma clang diagnostic pop
