@@ -17,8 +17,6 @@ namespace rgl {
 	float Ball::stfBaseScale = 1.0;
 	float Ball::stfHeightScale = 1.0;
 
-	constexpr std::string Ball::TAG;
-
 	Ball::Ball(int uid, float radi, float mass, int worldWidth, int worldHeight) {
 		TAG = "BALL" + std::to_string(uid);
 

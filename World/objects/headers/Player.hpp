@@ -9,12 +9,12 @@
 
 namespace rgl {
 
-	typedef constexpr struct sWorldMeta {
+	typedef  struct sWorldMeta {
 		std::string name;
 		int xMas, yMax;
 	} WorldMeta_t;
 
-	typedef constexpr struct sPlayerFeatures {
+	typedef  struct sPlayerFeatures {
 		sObjectInfo info;
 	} PlayerFeatures_t;
 
