@@ -12,15 +12,14 @@
 //  Copyright © 2020 rodo. All rights reserved.
 //
 
-#include "lib/pixFu_Extensions/Sprites/headers/SpriteSheet.hpp"
+#include "SpriteSheet.hpp"
 #include "OpenGL.h"
 #include "glm.hpp"
 #include "ext.hpp"
 #include "Texture2D.hpp"
 #include "PixFu.hpp"
 #include "Utils.hpp"
-#include "lib/pixFu_Extensions/Sprites/headers/SpriteSheets.hpp"
-
+#include "SpriteSheets.hpp"
 
 namespace rgl {
 

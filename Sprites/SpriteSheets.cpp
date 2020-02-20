@@ -6,14 +6,13 @@
 //  Copyright © 2020 rodo. All rights reserved.
 //
 
-#include "lib/pixFu_Extensions/Sprites/headers/SpriteSheets.hpp"
+#include "SpriteSheets.hpp"
 #include "Utils.hpp"
 
 namespace rgl {
 
 	int SpriteSheets::instanceCounter = 0;
 	std::string SpriteSheets::TAG = "SpriteSheets";
-	Texture2D *SpriteSheets::pGroundTexture = nullptr;
 
 	std::map<int, SpriteSheet *> SpriteSheets::mSpriteSheet;
 

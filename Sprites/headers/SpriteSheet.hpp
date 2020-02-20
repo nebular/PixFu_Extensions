@@ -180,7 +180,4 @@ namespace rgl {
 	inline float SpriteSheet::getSpriteRadius() { return sInfo.spriteRadiusConstant * SPRSIZE.x / 2; }
 };
 
-
-#endif /* SpriteRenderer_hpp */
-
 #pragma clang diagnostic pop
