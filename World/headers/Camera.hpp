@@ -9,6 +9,8 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma once
+#ifndef NABO
+#define NABO
 
 #include "glm.hpp"
 #include "matrix.hpp"
@@ -189,3 +191,4 @@ namespace rgl {
 }
 
 #pragma clang diagnostic pop
+#endif

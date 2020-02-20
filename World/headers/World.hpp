@@ -6,7 +6,7 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma once
 
-#include "Camera.hpp"
+#include "./Camera.hpp"
 #include "LayerVao.hpp"
 #include "TerrainShader.hpp"
 #include "ObjectShader.hpp"
@@ -150,7 +150,8 @@ public:
 	static constexpr Perspective_t PERSP_FOV90_MID = {90, 0.005, 100.0, 0.25};
 	static constexpr Perspective_t PERSP_FOV90_FAR = {90, 0.5, 1000.0,  0.25};
 	static constexpr Perspective_t PERSP_FOV60_LOW = {90, 0.005, 0.1,   0.25};
-	static constexpr Perspective_t PERSP_FOV60_MID = {70, 0.1, 1000.0,  0.25};
+//	static constexpr Perspective_t PERSP_FOV60_MID = {70, 0.1, 1000.0,  0.25};
+	static constexpr Perspective_t PERSP_FOV60_MID = {70, 0.01, 100.0,  0.25};
 	static constexpr Perspective_t PERSP_FOV60_FAR = {60, 0.5, 1000.0,  0.25};
 	
 	World(WorldConfig_t config, Perspective_t perspective = PERSP_FOV90_LOW);
