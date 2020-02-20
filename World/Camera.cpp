@@ -80,6 +80,35 @@ namespace rgl {
 		}
 	}
 
+	// Processes input received from a keyboard-like input system. Expects the pressed status of
+	// each direction, plus a mode to set the arrwos meaning: move camera, adjust position,
+	// adjust pitch/yaw
+
+	void Camera::inputKey(CameraKeyControlMode_t mode, bool left, bool right, bool up, bool down, float fElapsedTime) {
+
+		switch (mode) {
+			case MOVE:
+				if (up) inputMovement(CM_FORWARD, VSTEP, fElapsedTime);
+				if (down) inputMovement(CM_BACKWARD, VSTEP, fElapsedTime);
+				if (left) stepYaw(-STEP * 5);
+				if (right) stepYaw(STEP * 5);
+				break;
+			case ADJUST_ANGLES:
+				if (left) stepYaw(-STEP * 5);
+				if (right) stepYaw(STEP * 5);
+				if (up) stepPitch(-STEP * 2);
+				if (down) stepPitch(STEP * 2);
+				break;
+			case ADJUST_POSITION:
+				if (up) mPosition.y -= VSTEP * fElapsedTime;
+				if (down) mPosition.y += VSTEP * fElapsedTime;
+				if (left) inputMovement(CM_LEFT, VSTEP, fElapsedTime);
+				if (right) inputMovement(CM_RIGHT, VSTEP, fElapsedTime);
+				break;
+		}
+
+	};
+
 	// Processes input received from a mouse input system. Expects the offset value in both
 	// the x and y direction.
 
@@ -134,29 +163,8 @@ namespace rgl {
 		mUpVector = glm::fastNormalize(glm::cross(mRightVector, mFrontVector));
 	}
 
-	void Camera::move(float fElapsedTime) {
 
-		if (Keyboard::isHeld(Keys::ALT)) {
 
-			if (Keyboard::isHeld(Keys::UP)) stepPitch(-STEP * 2);
-			if (Keyboard::isHeld(Keys::DOWN)) stepPitch(STEP * 2);
-			if (Keyboard::isHeld(Keys::LEFT)) stepYaw(STEP * 5);
-			if (Keyboard::isHeld(Keys::RIGHT)) stepYaw(-STEP * 5);
-			updateCameraVectors();
-
-		} else if (Keyboard::isHeld(Keys::COMMAND)) {
-
-			if (Keyboard::isHeld(Keys::UP)) mPosition.y -= VSTEP * fElapsedTime;
-			if (Keyboard::isHeld(Keys::DOWN)) mPosition.y += VSTEP * fElapsedTime;
-
-		} else {
-			// walk mode
-			if (Keyboard::isHeld(Keys::UP)) inputMovement(CM_FORWARD, VSTEP, fElapsedTime);
-			if (Keyboard::isHeld(Keys::DOWN)) inputMovement(CM_BACKWARD, VSTEP, fElapsedTime);
-			if (Keyboard::isHeld(Keys::LEFT)) inputMovement(CM_LEFT, VSTEP, fElapsedTime);
-			if (Keyboard::isHeld(Keys::RIGHT)) inputMovement(CM_RIGHT, VSTEP, fElapsedTime);
-		}
-	};
 
 }
 
