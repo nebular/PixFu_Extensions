@@ -192,6 +192,7 @@ namespace rgl {
 		lStartTime = nowms();
 
 		if (pTexture->upload()) {
+
 			// the spritesheet (all sprites in one image)
 			// aqui no va pero deberia ir
 			pShader->use();

@@ -28,10 +28,10 @@ typedef struct sPerspective {
 } Perspective_t;
 
 typedef struct sWorldConfig {
-	const std::string shaderName = "world";
-	const glm::vec3 backgroundColor = {0.8,0.8,1};
-	const glm::vec3 lightPosition = {20000, 20000, 2000};
-	const glm::vec3 lightColor = {0.8, 0.8, 0.93};
+	const std::string 	shaderName = "world";
+	const glm::vec3 	backgroundColor = {0.8,0.8,1};
+	const glm::vec3 	lightPosition = {20000, 20000, 2000};
+	const glm::vec3 	lightColor = {0.8, 0.8, 0.93};
 } WorldConfig_t;
 
 typedef struct sObjectConfig {

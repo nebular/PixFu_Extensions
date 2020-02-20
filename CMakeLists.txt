@@ -27,19 +27,22 @@ include_directories(../pixFu/src/thirdparty/glm)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-include_directories(World/headers)
+include_directories(World/core/headers)
+include_directories(World/objects/headers)
 
 ## PIXENGINE
 
 add_library(pixFu_ext SHARED
-        World/Camera.cpp
-        World/ObjLoader.cpp
-        World/ObjectCluster.cpp
-        World/ObjectShader.cpp
-        World/Terrain.cpp
-        World/TerrainShader.cpp
-        World/World.cpp
-
+        World/core/Camera.cpp
+        World/core/ObjLoader.cpp
+        World/core/ObjectCluster.cpp
+        World/core/ObjectShader.cpp
+        World/core/Terrain.cpp
+        World/core/TerrainShader.cpp
+        World/core/World.cpp
+        World/objects/Ball.cpp
+        World/objects/Player.cpp
+        World/objects/Earth.cpp
         Sprites/SpriteSheets.cpp
         Sprites/SpriteSheet.cpp
         )
