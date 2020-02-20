@@ -9,7 +9,8 @@
 #include "TerrainShader.hpp"
 #include "ObjectShader.hpp"
 #include "Camera.hpp"
-#include "ObjectLoader.hpp"
+#include "LayerVao.hpp"
+#include "ObjLoader.hpp"
 
 #include <vector>
 #include <map>
@@ -47,14 +48,14 @@ typedef struct sTerrainConfig {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class ObjectCluster : public Layer {
+class ObjectCluster : public LayerVao {
 	
 	static std::string TAG;
 	
 	Texture2D *pTexture;
 	
 	bool bInited = false;
-	ObjectLoader *pLoader;
+	ObjLoader *pLoader;
 
 	std::vector<ObjectConfig_t> vInstances;
 	glm::mat4 mPlacer;
@@ -77,7 +78,7 @@ public:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class Terrain : public Layer {
+class Terrain : public LayerVao {
 	
 	static std::string TAG;
 	
@@ -95,7 +96,7 @@ class Terrain : public Layer {
 	};
 
 	Texture2D *pTexture;
-	ObjectLoader *pLoader;
+	ObjLoader *pLoader;
 
 	bool bInited = false;
 	

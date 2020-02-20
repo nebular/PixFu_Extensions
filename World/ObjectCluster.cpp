@@ -9,9 +9,11 @@
 #include "World.hpp"
 
 #include "glm.hpp"
-#include "Layer.hpp"
+#include "LayerVao.hpp"
 #include "ObjLoader.hpp"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace rgl {
 
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale);
@@ -19,7 +21,9 @@ namespace rgl {
 	std::string ObjectCluster::TAG = "ObjectCluster";
 
 	ObjectCluster::ObjectCluster(std::string name, WorldConfig_t planetConfig, ObjectConfig_t normalizeConfiguration)
-			: NAME(std::move(name)), PLANET(std::move(planetConfig)), PLACER(std::move(normalizeConfiguration)) {
+			: NAME(std::move(name)),
+			  PLANET(std::move(planetConfig)),
+			  PLACER(std::move(normalizeConfiguration)) {
 
 		if (DBG) LogV(TAG, "New Object Cluster " + NAME);
 
@@ -31,7 +35,6 @@ namespace rgl {
 				PLACER.position, //CONFIG.position,
 				PLACER.rotation.x, PLACER.rotation.y, PLACER.rotation.z, PLACER.scale
 		);
-
 
 		if (DBG) LogV(TAG, SF("Created ObjectCluster %s", NAME.c_str()));
 
@@ -75,7 +78,7 @@ namespace rgl {
 
 	void ObjectCluster::init() {
 
-		Layer::setup(
+		LayerVao::setup(
 				pLoader->vertices(), pLoader->verticesCount(),
 				pLoader->indices(), pLoader->indicesCount());
 
@@ -87,3 +90,5 @@ namespace rgl {
 
 };
 
+
+#pragma clang diagnostic pop

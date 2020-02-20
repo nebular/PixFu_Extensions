@@ -7,7 +7,7 @@
 //
 
 #include "World.hpp"
-#include "Layer.hpp"
+#include "LayerVao.hpp"
 
 
 namespace rgl {
@@ -63,7 +63,7 @@ namespace rgl {
 
 	void Terrain::init() {
 
-		Layer::setup(
+		LayerVao::setup(
 				pLoader->vertices(), pLoader->verticesCount(),
 				pLoader->indices(), pLoader->indicesCount());
 

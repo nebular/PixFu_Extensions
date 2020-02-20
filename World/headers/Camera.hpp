@@ -1,6 +1,11 @@
 //
 //  Camera.hpp
-//  PixEngine
+//  PixFu World Extensoin
+//
+//  An abstract camera class that processes input and calculates the corresponding Euler Angles,
+//	Vectors and Matrices for use in OpenGL
+//
+//  I learnt everything from https://learnopengl.com/Getting-started/Camera
 //
 //  Created by rodo on 19/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
@@ -19,18 +24,22 @@
 
 namespace rgl {
 
-// Defines several possible options for camera movement. Used as abstraction to stay away from window-system specific input methods
-	enum Camera_Movement {
+	// Defines several possible options for camera movement. Used as abstraction to stay away from
+	// window-system specific input methods
+
+	typedef enum CameraMovement {
 		CM_FORWARD,
 		CM_BACKWARD,
 		CM_LEFT,
 		CM_RIGHT,
 		CM_UP,
 		CM_DOWN
-	};
+	} CameraMovement_t;
 
 
-// An abstract camera class that processes input and calculates the corresponding Euler Angles, Vectors and Matrices for use in OpenGL
+	// An abstract camera class that processes input and calculates the corresponding Euler Angles,
+	// Vectors and Matrices for use in OpenGL
+
 	class Camera {
 
 		static constexpr glm::vec3 DEF_UPVECTOR = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -43,7 +52,6 @@ namespace rgl {
 		static constexpr float DEF_YAW = 0;
 		static constexpr float DEF_PITCH = 0; // M_PI;
 		static constexpr float DEF_HEIGHT = 0.2f;
-		static constexpr float DEF_SPEED = 2.5f;
 		static constexpr float DEF_MOUSE_SENS = 0.1f;
 		static constexpr float DEF_ZOOM = 45.0f;
 
@@ -77,18 +85,20 @@ namespace rgl {
 		// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 		glm::mat4 getViewMatrix();
 
-		// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-		void inputMovement(Camera_Movement direction, float speed = STEP, float fElapsedTime = 1);
-
 		// Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
 		void inputMouse(float xoffset, float yoffset, bool constrainPitch = true);
 
 		// Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
 		void inputMouseWheel(float yoffset);
 
+		// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
+		void inputMovement(CameraMovement_t direction, float speed = STEP, float fElapsedTime = 1);
+
+		// a convenient debug function to move the camera using cursor eys
 		void move(float fElapsedTime);
 
-		// getters
+		// getters & getters
+
 		glm::vec3 &getPosition();
 
 		void setX(float xpos);
@@ -103,17 +113,17 @@ namespace rgl {
 
 		float getRoll();
 
-		void setPitch(float ang);
+		void setPitch(float rads);
 
-		void setRoll(float ang);
+		void setRoll(float rads);
 
-		void setYaw(float ang);
+		void setYaw(float rads);
 
-		void stepYaw(float rads);
+		void stepYaw(float deltaRads);
 
-		void stepPitch(float rads);
+		void stepPitch(float deltaRads);
 
-		void stepRoll(float rads);
+		void stepRoll(float deltaRads);
 
 	private:
 
@@ -133,17 +143,17 @@ namespace rgl {
 
 	inline float Camera::getRoll() { return fRoll; }
 
-	inline void Camera::setPitch(float p) { fPitch = p; }
+	inline void Camera::setPitch(float rads) { fPitch = rads; }
 
-	inline void Camera::setRoll(float r) { fRoll = r; }
+	inline void Camera::setRoll(float rads) { fRoll = rads; }
 
-	inline void Camera::setYaw(float y) { fYaw = y; }
+	inline void Camera::setYaw(float rads) { fYaw = rads; }
 
-	inline void Camera::stepPitch(float rads) { fPitch += rads; }
+	inline void Camera::stepPitch(float deltaRads) { fPitch += deltaRads; }
 
-	inline void Camera::stepRoll(float rads) { fRoll += rads; }
+	inline void Camera::stepRoll(float deltaRads) { fRoll += deltaRads; }
 
-	inline void Camera::stepYaw(float rads) { fYaw += rads; }
+	inline void Camera::stepYaw(float deltaRads) { fYaw += deltaRads; }
 
 	inline void Camera::setHeight(float h) { mPosition.y = h; }
 
