@@ -7,7 +7,7 @@
 #pragma once
 
 #include "Camera.hpp"
-#include "Layer.hpp"
+#include "LayerVao.hpp"
 #include "TerrainShader.hpp"
 #include "ObjectShader.hpp"
 #include "ObjLoader.hpp"
@@ -48,7 +48,7 @@ typedef struct sTerrainConfig {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class ObjectCluster : public Layer {
+class ObjectCluster : public LayerVao {
 	
 	static std::string TAG;
 	
@@ -78,7 +78,7 @@ public:
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-class Terrain : public Layer {
+class Terrain : public LayerVao {
 	
 	static std::string TAG;
 	
