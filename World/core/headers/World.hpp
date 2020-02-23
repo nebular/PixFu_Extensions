@@ -37,19 +37,39 @@ namespace rgl {
 	typedef struct sObjectConfig {
 		glm::vec3 position = {0, 0, 0};
 		glm::vec3 rotation = {0, 0, 0};
-		float scale = 0.25;
-		const float mass = 1.0;
+		float radius = 1.0;
+		float mass = 1.0;
 	} ObjectConfig_t;
 
 	typedef struct sTerrainConfig {
 		const std::string name;
 		const glm::vec2 origin = {0, 0};
+		const float scaleHeight = 0.1;
 	} TerrainConfig_t;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
+	class Object {
+		
+		
+	};
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+	class World;
+	class WorldObject;
+	
+	typedef struct sVisible {
+		WorldObject *object;
+		glm::mat4 transformMatrix;
+	} Visible_t;
+
+
+
 	class ObjectCluster : public LayerVao {
 
+		friend class World;
+		
 		static std::string TAG;
 
 		Texture2D *pTexture;
@@ -57,7 +77,9 @@ namespace rgl {
 		bool bInited = false;
 		ObjLoader *pLoader;
 
-		std::vector<ObjectConfig_t> vInstances;
+		std::vector<Visible_t> vVisibles;
+		std::vector<Texture2D*> vTextures;
+		std::vector<WorldObject *> vInstances;
 		glm::mat4 mPlacer;
 
 	public:
@@ -65,12 +87,13 @@ namespace rgl {
 		const WorldConfig_t PLANET;
 		const ObjectConfig_t PLACER;
 		const std::string NAME;
+		World *WORLD;
 
-		ObjectCluster(std::string name, WorldConfig_t planetConfig, ObjectConfig_t normalizeConfiguration = ObjectConfig_t());
+		ObjectCluster(World *planet, std::string name, ObjectConfig_t normalizeConfiguration = ObjectConfig_t());
 
 		virtual ~ObjectCluster();
 
-		void add(ObjectConfig_t &config);
+		void add(WorldObject *object, bool setHeight = true);
 
 		void init();
 
@@ -100,6 +123,8 @@ namespace rgl {
 		Drawable *pHeightMap;
 		ObjLoader *pLoader;
 
+		float scaletest = 0.1;
+		
 		bool bInited = false;
 
 		void initMesh(uint vertexCount, uint twidth, uint theight);
@@ -119,14 +144,25 @@ namespace rgl {
 
 		void render(TerrainShader *shader);
 
-		float getHeight(glm::vec2 posNorm);
+		float getHeight(glm::vec3 &posWorld);
 
-		bool contains(glm::vec2 posWorld);
-	}
+		bool contains(glm::vec3 &posWorld);
+	};
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-		class World : public PixFuExtension {
+	class WorldObject {
+	public:
+		const std::string NAME;
+		inline WorldObject(std::string name):NAME(name){}
+		inline virtual ~WorldObject() = default;
+		virtual glm::vec3 &pos() = 0;
+		virtual glm::vec3 rot() = 0;
+		virtual float radius() = 0;
+	};
+
+	class Arena;
+	class World : public PixFuExtension {
 
 			static std::string TAG;
 
@@ -137,21 +173,31 @@ namespace rgl {
 
 			Light *pLight;
 			Camera *pCamera;
-
+		
 			std::vector<Terrain *> vTerrains;
 			std::vector<ObjectCluster *> vObjects;
 			std::map<std::string, ObjectCluster *> mCluesters;
 
-			bool init(PixFu *engine);
+		protected:
 
-			void tick(PixFu *engine, float fElapsedTime);
+			virtual bool init(PixFu *engine);
+			virtual void tick(PixFu *engine, float fElapsedTime);
+			void add(TerrainConfig_t terrainConfig);
+			void add(WorldObject *object, ObjectConfig_t initialTransform = ObjectConfig_t());
+	
+			template<typename Func>
+			void iterateObjects(Func callback) {
+				for (ObjectCluster *cluster:vObjects) {
+					std::for_each(cluster->vInstances.begin(), cluster->vInstances.end(), callback);
+				}
+			}
+
 
 
 		public:
 
 			const Perspective_t PERSPECTIVE;
 			const WorldConfig_t CONFIG;
-
 
 			static constexpr Perspective_t PERSP_FOV90_LOW = {90, 0.005, 0.1, 0.25};
 			static constexpr Perspective_t PERSP_FOV90_MID = {90, 0.005, 100.0, 0.25};
@@ -163,13 +209,8 @@ namespace rgl {
 			World(WorldConfig_t config, Perspective_t perspective = PERSP_FOV90_LOW);
 
 			virtual ~World();
-
-
-			void add(TerrainConfig_t terrainConfig);
-
-			void add(const char *name, ObjectConfig_t objectConfig, ObjectConfig_t initialTransform = ObjectConfig_t());
-
-			float getHeight(glm::vec2 posNorm);
+		
+			float getHeight(glm::vec3 &posWorld);
 
 			Camera *camera();
 

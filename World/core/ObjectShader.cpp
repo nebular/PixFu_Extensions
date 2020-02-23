@@ -7,6 +7,7 @@
 //
 
 #include "ObjectShader.hpp"
+#include "Frustum.hpp"
 
 namespace rgl {
 
@@ -37,10 +38,13 @@ namespace rgl {
 	void ObjectShader::loadViewMatrix(Camera *camera) {
 		glm::mat4 viewMatrix = camera->getViewMatrix();
 		setMat4("viewMatrix", (float *) &viewMatrix);
+		mFrustum = new Frustum(mProjectionMatrix * viewMatrix);
 	}
 
 	void ObjectShader::loadProjectionMatrix(glm::mat4 &projection) {
 		setMat4("projectionMatrix", (float *) &projection);
+		mProjectionMatrix = projection;
+		mFrustum = nullptr;
 	}
 
 

@@ -25,12 +25,14 @@ namespace rgl {
 
 		ObjLoader(std::string name);
 
-		float *vertices();
+		float *vertices(int mesh = 0);
 
-		unsigned verticesCount();
+		unsigned verticesCount(int mesh = 0);
 
-		unsigned *indices();
+		unsigned *indices(int mesh = 0);
 
-		unsigned indicesCount();
+		unsigned indicesCount(int mesh = 0);
+		
+		unsigned meshCount();
 	};
 }

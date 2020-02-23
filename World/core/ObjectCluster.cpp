@@ -11,82 +11,155 @@
 #include "glm.hpp"
 #include "LayerVao.hpp"
 #include "ObjLoader.hpp"
+#include "Frustum.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace rgl {
 
-	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale);
+glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale);
 
-	std::string ObjectCluster::TAG = "ObjectCluster";
+std::string ObjectCluster::TAG = "ObjectCluster";
 
-	ObjectCluster::ObjectCluster(std::string name, WorldConfig_t planetConfig, ObjectConfig_t normalizeConfiguration)
-			: NAME(std::move(name)),
-			  PLANET(std::move(planetConfig)),
-			  PLACER(std::move(normalizeConfiguration)) {
+ObjectCluster::ObjectCluster(World *planet, std::string name, ObjectConfig_t normalizeConfiguration)
+: NAME(std::move(name)),
+PLANET(planet->CONFIG),
+WORLD(planet),
+PLACER(std::move(normalizeConfiguration)) {
+	
+	if (DBG) LogV(TAG, "New Object Cluster " + NAME);
 
-		if (DBG) LogV(TAG, "New Object Cluster " + NAME);
+	pLoader = new ObjLoader("objects/" + NAME + "/"+NAME+".obj");
 
-		pTexture = new Texture2D("objects/" + NAME + ".png");
-
-		pLoader = new ObjLoader("objects/" + NAME + ".obj");
-
-		mPlacer = createTransformationMatrix(
-				PLACER.position, //CONFIG.position,
-				PLACER.rotation.x, PLACER.rotation.y, PLACER.rotation.z, PLACER.scale
-		);
-
-		if (DBG) LogV(TAG, SF("Created ObjectCluster %s", NAME.c_str()));
-
-	};
-
-	void ObjectCluster::add(ObjectConfig_t &config) {
-		vInstances.push_back(config);
-		if (DBG) LogV(TAG, SF("Add to cluster %s, total %d", NAME.c_str(), vInstances.size()));
+	for (int i = 0; i<pLoader->meshCount(); i++) {
+		if (DBG) LogV(TAG, SF("- texture %s, name %d", NAME.c_str(), i));
+		vTextures.push_back(new Texture2D("objects/" + NAME + "/"+NAME+"-"+std::to_string(i)+".png"));
 	}
+	
+	mPlacer = createTransformationMatrix(
+										 PLACER.position, //CONFIG.position,
+										 PLACER.rotation.x, PLACER.rotation.y, PLACER.rotation.z, PLACER.radius
+										 );
+	
+	if (DBG) LogV(TAG, SF("Created ObjectCluster %s", NAME.c_str()));
+	
+};
 
-	ObjectCluster::~ObjectCluster() {
-		delete pTexture;
-		pTexture = nullptr;
-		if (DBG) LogV(TAG, SF("Destroyed ObjectCluster %s", NAME.c_str()));
-	}
+void ObjectCluster::add(WorldObject *object, bool setHeight) {
+	glm::vec3 &pos = object->pos();
+	if (setHeight) pos.y  = WORLD->getHeight(pos);
+	vInstances.push_back(object);
+	if (DBG) LogV(TAG, SF("Add to cluster %s, total %d", NAME.c_str(), vInstances.size()));
+}
 
-	void ObjectCluster::render(ObjectShader *shader) {
+ObjectCluster::~ObjectCluster() {
+	delete pTexture;
+	pTexture = nullptr;
+	if (DBG) LogV(TAG, SF("Destroyed ObjectCluster %s", NAME.c_str()));
+}
 
-		if (!bInited) init();
+void ObjectCluster::render(ObjectShader *shader) {
+	
+	if (!bInited) init();
+	
+	int frustumHits = 0;	
+	
+	bool oneMesh= vMeshes.size() == 1;
 
-		shader->textureUnit("modelTexture", pTexture);
+	if (oneMesh) {
+		shader->textureUnit("modelTexture", vTextures[0]);
 		shader->loadShineVariables(1, 0.7);
-		pTexture->bind();
+		vTextures[0]->bind();
+		bind(0);
+	}
 
-		bind();
+	for (WorldObject *object : vInstances) {
+		
+		// cache object properties
+		glm::vec3 rot = object->rot();
+		glm::vec3 pos = object->pos();
+		float radius = object->radius();
 
-		for (ObjectConfig_t &config : vInstances) {
+		// our shader has a Frustum class initialized already initialized with the
+		// projection & view matrix, so we can now trivially check if an object will be
+		// visible.
+
+		Frustum *f = shader->frustum();
+		if (f == nullptr || f->IsBoxVisible(pos - radius, pos + radius)) {
+
+			// the object is visible, so transform its model to the desired rotation,
+			// position and radius
 
 			glm::mat4 tmatrix = createTransformationMatrix(
-					config.position, //CONFIG.position,
-					config.rotation.x, config.rotation.y, config.rotation.z, config.scale
-			);
-			glm::mat4 result = tmatrix * mPlacer;
+														   pos, //CONFIG.position,
+														   rot.x, rot.y, rot.z,
+														   radius
+														   );
 
-			shader->loadTransformationMatrix(result);
+			if (oneMesh) {
+			
+				// only one mesh
+				glm::mat4 result = tmatrix * mPlacer;
+				// load the transformation matrix
+				shader->loadTransformationMatrix(result);
 
-			draw(false);
+				// VAO thunder
+				draw(0, false);
+				
+			} else {
+				
+				Visible_t v = { object, tmatrix * mPlacer };
+				// save the transform matrix as we will use it several times to draw he individual meshes
+				vVisibles.push_back(v);
+			}
+		} else {
+			// we saved drawing this object
+			frustumHits++;
+		}
+	}
+
+	if (oneMesh) {
+		unbind();
+		return;
+	}
+	
+	// multi-mesh
+	// draw the meshes
+	
+	for (int i=0; i<vMeshes.size(); i++) {
+	
+		shader->textureUnit("modelTexture", vTextures[i]);
+		shader->loadShineVariables(1, 0.7);
+		vTextures[i]->bind();
+		bind(i);
+
+		for (Visible_t visible: vVisibles) {
+
+			// load the transformation matrix
+			shader->loadTransformationMatrix(visible.transformMatrix);
+
+			// VAO thunder
+			draw(i, false);
+
 		}
 		unbind();
 	}
+	vVisibles.clear();
+//	if (DBG) LogV(TAG, SF("Frustum Hits %d", frustumHits));
+}
 
-	void ObjectCluster::init() {
-
-		LayerVao::setup(
-				pLoader->vertices(), pLoader->verticesCount(),
-				pLoader->indices(), pLoader->indicesCount());
-
-		pTexture->upload();
-
-		bInited = true;
-
+void ObjectCluster::init() {
+	
+	for (int i = 0; i< pLoader->meshCount(); i++) {
+		LayerVao::add(
+					pLoader->vertices(i), pLoader->verticesCount(i),
+					pLoader->indices(i), pLoader->indicesCount(i));
+	
+		vTextures[i]->upload();
 	}
+	bInited = true;
+	
+}
 
 };
 

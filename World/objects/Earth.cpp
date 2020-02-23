@@ -17,20 +17,12 @@
 // 0.25 energy loss on crash
 #define KCRASH_EFFICIENCY 0.75
 
+#include "World.hpp"
+
 namespace rgl {
 
 // muti-vector iteration
 
-	template<typename Func, typename T>
-	void foreach(Func callback, std::vector <T> &v) {
-		std::for_each(v.begin(), v.end(), callback);
-	}
-
-	template<typename Func, typename T, typename... Args>
-	void foreach(Func callback, std::vector <T> &v, Args... args) {
-		std::for_each(v.begin(), v.end(), callback);
-		return foreach(callback, args...);
-	}
 
 // get current microseconds epoch
 	long pnow();
@@ -151,7 +143,7 @@ namespace rgl {
 
 	}
 
-	long Circuit::processCollisions(PixFu  *engine, float fElapsedTime) {
+	long Circuit::processCollisions(World *engine, float fElapsedTime) {
 
 		long crono = pnow();
 
@@ -166,7 +158,7 @@ namespace rgl {
 
 			// Set all balls time to maximum for this epoch
 
-			foreach([fSimElapsedTime](Ball *ball) {
+			world->iterate([fSimElapsedTime](Ball *ball) {
 				ball->fSimTimeRemaining = fSimElapsedTime;
 			}, vObjects);
 

@@ -9,6 +9,7 @@
 #include "World.hpp"
 #include "PixFu.hpp"
 #include "OpenGL.h"
+#include "Arena.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
@@ -46,21 +47,23 @@ namespace rgl {
 		vTerrains.push_back(world);
 	}
 
-	void World::add(const char *name, ObjectConfig_t objectConfig, ObjectConfig_t initialTransform) {
-
-		auto clusterItem = mCluesters.find(name);
+//	void World::add(const char *name, ObjectConfig_t objectConfig, ObjectConfig_t initialTransform) {
+	
+	void World::add(WorldObject *object, ObjectConfig_t initialTransform) {
+		
+		auto clusterItem = mCluesters.find(object->NAME);
 		ObjectCluster *cluster;
 
 		if (clusterItem == mCluesters.end()) {
 			// create object cluster
-			cluster = new ObjectCluster(name, CONFIG, initialTransform);
+			cluster = new ObjectCluster(this, object->NAME, initialTransform);
 			vObjects.push_back(cluster);
-			mCluesters[name] = cluster;
+			mCluesters[object->NAME] = cluster;
 		} else {
 			cluster = clusterItem->second;
 		}
 
-		cluster->add(objectConfig);
+		cluster->add(object, false);
 	}
 
 	bool World::init(PixFu *engine) {
@@ -101,11 +104,11 @@ namespace rgl {
 		if (DBG)
 			LogV(TAG, SF("Init World, FOV %f, aspectRatio %f",
 						 PERSPECTIVE.FOV, aspectRatio));
-
+		
 		return true;
 	}
 
-	float World::getHeight(glm::vec2 posWorld) {
+	float World::getHeight(glm::vec3 &posWorld) {
 
 		if (vTerrains.size()==1)
 			return vTerrains[0]->getHeight(posWorld);
@@ -114,9 +117,13 @@ namespace rgl {
 			if (terrain->contains(posWorld))
 				return terrain->getHeight(posWorld);
 		}
+		
+		return 0;
 	}
 
 	void World::tick(PixFu *engine, float fElapsedTime) {
+		
+		pCamera->update(fElapsedTime);
 
 		glClearColor(CONFIG.backgroundColor.x, CONFIG.backgroundColor.y, CONFIG.backgroundColor.z, 1.0);
 		glEnable(GL_DEPTH_TEST);
@@ -124,18 +131,6 @@ namespace rgl {
 		pShader->use();
 		pShader->loadViewMatrix(pCamera);
 		pShader->loadLight(pLight); //
-
-		CameraKeyControlMode_t mode =
-			Keyboard::isHeld(Keys::ALT) ? rgl::ADJUST_ANGLES :
-			Keyboard::isHeld(Keys::COMMAND) ? rgl::ADJUST_POSITION : rgl::MOVE;
-		
-		pCamera->inputKey(
-					  mode,
-					  Keyboard::isHeld(Keys::UP),
-					  Keyboard::isHeld(Keys::DOWN),
-					  Keyboard::isHeld(Keys::LEFT),
-					  Keyboard::isHeld(Keys::RIGHT),
-					  fElapsedTime);
 
 		for (Terrain *terrain:vTerrains) {
 			terrain->render(pShader);
@@ -151,12 +146,13 @@ namespace rgl {
 		pShaderObjects->use();
 		pShaderObjects->loadViewMatrix(pCamera);
 		pShaderObjects->loadLight(pLight); //
-		pShaderObjects->loadProjectionMatrix(projectionMatrix); //
+//		pShaderObjects->loadProjectionMatrix(projectionMatrix); //
 
 		for (ObjectCluster *object:vObjects) {
 			object->render(pShaderObjects);
 		}
 
+		
 		pShaderObjects->stop();
 		if (DBG) OpenGlUtils::glError("terrain tick");
 

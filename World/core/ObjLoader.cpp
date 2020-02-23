@@ -17,20 +17,26 @@ namespace rgl {
 			throw std::runtime_error("Problem loading object " + filename);
 	}
 
-	float *ObjLoader::vertices() {
-		return (float *) &pLoader->LoadedVertices[0];
+	unsigned ObjLoader::meshCount() {
+		return (unsigned)pLoader->LoadedMeshes.size();
+	}
+	
+	float *ObjLoader::vertices(int mesh) {
+		return (float *) &pLoader->LoadedMeshes[mesh].Vertices[0];
 	}
 
-	unsigned *ObjLoader::indices() {
-		return &pLoader->LoadedIndices[0];
+	unsigned *ObjLoader::indices(int mesh) {
+		return (unsigned *)&pLoader->LoadedMeshes[mesh].Indices[0];
 	}
 
-	unsigned ObjLoader::verticesCount() {
-		return (unsigned)pLoader->LoadedVertices.size();
+	unsigned ObjLoader::verticesCount(int mesh) {
+		return pLoader->LoadedMeshes[mesh].Vertices.size();
+//		return (unsigned)pLoader->LoadedVertices.size();
 	}
 
-	unsigned ObjLoader::indicesCount() {
-		return  (unsigned)pLoader->LoadedIndices.size();
+	unsigned ObjLoader::indicesCount(int mesh) {
+		return pLoader->LoadedMeshes[mesh].Indices.size();
+//		return  (unsigned)pLoader->LoadedIndices.size();
 	}
 
 }

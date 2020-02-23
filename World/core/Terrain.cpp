@@ -8,6 +8,7 @@
 
 #include "World.hpp"
 #include "LayerVao.hpp"
+#include "Config.hpp"
 
 
 #pragma clang diagnostic push
@@ -32,9 +33,10 @@ namespace rgl {
 	Terrain::Terrain(WorldConfig_t planetConfig, TerrainConfig_t config)
 			: CONFIG(config), PLANET(planetConfig) {
 
-		pLoader = new ObjLoader("maps/" + config.name + ".obj");
-		pTexture = new Texture2D("maps/" + config.name + ".png");
-		pHeightMap = Drawable::fromFile("maps/" + config.name + ".heights.png");
+				std::string path =std::string(PATH_LEVELS)+"/" + config.name;
+		pLoader = new ObjLoader(path + "/"+config.name+".obj");
+		pTexture = new Texture2D(path+"/" + config.name + ".png");
+		pHeightMap = Drawable::fromFile(path+"/" + config.name + ".heights.png");
 		mSize = {pTexture->width()/1000.0f, pTexture->height()/1000.0f};
 
 		if (DBG) LogV(TAG, SF("Created terrain %s", config.name.c_str()));
@@ -50,6 +52,19 @@ namespace rgl {
 
 	void Terrain::render(TerrainShader *shader) {
 
+		
+		if (Keyboard::isHeld(Keys::A)) {
+			scaletest+=0.001;
+			LogE(TAG, SF("scale %f",scaletest));
+		}
+		
+		if (Keyboard::isHeld(Keys::Z)) {
+			scaletest-=0.001;
+			LogE(TAG, SF("scale %f",scaletest));
+		}
+		
+
+		
 		if (!bInited) init();
 		shader->textureUnit("modelTexture", pTexture);
 		shader->loadShineVariables(1, 0.7);
@@ -67,7 +82,7 @@ namespace rgl {
 
 	void Terrain::init() {
 
-		LayerVao::setup(
+		LayerVao::add(
 				pLoader->vertices(), pLoader->verticesCount(),
 				pLoader->indices(), pLoader->indicesCount());
 
@@ -77,28 +92,19 @@ namespace rgl {
 
 	}
 
-	float Terrain::getHeight(glm::vec2 posWorld) {
-
-
+	float Terrain::getHeight(glm::vec3 &posWorld3d) {
 		if (pHeightMap != nullptr) {
-
-			posWorld -= CONFIG.origin;
-
-			// posWorld is texturepx / 1000 (by definition)
-			posWorld *= 1000;
-			posWorld = { fmod(posWorld.x, mSize.x) * 1000, fmod(posWorld.y, mSize.y) * 1000};
-
-			return pHeightMap->getPixel(static_cast<int>(posWorld.x), static_cast<int>(posWorld.y)).r / (float) 255;
+			glm::vec2 posWorld = { 1000 * (posWorld3d.x - CONFIG.origin.x), 1000*(posWorld3d.z - CONFIG.origin.y)};
+			return CONFIG.scaleHeight * pHeightMap->getPixel(posWorld.x, posWorld.y).r / (float) 255;
 		}
 		return 0;
-
 	}
 
-	bool Terrain::contains(glm::vec2 posWorld) {
+	bool Terrain::contains(glm::vec3 &posWorld) {
 		return posWorld.x >= CONFIG.origin.x
-			   && posWorld.y >= CONFIG.origin.y
+			   && posWorld.z >= CONFIG.origin.y
 			   && posWorld.x <= CONFIG.origin.x + mSize.x
-			   && posWorld.y <= CONFIG.origin.y + mSize.y;
+			   && posWorld.z <= CONFIG.origin.y + mSize.y;
 	}
 
 };

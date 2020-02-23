@@ -27,23 +27,26 @@
 
 #include "glm.hpp"
 #include "Drawable.hpp"
+#include "World.hpp"
 
 namespace rgl {
+
 
 	typedef enum eOverlaps {
 		OVERLAPS, OVERLAPS_OUTER, NO_OVERLAPS
 	} Overlaps_t;
 
-	class Ball {
+	class Ball : public WorldObject {
 
 		std::string TAG;
+		static int instanceCounter;
 
 	protected:
 
 		// Circuit has the tight collision detection loops
 		// so it is cool to have private access to vars, mostly to position.
 
-		friend class Circuit;
+		friend class Arena;
 
 		friend class Orbit;
 
@@ -59,20 +62,21 @@ namespace rgl {
 		// TODO: research which values to use as jdavidx example uses hundreds of balls but
 		// TODO: we are an order of magnitude below, at the most around 30 objects and very spaced
 
-		static constexpr int SIMULATIONUPDATES = 2; // 4
+		static constexpr int SIMULATIONUPDATES = 1; // 4
 
 		// Multiple collision trees require more steps to resolve. Normally we would
 		// continue simulation until the object has no simulation time left for this
 		// epoch, however this is risky as the system may never find stability, so we
 		// can clamp it here
 
-		static constexpr int MAXSIMULATIONSTEPS = 10; // 15
+		static constexpr int MAXSIMULATIONSTEPS = 3; // 15
 
-		int nId = 0;                        // Ball ID
+		const int nId;                        // Ball ID
+	
 		int iWorldWidth, iWorldHeight;        // world size
 
 		glm::vec3 position = {0, 0, 0};        // current ball position in world coordinates
-
+		glm::vec3 rotation = { 0,0,0 };
 		float fRadius, fMass;
 		float fAngle = 0;                    // ball angle (heading)
 
@@ -94,17 +98,23 @@ namespace rgl {
 		float fAccelerationZ = 0.0;            // upwards acceleration
 		float fAngleTerrain = 0.0;            // player horizontal angle / terrain
 		float fPenalty = 1.0;                // penalty in speed percent imposed by terrain irregularities
-		bool bFlying = false;                // whether the ball is currently "flying"
 
+		float fMetronome = 0;
+
+		bool  bFlying = false;                // whether the ball is currently "flying"
+		
 		bool bReverse = false;                // reverse gear flag
 		bool bForward = false;                // forward gear flag
 		bool bDisabled = false;                // disable the player (will not be updated & behave as ghost) (debug)
+
+		bool bStatic = false;				// whether this is a static object that wont collide with another static object
 
 		// Internal Simulation vars
 		glm::vec3 origPos;
 		float fSimTimeRemaining;
 
-		Ball(int uid, float radi, float mass, int worldWidth, int worldHeight);
+		Ball(std::string className, glm::vec3 position, float radi, float mass, bool isStatic = false);
+		Ball(glm::vec3 position, float radi, float mass, float angle);
 
 	public:
 
@@ -114,15 +124,17 @@ namespace rgl {
 
 		float id();
 
-		glm::vec3 pos();            // ball world position
-		float xWorld();            // get x world coord
-		float yWorld();            // get y world coord
-		float xNorm();            // get x normalized coord
-		float yNorm();            // get y normalized coord
+		glm::vec3 &pos() override;            	// ball world position
+		glm::vec3 rot() override;            	// ball world position
+		float radius() override;            	// ball radius
+
+		float xWorld();            				// get x world coord
+		float yWorld();            				// get y world coord
+		float xNorm();            				// get x normalized coord
+		float yNorm();            				// get y normalized coord
 		float angle();            // ball angle (heading)
 		float speed();            // ball speed
 		float mass();            // ball mass
-		float radius();            // ball radius
 		float outerRadius();    // outer radius (collision prediction)
 
 		glm::vec3 speedVector();    // speed vector
@@ -140,6 +152,8 @@ namespace rgl {
 		bool isPointInBall(glm::vec3 point);
 
 		bool intersects(Ball *b2, bool outerRadius);
+		
+		bool isStatic();
 
 		// whether a ball overlaps this one
 		Overlaps_t overlaps(Ball *b2);
@@ -165,13 +179,13 @@ namespace rgl {
 		void commitSimulation();
 
 		// process ball iteration
-		Ball *process(float fTime, Drawable *heightmap = nullptr);
+		Ball *process(World *world, float fTime);
 
 		// heights
-		float getTerrainHeight(Drawable *heightmap, glm::vec2 pos);
+		float getTerrainHeight(glm::vec3 pos, World *world);
 
 		// process Height effects (height calcs separated from 2D calcs)
-		Ball *processHeights(float fTime, Drawable *heightmap);
+		Ball *processHeights(World *world, float fTime);
 
 	};
 
@@ -179,7 +193,8 @@ namespace rgl {
 
 	inline float Ball::id() { return nId; }
 
-	inline glm::vec3 Ball::pos() { return position; }                        // ball world position
+	inline glm::vec3 &Ball::pos() { return position; }                        // ball world position
+	inline glm::vec3 Ball::rot() { return { 0,fAngle,0};}                        // ball world position
 	inline float Ball::xWorld() { return position.x; }                        // get x world coord
 	inline float Ball::yWorld() { return position.z; }                        // get y world coord
 	inline float Ball::xNorm() { return position.x / iWorldWidth; }        // get x normalized coord
@@ -190,8 +205,10 @@ namespace rgl {
 	inline float Ball::radius() { return fRadius * fRadiusMultiplier; }        // ball final radius
 	inline float Ball::outerRadius() { return fOuterRadius * fRadiusMultiplier; }
 
+	inline bool Ball::isStatic() { return bStatic;}
+
 	// todo
-	inline glm::vec3 Ball::speedVector() { return {fSpeed * cos(fAngle), position.z, fSpeed * sin(fAngle)}; }
+	inline glm::vec3 Ball::speedVector() { return {fSpeed * cos(fAngle), 0, fSpeed * sin(fAngle)}; }
 
 	inline float Ball::height() { return position.z; }                            // ball height
 	inline bool Ball::flying() { return bFlying; }                            // whether ball is flying
@@ -213,12 +230,6 @@ namespace rgl {
 	inline void Ball::setHeightScale(float scale) {
 		stfHeightScale = scale;
 	}
-
-	inline float Ball::getTerrainHeight(Drawable *heightmap, glm::vec2 pos) {
-		return heightmap->sample(fmod(pos.x / heightmap->width, 1.0f),
-								 fmod(pos.y / heightmap->height, 1.0f)).r / (float) 255;
-	}
-
 
 	class LinearDelayer {
 

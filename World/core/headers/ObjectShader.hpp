@@ -14,8 +14,14 @@
 
 namespace rgl {
 
+	class Frustum;
 	class ObjectShader : public Shader {
 
+		// keey this for frustum calculations
+		glm::mat4 mProjectionMatrix;
+		// we wil evaluate each draw() to check if inside the frustum
+		Frustum *mFrustum;
+		
 	public:
 
 		ObjectShader(std::string name);
@@ -31,5 +37,7 @@ namespace rgl {
 		void loadViewMatrix(Camera *camera);
 
 		void loadProjectionMatrix(glm::mat4 &projection);
+		
+		Frustum *frustum() { return mFrustum; }
 	};
 }

@@ -43,13 +43,15 @@ typedef enum sCameraKeyControlMode {
 // An abstract camera class that processes input and calculates the corresponding Euler Angles,
 // Vectors and Matrices for use in OpenGL
 
+class World;
+class Player;
 class Camera {
 	
 	static constexpr glm::vec3 DEF_UPVECTOR = glm::vec3(0.0f, 1.0f, 0.0f);
 	static constexpr glm::vec3 DEF_FRONTVECTOR = glm::vec3(0.0f, 0.0f, -1.0f);
 	
-	static constexpr float STEP = 0.0001f * 5.0f;
-	static constexpr float VSTEP = 0.1;
+	static constexpr float STEP = 0.0001f * 15.0f;
+	static constexpr float VSTEP = 0.3;
 	
 	// Default camera values
 	static constexpr float DEF_YAW = 0;
@@ -71,9 +73,17 @@ class Camera {
 	float fPitch;
 	float fRoll;
 	
+	// target mode
+	
+	float distance;
+	float targetDistance;
+	float targetAngle;
+	
 	// Camera options
 	float mMouseSensitivity;
 	float mMouseZoom;
+	
+	int mCameraMode;
 	
 public:
 	
@@ -84,6 +94,8 @@ public:
 		   float pitch = DEF_PITCH,
 		   glm::vec3 up = DEF_UPVECTOR
 		   );
+	
+	void update(float fElapsedTime);
 	
 	// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 	glm::mat4 getViewMatrix();
@@ -101,7 +113,7 @@ public:
 	// each direction, plus a mode to set the arrwos meaning: move camera, adjust position,
 	// adjust pitch/yaw
 
-	void inputKey(CameraKeyControlMode_t mode, bool up, bool down, bool left, bool right, float fElapsedTime);
+	void inputKey(World *world, CameraKeyControlMode_t mode, bool up, bool down, bool left, bool right, float fElapsedTime);
 	
 	void stepYaw(float deltaRads);
 	
@@ -131,6 +143,7 @@ public:
 	
 	void setYaw(float rads);
 	
+	void follow(Player *player);
 	
 private:
 	
