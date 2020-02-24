@@ -23,7 +23,6 @@ constexpr glm::vec3 Camera::DEF_UPVECTOR;
 constexpr glm::vec3 Camera::DEF_FRONTVECTOR;
 
 constexpr float Camera::STEP;
-constexpr float Camera::VSTEP;
 constexpr float Camera::DEF_YAW;
 constexpr float Camera::DEF_PITCH;
 constexpr float Camera::DEF_HEIGHT;
@@ -42,7 +41,7 @@ mFrontVector(DEF_FRONTVECTOR),
 mMouseSensitivity(DEF_MOUSE_SENS),
 mMouseZoom(DEF_ZOOM),
 UPVECTOR(up) {
-	mPosition = position;
+	mPosition = interPosition = position;
 	fYaw = yaw;
 	fRoll = 0;
 	fPitch = pitch;
@@ -83,57 +82,40 @@ void Camera::inputMovement(CameraMovement_t direction, float speed, float fElaps
 	}
 }
 
-
-void Camera::follow(Player *player) {
-		
-	bool smooth = false;
-	
-	float d = distance+0.03*player->getSpeedPercent();
-	if (smooth) targetAngle = player->angle();
-	else fYaw = targetAngle = player->angle();
-
-	glm::vec3 ppos = player->pos();
-//	LogV("cam", SF("player x %f z %f dist %f", ppos.x, ppos.z, distance));
-
-	//	setX(ppos.x  + d * cosf(fYaw ));
-	//	setZ(ppos.z  + d * sinf(fYaw ));
-	//	inputMovement(CM_BACKWARD, VSTEP, 0.005);
-	setX(ppos.x);
-	setZ(ppos.z);
-	setHeight(ppos.y + 0.005);
-	inputMovement(CM_BACKWARD, VSTEP, 0.15);
-	inputMovement(CM_UP, VSTEP, 0.05);
-	setPitch(0.05);
-//	setHeight(ppos.y + distance);
+void Camera::follow(Player *player, float fElapsedTime) {
+	targetPosition = player->pos();
+	targetAngle = -M_PI/2 - player->angle();
 }
 
+void Camera::setTargetMode(bool enable) { targetMode = enable; }
+
 void Camera::update(float fElapsedTime) {
-	
-	return;
-	
-	float kd = 1.0/10000 * fElapsedTime * 60, kx = kd/2;
-	
-	if (targetDistance<distance) distance-=kd;
-	if (targetDistance>distance) distance+=kd;
-	if (fabs(targetDistance-distance) < kx) {
-		distance = targetDistance;
-	}
-	
-	//	lastDistance = distance;
-	
-	float finalAngle = targetAngle - fYaw;
-//	if (finalAngle < -M_PI) finalAngle += 2*M_PI;
-//	if (finalAngle > M_PI) finalAngle -= 2*M_PI;
-	
-	if (fabs(finalAngle) < 0.1) {
-		fYaw = targetAngle;
-	} else {
-		float k = M_PI / 180 * fElapsedTime * 120;
-		if (targetAngle < fYaw) fYaw -= k; // 2;
-		if (targetAngle > fYaw) fYaw += k; // 2;
-		if (fabs(targetAngle - fYaw) < 0.005) fYaw = targetAngle;
+
+	if (targetMode) {
+		float lerp  = 15; // 0.1;
+
+		if (smooth) {
+			fYaw += (targetAngle - fYaw) * lerp * fElapsedTime;
+		} else {
+			setYaw(targetAngle);
+		}
+
+		setPitch(fPlayerPitch);
 		updateCameraVectors();
+		
+		if (smooth) {
+			interPosition.x += (targetPosition.x - interPosition.x) * lerp * fElapsedTime;
+			interPosition.y += (targetPosition.y - interPosition.y) * lerp * fElapsedTime;
+			interPosition.z += (targetPosition.z - interPosition.z) * lerp * fElapsedTime;
+			mPosition = interPosition;
+		} else {
+			mPosition = targetPosition;
+		}
+
+		inputMovement(CM_BACKWARD, fPlayerDistanceFar, 0.08);
+		inputMovement(CM_UP, fPlayerDistanceUp, 0.08);
 	}
+
 }
 
 // Processes input received from a keyboard-like input system. Expects the pressed status of
@@ -146,7 +128,7 @@ void Camera::inputKey(World *world, CameraKeyControlMode_t mode, bool up, bool d
 	
 	switch (mode) {
 		case MOVE:
-			mPosition.y = world->getHeight(mPosition) + 0.01;
+//			mPosition.y = world->getHeight(mPosition) + 0.01;
 			if (up) inputMovement(CM_FORWARD, VSTEP, fElapsedTime);
 			if (down) inputMovement(CM_BACKWARD, VSTEP, fElapsedTime);
 			if (left) stepYaw(-STEP * 5);
@@ -164,6 +146,21 @@ void Camera::inputKey(World *world, CameraKeyControlMode_t mode, bool up, bool d
 			if (left) inputMovement(CM_LEFT, VSTEP, fElapsedTime);
 			if (right) inputMovement(CM_RIGHT, VSTEP, fElapsedTime);
 			break;
+		case ADJUST_PLAYER_ANGLES:
+			if (up) fPlayerPitch -= VSTEP/100;
+			if (down) fPlayerPitch += VSTEP/100;
+//			LogV("cam", SF("fPlayerPitch %f", fPlayerPitch));
+			break;
+		case ADJUST_PLAYER_POSITION:
+			if (left) fPlayerDistanceFar -= VSTEP/100;
+			if (right) fPlayerDistanceFar += VSTEP/100;
+			if (up) fPlayerDistanceUp -= VSTEP/1000;
+			if (down) fPlayerDistanceUp += VSTEP/1000;
+			if (fPlayerDistanceUp<0) fPlayerDistanceUp = 0;
+//			LogV("cam", SF("fPlayerDistanceFar %f fPlayerDistanceUp  %f", fPlayerDistanceFar, fPlayerDistanceUp));
+
+			break;
+
 	}
 	
 };
@@ -204,7 +201,6 @@ void Camera::inputMouseWheel(float yoffset) {
 }
 
 void Camera::updateCameraVectors() {
-	
 	// Calculate the new Front vector
 	glm::vec3 front = {
 		cosf(fYaw) * cosf(fPitch),
@@ -220,6 +216,7 @@ void Camera::updateCameraVectors() {
 	mFrontVector = glm::fastNormalize(front);
 	mRightVector = glm::fastNormalize(glm::cross(mFrontVector, UPVECTOR));
 	mUpVector = glm::fastNormalize(glm::cross(mRightVector, mFrontVector));
+	
 }
 
 

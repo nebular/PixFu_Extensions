@@ -9,11 +9,12 @@
 #include "Ball.hpp"
 #include "Utils.hpp"
 #include "World.hpp"
+#include "Config.hpp"
 #include <cmath>
 
 namespace rgl {
 
-	constexpr int KSPEED = 1;
+	constexpr int KSPEED = 1000;
 	// global scale for ball radius
 	float Ball::stfBaseScale = 1.0;
 	float Ball::stfHeightScale = 1.0;
@@ -101,7 +102,8 @@ namespace rgl {
 						  (position.z - b2->position.z) * (position.z - b2->position.z));
 
 		bool overlaps2d = vect <= (radius() + b2->radius()) * (radius() + b2->radius());
-
+		if (overlaps2d) return OVERLAPS;
+	
 		// does not overlap. Lets check outer radius for collision prediction
 		return fOuterRadius > 0
 			   && vect <= (outerRadius() + b2->radius()) * (outerRadius() + b2->radius())
@@ -110,6 +112,7 @@ namespace rgl {
 
 // subclasses MUST call this
 	void Ball::onCollision(Ball *other, float fElapsedTime, float newSpeed, float newAngle) {
+		LogV(TAG, SF("I crashed, former speed %f, new speed %f, angle %f,  new angle %f", fSpeed, newSpeed, fAngle, newAngle));
 		fAngle = newAngle;
 		fSpeed = newSpeed;
 	}
@@ -126,8 +129,10 @@ namespace rgl {
 		if (fSpeed != 0 || true) {
 
 			float fIntendedSpeed = fSpeed;
+			
 			float fActualDistance = sqrtf(
 					(position.x - origPos.x) * (position.x - origPos.x) + (position.z - origPos.z) * (position.z - origPos.z));
+			
 			float fActualTime = fActualDistance / fIntendedSpeed;
 
 			// After static resolution, there may be some time still left for this epoch,
@@ -153,13 +158,19 @@ namespace rgl {
 
 		fMetronome += fTime;
 		
-		// fAcceleration += fOverAcceleration *  fTime;
 		bool wasPositive = fSpeed >= 0;
-		fSpeed += fAcceleration * fTime - TERRAINFRICTION * fTime * (1 - fmin(fSpeed / 0.2, 1));
-//	if (fSpeed < 0 && !bReverse) fSpeed = 0;
-		if (fSpeed < 0 && wasPositive & !bReverse) fSpeed = 0;
 
+		if (fAcceleration != 0)
+			fSpeed += fAcceleration * fTime; //  - TERRAINFRICTION * fTime * (1 - fmin(fSpeed / 0.2, 1));
+
+		//		if (fSpeed < 0 && !bReverse) fSpeed = 0;
+		//		if (fSpeed < 0 && wasPositive & !bReverse) fSpeed = 0;
+
+//		LogV(TAG, SF("Accel %f, speed %f", fAcceleration, fSpeed));
+		
 		// Speed vector
+
+//		 LA QUE SI VA AJUSTADA
 		float
 			vx = -cosf(fAngle) * fSpeed,
 			vy = -sinf(fAngle) * fSpeed;
@@ -168,9 +179,24 @@ namespace rgl {
 		position.z += vx * fTime * KSPEED;
 		position.x += vy * fTime * KSPEED;
 
+		
+		//		 LA QUE NO VA AJUSTADA
+		/*
+		float ang = fAngle; // - M_PI/2;
+		
+//		glm::vec3 v = -speedVector();
+		// Speed vector
+		float	vx = cosf(ang) * fSpeed,
+				vy = sinf(ang) * fSpeed;
+
+		// Update position
+		position.x += vx * fTime * KSPEED;
+		position.z += vy * fTime * KSPEED;
+		 */
+
 		// Stop ball when velocity is neglible
-		if (fabs(fSpeed) < STABLE && !bForward && !bReverse && fAcceleration == 0)
-			fSpeed = fAcceleration = fOverAcceleration = 0;
+//		if (fabs(fSpeed) < STABLE && !bForward && !bReverse && fAcceleration == 0)
+//			fSpeed = fAcceleration = fOverAcceleration = 0;
 
 		// process heights from heightmap
 		return processHeights(world, fTime);
@@ -188,7 +214,7 @@ namespace rgl {
 			chk.x =position.x + collisionRadius;
 			float heightr = world->getHeight(chk);
 			fAngleTerrain = atan2((10 * (heightr - heightl)), (2 * collisionRadius));
-
+// TODO
 			//	std::cerr << "angle terr " << fAngleTerrain * 180 / 3.141592 << std::endl;
 			//	std::cerr << "height  terr " << height << " ply " << fHeight << std::endl;
 
@@ -212,12 +238,13 @@ namespace rgl {
 				// because it is a little random as the heights are very irregular. So we only use it to
 				// impose penalties on the speed depending on the gradient
 
-				float delta = height - fHeight;
+				float delta = height - position.y;
 				if (delta < RIDEHEIGHT_SEAMLESS) {
 
 					// we can ride seamlessly across this irregularity
 
-					fHeight = fHeightTarget = height;		// accept new height
+					position.y = height;
+					fHeightTarget = height;		// accept new height
 					fPenalty = 1;							// seamlessly drive
 
 				} else {
@@ -231,8 +258,8 @@ namespace rgl {
 										// but that's why we keep the calculated penalty so it can be
 										// added in the CPU car drive routines where it makes sense
 
-					fHeight = fHeightTarget = height;		// accept new height
-
+					position.y = fHeightTarget = height;		// accept new height
+					
 					if (DBG) std::cerr << "Height Delta " << delta<< " penalty " << fPenalty << std::endl;
 
 				}
@@ -254,33 +281,23 @@ namespace rgl {
 
 				} else {
 
-					//	std::cerr << "ostion"<<std::endl;
-					// a wall or something higher than the car
-					//	std::cerr << "CRASH !!" << fSpeed << " fh " << fHeight <<std::endl;
-					//	fSpeed=fmin(-abs(fSpeed),-.02);
-/// antes 4.0 TODO
-//					Ball *obstacle = makeCollisionBall(4.0, mass()); // mass*0.8
-					Ball *obstacle = makeCollisionBall(radius(), mass()); // mass*0.8
-					float fDistance = distance(obstacle);
-
+					Ball *obstacle = makeCollisionBall(4.0,mass()); // mass*0.8
+					float fDistance =distance(obstacle);
+					
 					// Calculate displacement required
 					float fOverlap = 1.0f * (fDistance - radius() - obstacle->radius());
-
+					
 					// Displace Current Ball away from collision
-					position.x -= fOverlap * cos(-fAngle); //  * (position.x - obstacle->position.x) / fDistance;
-					position.z -= fOverlap * sin(-fAngle); //  * (position.z - obstacle->position.z) / fDistance;
-
-					//	float height = sprHeights->Sample(fmod(position.x/sprHeights->width,1.0f), fmod(position.z/sprHeights->height, 1.0f)).r / (float)255;
-					//	fHeight = fHeightTarget = height;
-					//	fHeightTarget = height;
-					//	std::cerr << "new height "<<fHeight<<std::endl;
+					position.x -= fOverlap*cos(-fAngle); //  * (position.x - obstacle->position.x) / fDistance;
+					position.z -= fOverlap*sin(-fAngle); //  * (position.y - obstacle->position.y) / fDistance;
 
 					return obstacle;
 				}
 #endif
 			}
 
-			float ACCELERATION_EARTH = 9.8 / 10 * 4000; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
+		float ACCELERATION_EARTH = 9.8 * 4000; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
+//		float ACCELERATION_EARTH = 9.8 / 10 ; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
 
 			if (fAccelerationZ > -ACCELERATION_EARTH || position.y != fHeightTarget) {
 

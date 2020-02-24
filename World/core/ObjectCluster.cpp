@@ -9,6 +9,8 @@
 #include "World.hpp"
 
 #include "glm.hpp"
+#include "ObjectCluster.hpp"
+
 #include "LayerVao.hpp"
 #include "ObjLoader.hpp"
 #include "Frustum.hpp"
@@ -29,6 +31,19 @@ PLACER(std::move(normalizeConfiguration)) {
 	
 	if (DBG) LogV(TAG, "New Object Cluster " + NAME);
 
+	glm::mat4 flipMatrix = glm::identity<glm::mat4>();
+	
+	/*
+	  _            _
+								|  1  0  0  0  |
+								|  0  1  0  0  |
+	 Matrix_Mirrored_On_Z = M * |  0  0 -1  0  |
+								|_ 0  0  0  1 _|
+	 
+	 */
+//	flipMatrix[0][0]=-1;
+	
+	
 	pLoader = new ObjLoader("objects/" + NAME + "/"+NAME+".obj");
 
 	for (int i = 0; i<pLoader->meshCount(); i++) {
@@ -36,17 +51,19 @@ PLACER(std::move(normalizeConfiguration)) {
 		vTextures.push_back(new Texture2D("objects/" + NAME + "/"+NAME+"-"+std::to_string(i)+".png"));
 	}
 	
+	const glm::vec3 &pos = PLACER.position;
 	mPlacer = createTransformationMatrix(
-										 PLACER.position, //CONFIG.position,
-										 PLACER.rotation.x, PLACER.rotation.y, PLACER.rotation.z, PLACER.radius
-										 );
+										 pos,//CONFIG.position,
+										 PLACER.rotation.x, PLACER.rotation.y, PLACER.rotation.z,
+										 PLACER.radius
+										 ) * flipMatrix;
 	
 	if (DBG) LogV(TAG, SF("Created ObjectCluster %s", NAME.c_str()));
 	
 };
 
 void ObjectCluster::add(WorldObject *object, bool setHeight) {
-	glm::vec3 &pos = object->pos();
+	glm::vec3 pos = object->pos();
 	if (setHeight) pos.y  = WORLD->getHeight(pos);
 	vInstances.push_back(object);
 	if (DBG) LogV(TAG, SF("Add to cluster %s, total %d", NAME.c_str(), vInstances.size()));
@@ -78,7 +95,8 @@ void ObjectCluster::render(ObjectShader *shader) {
 		// cache object properties
 		glm::vec3 rot = object->rot();
 		glm::vec3 pos = object->pos();
-		float radius = object->radius();
+		
+		float radius = object->radius() / 1000;
 
 		// our shader has a Frustum class initialized already initialized with the
 		// projection & view matrix, so we can now trivially check if an object will be

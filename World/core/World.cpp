@@ -68,6 +68,8 @@ namespace rgl {
 
 	bool World::init(PixFu *engine) {
 
+		auto toRad = [] (float degs) { return degs * M_PI / 180; };
+
 		pLight = new Light(CONFIG.lightPosition, CONFIG.lightColor);
 		pCamera = new Camera();
 
@@ -79,7 +81,7 @@ namespace rgl {
 
 		// load projection matrix
 		float aspectRatio = (float) engine->screenWidth() / (float) engine->screenHeight();
-		projectionMatrix = glm::perspective(PERSPECTIVE.FOV, aspectRatio, PERSPECTIVE.NEAR_PLANE, PERSPECTIVE.FAR_PLANE);
+		projectionMatrix = glm::perspective((float)toRad((float)PERSPECTIVE.FOV), aspectRatio, PERSPECTIVE.NEAR_PLANE, PERSPECTIVE.FAR_PLANE);
 
 		pShader->loadProjectionMatrix(projectionMatrix);
 		//		pShader->loadLight(pLight);

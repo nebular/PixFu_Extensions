@@ -10,7 +10,7 @@
 #include <string>
 
 #define DBG_NOEDGESCOLLISIONS
-
+#define DBG_NOHEIGHTMAPCOLLISIONS
 constexpr int LEVEL_MAXPLAYERS = 8;
 
 constexpr char PATH_LEVELS[] = "levels";

@@ -74,12 +74,6 @@ struct sLineSegment
 	float ex, ey;
 	float radius;
 	
-	inline float sxn() const { return sx / 1000; };
-	inline float syn() const { return sy / 1000; };
-	inline float exn() const  { return ex / 1000; };
-	inline float eyn() const  { return ey / 1000; };
-	inline float radn() const { return radius / 1000; }
-
 	inline float angle() { return atan2(ey-sy, ex-sx);}
 
 	inline sLineSegment scaled(float s) { return { sx*s,sy*s,ex*s,ey*s, radius}; }

@@ -28,7 +28,7 @@ class Arena : public World {
 	std::vector <std::pair<Ball *, Ball *>> vCollidingPairs;
 	std::vector <std::pair<Ball *, Ball *>> vFutureColliders;
 
-	Player *pHumanPlayer, *pCamPlayer;
+	Player *pHumanPlayer = nullptr, *pCamPlayer = nullptr;
 	const ArenaLevel_t *LEVEL;
 	float fPos=0, fMetronome=0;
 public:
@@ -42,6 +42,7 @@ protected:
 	void tick(PixFu *engine, float fElapsedTime) override;
 
 	void processInput(PixFu *engine, float fElapsedTime);
+	void driveSpline(float fElapsedTime);
 
 private:
 	// process collisions

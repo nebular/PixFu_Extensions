@@ -7,7 +7,7 @@
 //
 
 #include "World.hpp"
-#include "LayerVao.hpp"
+#include "Terrain.hpp"
 #include "Config.hpp"
 
 
@@ -17,6 +17,18 @@ namespace rgl {
 
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale) {
 
+		glm::mat4 flipMatrix = glm::identity<glm::mat4>();
+		
+		/*
+		  _            _
+									|  1  0  0  0  |
+									|  0  1  0  0  |
+		 Matrix_Mirrored_On_Z = M * |  0  0 -1  0  |
+									|_ 0  0  0  1 _|
+		 
+		 */
+//		flipMatrix[2][2]=-1;
+
 		glm::mat4 matrix = glm::identity<glm::mat4>();
 
 		matrix = glm::translate(matrix, translation);
@@ -24,7 +36,7 @@ namespace rgl {
 		matrix = glm::rotate(matrix, ryrads, {0, 1, 0});
 		matrix = glm::rotate(matrix, rzrads, {0, 0, 1});
 		matrix = glm::scale(matrix, {scale, scale, scale});
-		return matrix;
+		return matrix * flipMatrix;
 	}
 
 
@@ -37,10 +49,13 @@ namespace rgl {
 		pLoader = new ObjLoader(path + "/"+config.name+".obj");
 		pTexture = new Texture2D(path+"/" + config.name + ".png");
 		pHeightMap = Drawable::fromFile(path+"/" + config.name + ".heights.png");
-		mSize = {pTexture->width()/1000.0f, pTexture->height()/1000.0f};
+		mSize = {pTexture->width(), pTexture->height()};
 
+		pDirtTexture = new Texture2D(new Drawable(mSize.x, mSize.y));
+		pDirtCanvas = new Canvas2D(pDirtTexture->buffer());
+		pDirtCanvas->blank();
 		if (DBG) LogV(TAG, SF("Created terrain %s", config.name.c_str()));
-
+		pDirtCanvas->drawCircle(0,0,100,rgl::Colors::RED);
 	};
 
 	Terrain::~Terrain() {
@@ -69,8 +84,13 @@ namespace rgl {
 		shader->textureUnit("modelTexture", pTexture);
 		shader->loadShineVariables(1, 0.7);
 
+		if (pDirtTexture != nullptr) {
+			if (pDirtTexture->buffer()->clearDirty()) pDirtTexture->update();
+			shader->textureUnit("dirtyTexture", pDirtTexture);
+		}
+
 		glm::mat4 tmatrix = createTransformationMatrix(
-				{CONFIG.origin.x, 0, CONFIG.origin.y},
+				{CONFIG.origin.x/1000, 0, CONFIG.origin.y/1000},
 				0, 0, 0, 1
 		);
 
@@ -87,6 +107,7 @@ namespace rgl {
 				pLoader->indices(), pLoader->indicesCount());
 
 		pTexture->upload();
+		if (pDirtTexture != nullptr) pDirtTexture->upload();
 
 		bInited = true;
 
@@ -94,8 +115,8 @@ namespace rgl {
 
 	float Terrain::getHeight(glm::vec3 &posWorld3d) {
 		if (pHeightMap != nullptr) {
-			glm::vec2 posWorld = { 1000 * (posWorld3d.x - CONFIG.origin.x), 1000*(posWorld3d.z - CONFIG.origin.y)};
-			return CONFIG.scaleHeight * pHeightMap->getPixel(posWorld.x, posWorld.y).r / (float) 255;
+			glm::vec2 posWorld = { (posWorld3d.x - CONFIG.origin.x), (posWorld3d.z - CONFIG.origin.y)};
+			return CONFIG.scaleHeight * 1000 * pHeightMap->getPixel(posWorld.x, posWorld.y).r / (float) 255;
 		}
 		return 0;
 	}

@@ -16,6 +16,7 @@ typedef struct sPlayerFeatures {
 
 	const std::string className;
 	const sObjectConfig config;
+	
 		
 	const float MAXSPEED = 0.15;				// max speed in m/h, 0.15 = 150 km/h and kind of makes sense for the map
 	const float MAXSPEEDBACK = 0.04;			// max speed backwards
@@ -47,6 +48,10 @@ typedef struct sPlayerFeatures {
 //		void setActiveWeapon(const Weapon_t *weapon, Ball *player);
 //		void setPassiveWeapon(const Weapon_t *weapon, Ball *player, bool enable = true);
 
+		
+		
+		float wheelBase()			const;
+		
 		float maxSpeed()			const;
 		float maxSpeedBack() 		const;
 		float maxAcceleration() 	const;
@@ -88,6 +93,7 @@ inline void PlayerFeatures::setPassiveWeapon(const Weapon_t *weapon, Ball *playe
 	player->setRadiusMultiplier(weapon == nullptr || weapon->scaleMultiplier == 0 ? 1.0 : weapon->scaleMultiplier);
 }
 */
+inline float PlayerFeatures::wheelBase() 		const { return tFeatures.config.radius * 1.7; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 
 inline float PlayerFeatures::maxSpeed() 		const { return tFeatures.MAXSPEED; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 inline float PlayerFeatures::maxSpeedBack() 	const { return tFeatures.MAXSPEEDBACK; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }

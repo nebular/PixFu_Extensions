@@ -21,7 +21,8 @@
 // terrain friction on height irrgularities constant TODO move to sCircuitInfo  and sFeatures
 #define TERRAINFRICTION 0.005
 // height irregularities gradient we can ignore and drive through unaffected
-#define RIDEHEIGHT_SEAMLESS 0.1
+#define RIDEHEIGHT_SEAMLESS 5
+// 0.1
 
 #define FAKE_BALL_ID 9999
 
@@ -62,14 +63,14 @@ namespace rgl {
 		// TODO: research which values to use as jdavidx example uses hundreds of balls but
 		// TODO: we are an order of magnitude below, at the most around 30 objects and very spaced
 
-		static constexpr int SIMULATIONUPDATES = 1; // 4
+		static constexpr int SIMULATIONUPDATES = 2; // 4
 
 		// Multiple collision trees require more steps to resolve. Normally we would
 		// continue simulation until the object has no simulation time left for this
 		// epoch, however this is risky as the system may never find stability, so we
 		// can clamp it here
 
-		static constexpr int MAXSIMULATIONSTEPS = 3; // 15
+		static constexpr int MAXSIMULATIONSTEPS = 15; // 15
 
 		const int nId;                        // Ball ID
 	
@@ -123,8 +124,8 @@ namespace rgl {
 		static void setHeightScale(float scale);
 
 		float id();
-
-		glm::vec3 &pos() override;            	// ball world position
+		glm::vec3 pos() override;            	// ball normalized position
+		glm::vec3 &posWorld();            	// ball normalized position
 		glm::vec3 rot() override;            	// ball world position
 		float radius() override;            	// ball radius
 
@@ -193,14 +194,15 @@ namespace rgl {
 
 	inline float Ball::id() { return nId; }
 
-	inline glm::vec3 &Ball::pos() { return position; }                        // ball world position
+	inline glm::vec3 Ball::pos() { return position/1000.0f; }                        // ball world position
+	inline glm::vec3 &Ball::posWorld() { return position; }                        // ball world position
 	inline glm::vec3 Ball::rot() { return { 0,fAngle,0};}                        // ball world position
 	inline float Ball::xWorld() { return position.x; }                        // get x world coord
 	inline float Ball::yWorld() { return position.z; }                        // get y world coord
 	inline float Ball::xNorm() { return position.x / iWorldWidth; }        // get x normalized coord
 	inline float Ball::yNorm() { return position.z / iWorldHeight; }        // get y normalized coord
 	inline float Ball::angle() { return fAngle; }                            // ball angle (heading)
-	inline float Ball::speed() { return fabs(fSpeed); }                    // ball speed
+	inline float Ball::speed() { return fSpeed; }   // TODO fabs             		// ball speed
 	inline float Ball::mass() { return fMass * fMassMultiplier; }            // ball final mass
 	inline float Ball::radius() { return fRadius * fRadiusMultiplier; }        // ball final radius
 	inline float Ball::outerRadius() { return fOuterRadius * fRadiusMultiplier; }
@@ -208,9 +210,9 @@ namespace rgl {
 	inline bool Ball::isStatic() { return bStatic;}
 
 	// todo
-	inline glm::vec3 Ball::speedVector() { return {fSpeed * cos(fAngle), 0, fSpeed * sin(fAngle)}; }
+	inline glm::vec3 Ball::speedVector() { return {fSpeed * cos(fAngle), 0,fSpeed * sin(fAngle)}; }
 
-	inline float Ball::height() { return position.z; }                            // ball height
+	inline float Ball::height() { return position.y; }                            // ball height
 	inline bool Ball::flying() { return bFlying; }                            // whether ball is flying
 	inline void Ball::setMassMultiplier(float massMultiplier) { fMassMultiplier = massMultiplier; }
 

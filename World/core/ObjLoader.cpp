@@ -30,13 +30,11 @@ namespace rgl {
 	}
 
 	unsigned ObjLoader::verticesCount(int mesh) {
-		return pLoader->LoadedMeshes[mesh].Vertices.size();
-//		return (unsigned)pLoader->LoadedVertices.size();
+		return (unsigned)pLoader->LoadedMeshes[mesh].Vertices.size();
 	}
 
 	unsigned ObjLoader::indicesCount(int mesh) {
-		return pLoader->LoadedMeshes[mesh].Indices.size();
-//		return  (unsigned)pLoader->LoadedIndices.size();
+		return (unsigned)pLoader->LoadedMeshes[mesh].Indices.size();
 	}
 
 }

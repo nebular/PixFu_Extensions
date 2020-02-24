@@ -37,7 +37,7 @@ typedef enum CameraMovement {
 } CameraMovement_t;
 
 typedef enum sCameraKeyControlMode {
-	MOVE, ADJUST_POSITION, ADJUST_ANGLES
+	MOVE, ADJUST_POSITION, ADJUST_ANGLES, ADJUST_PLAYER_POSITION, ADJUST_PLAYER_ANGLES
 } CameraKeyControlMode_t;
 
 // An abstract camera class that processes input and calculates the corresponding Euler Angles,
@@ -50,8 +50,7 @@ class Camera {
 	static constexpr glm::vec3 DEF_UPVECTOR = glm::vec3(0.0f, 1.0f, 0.0f);
 	static constexpr glm::vec3 DEF_FRONTVECTOR = glm::vec3(0.0f, 0.0f, -1.0f);
 	
-	static constexpr float STEP = 0.0001f * 15.0f;
-	static constexpr float VSTEP = 0.3;
+	static constexpr float STEP = 0.0001f * 15.0f, VSTEP = 0.05;
 	
 	// Default camera values
 	static constexpr float DEF_YAW = 0;
@@ -74,22 +73,28 @@ class Camera {
 	float fRoll;
 	
 	// target mode
-	
-	float distance;
+	bool smooth = true;
+	bool targetMode = false;
 	float targetDistance;
 	float targetAngle;
+	glm::vec3 targetPosition, interPosition;
 	
 	// Camera options
 	float mMouseSensitivity;
 	float mMouseZoom;
 	
 	int mCameraMode;
+
+	// camera player focus
+	float fPlayerDistanceUp = 0.1;
+	float fPlayerDistanceFar = 0.3; // 0.05;
+	float fPlayerPitch = -0.05;
 	
 public:
 	
 	// Constructor with vectors
 	Camera(
-		   glm::vec3 position = glm::vec3(0.0f, -DEF_HEIGHT, 0.0f),
+		   glm::vec3 position = glm::vec3(0.0f, DEF_HEIGHT, 0.0f),
 		   float yaw = DEF_YAW,
 		   float pitch = DEF_PITCH,
 		   glm::vec3 up = DEF_UPVECTOR
@@ -143,7 +148,9 @@ public:
 	
 	void setYaw(float rads);
 	
-	void follow(Player *player);
+	void follow(Player *player, float fElapsedTime);
+	
+	void setTargetMode(bool enable);
 	
 private:
 	
