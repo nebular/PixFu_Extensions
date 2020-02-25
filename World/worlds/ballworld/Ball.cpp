@@ -158,7 +158,7 @@ namespace rgl {
 
 		fMetronome += fTime;
 		
-		bool wasPositive = fSpeed >= 0;
+//		bool wasPositive = fSpeed >= 0;
 
 		if (fAcceleration != 0)
 			fSpeed += fAcceleration * fTime; //  - TERRAINFRICTION * fTime * (1 - fmin(fSpeed / 0.2, 1));

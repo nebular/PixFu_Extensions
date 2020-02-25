@@ -29,7 +29,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 include_directories(World/)
 include_directories(World/core/headers)
-include_directories(World/objects/headers)
+include_directories(World/worlds/ballworld/headers)
 
 ## PIXENGINE
 
@@ -37,12 +37,13 @@ add_library(pixFu_ext SHARED
         World/core/Camera.cpp
         World/core/ObjectCluster.cpp
         World/core/ObjectShader.cpp
+        World/core/ObjLoader.cpp
         World/core/Terrain.cpp
         World/core/TerrainShader.cpp
         World/core/World.cpp
-        World/objects/Ball.cpp
-        World/objects/Player.cpp
-        World/objects/Earth.cpp
+        World/worlds/ballworld/Ball.cpp
+        World/worlds/ballworld/BallWorld.cpp
+        World/worlds/ballworld/Player.cpp
         Sprites/SpriteSheets.cpp
         Sprites/SpriteSheet.cpp
         )

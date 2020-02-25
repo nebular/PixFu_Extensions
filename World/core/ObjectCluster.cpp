@@ -7,13 +7,12 @@
 //
 
 #include "World.hpp"
-
-#include "glm.hpp"
-#include "ObjectCluster.hpp"
-
+#include "Frustum.hpp"
 #include "LayerVao.hpp"
 #include "ObjLoader.hpp"
-#include "Frustum.hpp"
+#include "ObjectCluster.hpp"
+
+#include "glm.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
@@ -168,7 +167,7 @@ namespace rgl {
 			unbind();
 		}
 		vVisibles.clear();
-//	if (DBG) LogV(TAG, SF("Frustum Hits %d", frustumHits));
+		//	if (DBG) LogV(TAG, SF("Frustum Hits %d", frustumHits));
 	}
 
 	void ObjectCluster::init() {
@@ -176,14 +175,12 @@ namespace rgl {
 		for (int i = 0; i < pLoader->meshCount(); i++) {
 			LayerVao::add(
 					pLoader->vertices(i), pLoader->verticesCount(i),
-					pLoader->indices(i), pLoader->indicesCount(i));
-
-			vTextures[i]->upload();
+					pLoader->indices(i), pLoader->indicesCount(i)
+			);
+			vTextures[i]->upload(); // todo materials
 		}
 		bInited = true;
-
 	}
-
 };
 
 
