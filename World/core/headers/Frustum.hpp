@@ -7,6 +7,7 @@
 //
 // https://gist.github.com/podgorskiy/e69
 
+#pragma clang diagnostic push
 #pragma once
 
 namespace rgl {
@@ -134,3 +135,5 @@ namespace rgl {
 		return res * (-1.0f / D);
 	}
 }
+
+#pragma clang diagnostic pop
