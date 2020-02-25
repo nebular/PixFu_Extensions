@@ -140,7 +140,6 @@ namespace rgl {
 				// this would disable car collisions (with other cars)
 				return pnow()-crono;
 	#endif
-				int ostias = 0;
 				
 				// Work out static collisions with walls and displace balls so no overlaps
 				iterateObjects([this, fSimElapsedTime,&edges](WorldObject *b) {
