@@ -47,7 +47,7 @@ namespace rgl {
 		const std::string NAME;
 		World *WORLD;
 
-		ObjectCluster(World *planet, std::string name, Transformation_t initialTransform = Transformation_t(0))00;
+		ObjectCluster(World *planet, std::string name, Transformation_t initialTransform = Transformation_t());
 
 		virtual ~ObjectCluster();
 

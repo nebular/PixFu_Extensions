@@ -48,7 +48,7 @@ namespace rgl {
 
 		void add(TerrainConfig_t terrainConfig);
 
-		void add(WorldObject *object, ObjectConfig_t initialTransform = ObjectConfig_t());
+		void add(WorldObject *object, Transformation_t initialTransform = Transformation_t());
 
 		template<typename Func>
 		void iterateObjects(Func callback) {

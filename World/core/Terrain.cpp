@@ -33,8 +33,6 @@ namespace rgl {
 
 		 */
 
-		glm::mat4 flipMatrix = glm::identity<glm::mat4>();
-
 		if (flipX) flipMatrix[0][0] = -1.0f;
 		if (flipY) flipMatrix[1][1] = -1.0f;
 		if (flipZ) flipMatrix[2][2] = -1.0f;

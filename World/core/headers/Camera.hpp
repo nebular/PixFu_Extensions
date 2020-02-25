@@ -105,8 +105,8 @@ namespace rgl {
 				float initialYaw = DEF_YAW,
 				float initialPitch = DEF_PITCH,
 				glm::vec3 upVector = DEF_UPVECTOR,
-				bool smooth,
-				float smoothLerp
+				bool smooth = true,
+				float smoothLerp = 15
 		);
 
 		void update(float fElapsedTime);
@@ -274,6 +274,13 @@ namespace rgl {
 		mTargetPosition = target->pos();
 		fTargetAngle = (float) -M_PI / 2.0f - target->rot().y;
 	}
+
+	/**
+	 * Enables target mode
+	 * @param enable  Whether
+	 */
+
+	inline void Camera::setTargetMode(bool enable) { bTargetMode = enable; }
 
 
 	class Light {

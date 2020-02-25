@@ -49,7 +49,7 @@ namespace rgl {
 
 //	void World::add(const char *name, ObjectConfig_t objectConfig, ObjectConfig_t initialTransform) {
 	
-	void World::add(WorldObject *object, ObjectConfig_t initialTransform) {
+	void World::add(WorldObject *object, Transformation_t initialTransform) {
 		
 		auto clusterItem = mCluesters.find(object->CLASS);
 		ObjectCluster *cluster;

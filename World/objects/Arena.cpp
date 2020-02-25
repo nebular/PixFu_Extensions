@@ -382,7 +382,6 @@ void Arena::processInput(PixFu *engine, float fElapsedTime) {
 		
 	if (pCamPlayer == nullptr) // || mode != MOVE)
 		camera()->inputKey(
-					  this,
 					  mode,
 					  Keyboard::isHeld(Keys::UP),
 					  Keyboard::isHeld(Keys::DOWN),
@@ -395,10 +394,9 @@ void Arena::processInput(PixFu *engine, float fElapsedTime) {
 
 	float xdelta = 0, ydelta = 0, K = 0.01;
 	if (pCamPlayer!=nullptr) {
-		camera()->follow(pHumanPlayer, fElapsedTime);
+		camera()->follow(pHumanPlayer);
 		if (mode != MOVE) {
 			camera()->inputKey(
-							  this,
 							  mode == ADJUST_ANGLES ? ADJUST_PLAYER_ANGLES : ADJUST_PLAYER_POSITION,
 							  Keyboard::isHeld(Keys::UP),
 							  Keyboard::isHeld(Keys::DOWN),
