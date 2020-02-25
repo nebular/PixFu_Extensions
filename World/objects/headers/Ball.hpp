@@ -29,6 +29,7 @@
 #include "glm.hpp"
 #include "Drawable.hpp"
 #include "World.hpp"
+#include "BallWorld.hpp"
 
 namespace rgl {
 
@@ -39,6 +40,8 @@ namespace rgl {
 
 	class Ball : public WorldObject {
 
+		friend class BallWorld;
+		
 		std::string TAG;
 		static int instanceCounter;
 

@@ -287,7 +287,7 @@ struct sSpline
 		t = t - (int)t;
 		
 		float tt = t * t;
-		float ttt = tt * t;
+//		float ttt = tt * t;
 		
 		float q1 = -3.0f * tt + 4.0f*t - 1.0f;
 		float q2 = 9.0f*tt - 10.0f*t;

@@ -1,6 +1,8 @@
 // Base class for a 3d world
+//
 // Provides methods to add terrains and objects
-// and has a camera and lighting
+// and has a camera and lighting. This class does not know about
+// physics, that is the task of derived classes.
 //
 // Created by rodo on 2020-02-17.
 //

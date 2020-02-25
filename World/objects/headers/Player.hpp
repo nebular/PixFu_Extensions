@@ -10,7 +10,7 @@
 
 namespace rgl {
 
-	typedef  struct sWorldMeta {
+	typedef struct sWorldMeta {
 		std::string name;
 		int xMas, yMax;
 	} WorldMeta_t;
@@ -20,7 +20,6 @@ namespace rgl {
 		sObjectConfig config;
 		bool isStatic = true;
 	} ObjectFeatures_t;
-
 
 	class Player : public Ball {
 

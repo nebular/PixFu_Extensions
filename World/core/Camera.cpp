@@ -89,7 +89,7 @@ namespace rgl {
 
 	/**
 	 * Updates the camera. called by the engine.
-	 * @param fElapsedTime
+	 * @param fElapsedTime frame time
 	 */
 
 	void Camera::update(float fElapsedTime) {

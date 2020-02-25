@@ -10,7 +10,6 @@
 #include "Terrain.hpp"
 #include "Config.hpp"
 
-
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace rgl {

@@ -1,15 +1,15 @@
+// Base class for a 3d world
 //
-//  World.cpp
-//  PixEngine
+// Provides methods to add terrains and objects
+// and has a camera and lighting. This class does not know about
+// physics, that is the task of derived classes.
 //
-//  Created by rodo on 17/02/2020.
-//  Copyright © 2020 rodo. All rights reserved.
+// Created by rodo on 2020-02-17.
 //
 
 #include "World.hpp"
 #include "PixFu.hpp"
 #include "OpenGL.h"
-#include "Arena.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
@@ -125,17 +125,13 @@ namespace rgl {
 			terrain->render(pShader);
 		}
 
-//	pGrid->draw();
-
 		pShader->stop();
-
 
 		if (vObjects.size() == 0) return;
 
 		pShaderObjects->use();
 		pShaderObjects->loadViewMatrix(pCamera);
-		pShaderObjects->loadLight(pLight); //
-//		pShaderObjects->loadProjectionMatrix(projectionMatrix); //
+		pShaderObjects->loadLight(pLight);
 
 		for (ObjectCluster *object:vObjects) {
 			object->render(pShaderObjects);

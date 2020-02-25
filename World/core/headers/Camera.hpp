@@ -187,13 +187,13 @@ namespace rgl {
 
 		/**
 		 * Set camera pitch
-		 * @param rads
+		 * @param rads Pitch in radians
 		 */
 		void setPitch(float rads);
 
 		/**
 		 * Set camera roll
-		 * @param rads
+		 * @param rads Toll in radians
 		 */
 
 		void setRoll(float rads);
@@ -206,8 +206,7 @@ namespace rgl {
 
 		/**
 		 * Follow a target
-		 * @param player
-		 * @param fElapsedTime
+		 * @param target Target to follow
 		 */
 
 		void follow(WorldObject *target);

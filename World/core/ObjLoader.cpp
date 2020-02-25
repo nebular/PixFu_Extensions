@@ -17,7 +17,7 @@ namespace rgl {
 	}
 
 	 unsigned ObjLoader::meshCount() {
-		return pLoader->LoadedMeshes.size();
+		return (unsigned)pLoader->LoadedMeshes.size();
 	}
 
 	 float *ObjLoader::vertices(int mesh) {

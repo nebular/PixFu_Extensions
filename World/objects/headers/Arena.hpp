@@ -9,7 +9,7 @@
 #pragma once
 
 #include <vector>
-#include "World.hpp"
+#include "BallWorld.hpp"
 #include "ArenaLevel.hpp"
 
 namespace rgl {
@@ -20,14 +20,10 @@ class GameObject;
 class Player;
 
 
-class Arena : public World {
+class Arena : public BallWorld {
 	
 	static std::string TAG;
 	
-	std::vector<Ball *> vFakeBalls;
-	std::vector <std::pair<Ball *, Ball *>> vCollidingPairs;
-	std::vector <std::pair<Ball *, Ball *>> vFutureColliders;
-
 	Player *pHumanPlayer = nullptr, *pCamPlayer = nullptr;
 	const ArenaLevel_t *LEVEL;
 	float fPos=0, fMetronome=0;
@@ -44,15 +40,6 @@ protected:
 	void processInput(PixFu *engine, float fElapsedTime);
 	void driveSpline(float fElapsedTime);
 
-private:
-	// process collisions
-	long processCollisions(float fElapsedTime);
-
-	// process static collisions
-	void processStaticCollision(Ball *ball, Ball *target);
-
-	// process dynamic collisions
-	void processDynamicCollision(Ball *ball, Ball *target, float fElapsedTime);
 };
 
 
