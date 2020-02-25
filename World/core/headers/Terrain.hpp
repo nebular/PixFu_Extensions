@@ -7,6 +7,7 @@
 //
 
 #pragma once
+
 #include "Canvas2D.hpp"
 #include "Texture2D.hpp"
 #include "LayerVao.hpp"
@@ -55,7 +56,7 @@ namespace rgl {
 
 		const TerrainConfig_t CONFIG;
 		const WorldConfig_t PLANET;
-		
+
 		Terrain(WorldConfig_t planetConfig, TerrainConfig_t config);
 
 		virtual ~Terrain();
@@ -70,8 +71,8 @@ namespace rgl {
 		bool contains(glm::vec3 &posWorld);
 
 		/** draws a debug grid */
-		void wireframe(int inc=100);
-		
+		void wireframe(int inc = 100);
+
 		/** Canvas rendered over the 3D texture */
 		Canvas2D *canvas();
 
@@ -80,8 +81,9 @@ namespace rgl {
 
 	inline float Terrain::getHeight(glm::vec3 &posWorld3d) {
 		return (pHeightMap != nullptr)
-			? CONFIG.scaleHeight * 1000 * pHeightMap->getPixel(posWorld3d.x - CONFIG.origin.x, posWorld3d.z - CONFIG.origin.y).r / (float) 255
-			: 0;
+			   ? CONFIG.scaleHeight * 1000 * pHeightMap->getPixel(posWorld3d.x - CONFIG.origin.x, posWorld3d.z - CONFIG.origin.y).r /
+				 (float) 255
+			   : 0;
 	}
 
 	inline bool Terrain::contains(glm::vec3 &posWorld) {
@@ -91,6 +93,6 @@ namespace rgl {
 			   && posWorld.z <= CONFIG.origin.y + mSize.y;
 	}
 
-	inline Canvas2D *Terrain::canvas() {return pDirtCanvas;}
+	inline Canvas2D *Terrain::canvas() { return pDirtCanvas; }
 
 }

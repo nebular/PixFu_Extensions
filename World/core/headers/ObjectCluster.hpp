@@ -15,46 +15,47 @@
 
 namespace rgl {
 
-class World;
-class WorldObject;
+	class World;
 
-typedef struct sVisible {
-	WorldObject *object;
-	glm::mat4 transformMatrix;
-} Visible_t;
+	class WorldObject;
 
-class ObjectCluster : public LayerVao {
+	typedef struct sVisible {
+		WorldObject *object;
+		glm::mat4 transformMatrix;
+	} Visible_t;
 
-	friend class World;
-	
-	static std::string TAG;
+	class ObjectCluster : public LayerVao {
 
-	Texture2D *pTexture;
+		friend class World;
 
-	bool bInited = false;
-	ObjLoader *pLoader;
+		static std::string TAG;
 
-	std::vector<Visible_t> vVisibles;
-	std::vector<Texture2D*> vTextures;
-	std::vector<WorldObject *> vInstances;
-	glm::mat4 mPlacer;
+		Texture2D *pTexture;
 
-public:
+		bool bInited = false;
+		ObjLoader *pLoader;
 
-	const WorldConfig_t PLANET;
-	const ObjectConfig_t PLACER;
-	const std::string NAME;
-	World *WORLD;
+		std::vector<Visible_t> vVisibles;
+		std::vector<Texture2D *> vTextures;
+		std::vector<WorldObject *> vInstances;
+		glm::mat4 mPlacer;
 
-	ObjectCluster(World *planet, std::string name, ObjectConfig_t normalizeConfiguration = ObjectConfig_t());
+	public:
 
-	virtual ~ObjectCluster();
+		const WorldConfig_t PLANET;
+		const Transformation_t PLACER;
+		const std::string NAME;
+		World *WORLD;
 
-	void add(WorldObject *object, bool setHeight = true);
+		ObjectCluster(World *planet, std::string name, Transformation_t initialTransform = Transformation_t(0))00;
 
-	void init();
+		virtual ~ObjectCluster();
 
-	void render(ObjectShader *shader);
-};
+		void add(WorldObject *object, bool setHeight = true);
+
+		void init();
+
+		void render(ObjectShader *shader);
+	};
 
 }

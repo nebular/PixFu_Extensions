@@ -51,14 +51,14 @@ namespace rgl {
 	
 	void World::add(WorldObject *object, ObjectConfig_t initialTransform) {
 		
-		auto clusterItem = mCluesters.find(object->NAME);
+		auto clusterItem = mCluesters.find(object->CLASS);
 		ObjectCluster *cluster;
 
 		if (clusterItem == mCluesters.end()) {
 			// create object cluster
-			cluster = new ObjectCluster(this, object->NAME, initialTransform);
+			cluster = new ObjectCluster(this, object->CLASS, initialTransform);
 			vObjects.push_back(cluster);
-			mCluesters[object->NAME] = cluster;
+			mCluesters[object->CLASS] = cluster;
 		} else {
 			cluster = clusterItem->second;
 		}

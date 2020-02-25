@@ -1,3 +1,6 @@
+// Base class for a 3d world
+// Provides methods to add terrains and objects
+// and has a camera and lighting
 //
 // Created by rodo on 2020-02-17.
 //
@@ -20,98 +23,95 @@ namespace rgl {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
-	class WorldObject {
-	public:
-		const std::string NAME;
-		inline WorldObject(std::string name):NAME(name){}
-		inline virtual ~WorldObject() = default;
-		virtual glm::vec3 pos() = 0;
-		virtual glm::vec3 rot() = 0;
-		virtual float radius() = 0;
-	};
-
-	class Arena;
+	// Base World class
 	class World : public PixFuExtension {
 
-			static std::string TAG;
+		static std::string TAG;
 
-			TerrainShader *pShader;
-			ObjectShader *pShaderObjects;
+		TerrainShader *pShader;
+		ObjectShader *pShaderObjects;
 
-			glm::mat4 projectionMatrix;
+		glm::mat4 projectionMatrix;
 
-			Light *pLight;
-			Camera *pCamera;
-		
-			std::vector<Terrain *> vTerrains;
-			std::vector<ObjectCluster *> vObjects;
-			std::map<std::string, ObjectCluster *> mCluesters;
+		Light *pLight;
+		Camera *pCamera;
 
-		protected:
+		std::vector<Terrain *> vTerrains;
+		std::vector<ObjectCluster *> vObjects;
+		std::map<std::string, ObjectCluster *> mCluesters;
 
-			virtual bool init(PixFu *engine);
-			virtual void tick(PixFu *engine, float fElapsedTime);
-			void add(TerrainConfig_t terrainConfig);
-			void add(WorldObject *object, ObjectConfig_t initialTransform = ObjectConfig_t());
-	
-			template<typename Func>
-			void iterateObjects(Func callback) {
-				for (ObjectCluster *cluster:vObjects) {
-					std::for_each(cluster->vInstances.begin(), cluster->vInstances.end(), callback);
-				}
+	protected:
+
+		virtual bool init(PixFu *engine);
+
+		virtual void tick(PixFu *engine, float fElapsedTime);
+
+		void add(TerrainConfig_t terrainConfig);
+
+		void add(WorldObject *object, ObjectConfig_t initialTransform = ObjectConfig_t());
+
+		template<typename Func>
+		void iterateObjects(Func callback) {
+			for (ObjectCluster *cluster:vObjects) {
+				std::for_each(cluster->vInstances.begin(), cluster->vInstances.end(), callback);
 			}
-
-
-
-		public:
-
-			const Perspective_t PERSPECTIVE;
-			const WorldConfig_t CONFIG;
-
-			static constexpr Perspective_t PERSP_FOV90_LOW = {90, 0.005, 0.1, 0.25};
-			static constexpr Perspective_t PERSP_FOV90_MID = {90, 0.005, 100.0, 0.25};
-			static constexpr Perspective_t PERSP_FOV90_FAR = {90, 0.5, 1000.0, 0.25};
-			static constexpr Perspective_t PERSP_FOV60_LOW = {90, 0.005, 0.1, 0.25};
-			static constexpr Perspective_t PERSP_FOV60_MID = {70, 0.005, 1000.0, 0.25};
-			static constexpr Perspective_t PERSP_FOV60_FAR = {60, 0.5, 1000.0, 0.25};
-
-			World(WorldConfig_t config, Perspective_t perspective = PERSP_FOV90_LOW);
-
-			virtual ~World();
-		
-
-			Camera *camera();
-		
-			float getHeight(glm::vec3 &posWorld);
-			Canvas2D *canvas(glm::vec3 &posWorld);
-
-		};
-
-		inline Camera *World::camera() { return pCamera; }
-		inline float World::getHeight(glm::vec3 &posWorld) {
-
-			if (vTerrains.size()==1)
-				return vTerrains[0]->getHeight(posWorld);
-
-			for (Terrain *terrain:vTerrains) {
-				if (terrain->contains(posWorld))
-					return terrain->getHeight(posWorld);
-			}
-			
-			return 0;
 		}
-		inline Canvas2D *World::canvas(glm::vec3 &posWorld) {
 
-			if (vTerrains.size()==1)
-				return vTerrains[0]->canvas();
 
-			for (Terrain *terrain:vTerrains) {
-				if (terrain->contains(posWorld))
-					return terrain->canvas();
-			}
-			
-			return nullptr;
+	public:
+
+		const Perspective_t PERSPECTIVE;
+		const WorldConfig_t CONFIG;
+
+		static constexpr Perspective_t PERSP_FOV90_LOW = {90, 0.005, 0.1, 0.25};
+		static constexpr Perspective_t PERSP_FOV90_MID = {90, 0.005, 100.0, 0.25};
+		static constexpr Perspective_t PERSP_FOV90_FAR = {90, 0.5, 1000.0, 0.25};
+		static constexpr Perspective_t PERSP_FOV60_LOW = {90, 0.005, 0.1, 0.25};
+		static constexpr Perspective_t PERSP_FOV60_MID = {70, 0.005, 1000.0, 0.25};
+		static constexpr Perspective_t PERSP_FOV60_FAR = {60, 0.5, 1000.0, 0.25};
+
+		World(WorldConfig_t config, Perspective_t perspective = PERSP_FOV90_LOW);
+
+		virtual ~World();
+
+		// get camera
+		Camera *camera();
+
+		// query heightmap
+		float getHeight(glm::vec3 &posWorld);
+
+		// get 3d canvas
+		Canvas2D *canvas(glm::vec3 &posWorld);
+
+	};
+
+	inline Camera *World::camera() { return pCamera; }
+
+	inline float World::getHeight(glm::vec3 &posWorld) {
+
+		if (vTerrains.size() == 1)
+			return vTerrains[0]->getHeight(posWorld);
+
+		for (Terrain *terrain:vTerrains) {
+			if (terrain->contains(posWorld))
+				return terrain->getHeight(posWorld);
 		}
+
+		return 0;
+	}
+
+	inline Canvas2D *World::canvas(glm::vec3 &posWorld) {
+
+		if (vTerrains.size() == 1)
+			return vTerrains[0]->canvas();
+
+		for (Terrain *terrain:vTerrains) {
+			if (terrain->contains(posWorld))
+				return terrain->canvas();
+		}
+
+		return nullptr;
+	}
 
 }
 

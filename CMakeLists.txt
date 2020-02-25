@@ -27,6 +27,7 @@ include_directories(../pixFu/src/thirdparty/glm)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
+include_directories(World/)
 include_directories(World/core/headers)
 include_directories(World/objects/headers)
 
@@ -34,7 +35,6 @@ include_directories(World/objects/headers)
 
 add_library(pixFu_ext SHARED
         World/core/Camera.cpp
-        World/core/ObjLoader.cpp
         World/core/ObjectCluster.cpp
         World/core/ObjectShader.cpp
         World/core/Terrain.cpp
