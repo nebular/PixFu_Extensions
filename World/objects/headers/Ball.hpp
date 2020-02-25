@@ -15,7 +15,7 @@
 // car decceleration constant TODO move to sFeatures
 #define KDECCEL 0.12
 // car acceleration constant TODO move to sFeatures
-#define KACCEL 0.05
+#define KACCEL 0.1
 // speed brke constant TODO move to sFeatures
 #define KBRAKE 0.2
 // terrain friction on height irrgularities constant TODO move to sCircuitInfo  and sFeatures
@@ -195,6 +195,7 @@ namespace rgl {
 	inline float Ball::id() { return nId; }
 
 	inline glm::vec3 Ball::pos() { return position/1000.0f; }                        // ball world position
+
 	inline glm::vec3 &Ball::posWorld() { return position; }                        // ball world position
 	inline glm::vec3 Ball::rot() { return { 0,fAngle,0};}                        // ball world position
 	inline float Ball::xWorld() { return position.x; }                        // get x world coord

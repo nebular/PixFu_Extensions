@@ -296,13 +296,13 @@ namespace rgl {
 #endif
 			}
 
-		float ACCELERATION_EARTH = 9.8 * 4000; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
+		float ACCELERATION_EARTH = 9.8 ; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
 //		float ACCELERATION_EARTH = 9.8 / 10 ; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
 
 			if (fAccelerationZ > -ACCELERATION_EARTH || position.y != fHeightTarget) {
 
-				float vz = fAccelerationZ * fTime;
-				float sz = vz * fTime * KSPEED;
+				float vz = fAccelerationZ * fTime * KSPEED;
+				float sz = vz * fTime;
 				
 				if (fAccelerationZ > 0) {
 
@@ -314,7 +314,7 @@ namespace rgl {
 				} else {
 
 					// falling
-					// if (DBG) std::cerr << "fall down "<<fHeight<<" vz "<<vz<<" az " << fAccelerationZ << std::endl;
+//					if (DBG) std::cerr << "fall down "<<position.y<<" vz "<<vz<<" az " << fAccelerationZ << std::endl;
 					position.y += sz;
 					if (position.y < fHeightTarget) {
 						position.y = fHeightTarget;

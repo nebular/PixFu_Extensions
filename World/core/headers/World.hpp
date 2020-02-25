@@ -79,14 +79,39 @@ namespace rgl {
 
 			virtual ~World();
 		
-			float getHeight(glm::vec3 &posWorld);
 
 			Camera *camera();
+		
+			float getHeight(glm::vec3 &posWorld);
+			Canvas2D *canvas(glm::vec3 &posWorld);
 
 		};
 
 		inline Camera *World::camera() { return pCamera; }
+		inline float World::getHeight(glm::vec3 &posWorld) {
 
+			if (vTerrains.size()==1)
+				return vTerrains[0]->getHeight(posWorld);
+
+			for (Terrain *terrain:vTerrains) {
+				if (terrain->contains(posWorld))
+					return terrain->getHeight(posWorld);
+			}
+			
+			return 0;
+		}
+		inline Canvas2D *World::canvas(glm::vec3 &posWorld) {
+
+			if (vTerrains.size()==1)
+				return vTerrains[0]->canvas();
+
+			for (Terrain *terrain:vTerrains) {
+				if (terrain->contains(posWorld))
+					return terrain->canvas();
+			}
+			
+			return nullptr;
+		}
 
 }
 

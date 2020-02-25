@@ -14,7 +14,10 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace rgl {
+	
+	std::string Terrain::TAG = "Terrain";
 
+	/** Convenience to create a transform matrix */
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale) {
 
 		glm::mat4 flipMatrix = glm::identity<glm::mat4>();
@@ -27,7 +30,9 @@ namespace rgl {
 									|_ 0  0  0  1 _|
 		 
 		 */
-//		flipMatrix[2][2]=-1;
+
+		// no flip at the moment but something is going on here
+		// flipMatrix[2][2]=-1;
 
 		glm::mat4 matrix = glm::identity<glm::mat4>();
 
@@ -40,12 +45,11 @@ namespace rgl {
 	}
 
 
-	std::string Terrain::TAG = "Terrain";
 
 	Terrain::Terrain(WorldConfig_t planetConfig, TerrainConfig_t config)
 			: CONFIG(config), PLANET(planetConfig) {
 
-				std::string path =std::string(PATH_LEVELS)+"/" + config.name;
+		std::string path =std::string(PATH_LEVELS)+"/" + config.name;
 		pLoader = new ObjLoader(path + "/"+config.name+".obj");
 		pTexture = new Texture2D(path+"/" + config.name + ".png");
 		pHeightMap = Drawable::fromFile(path+"/" + config.name + ".heights.png");
@@ -54,8 +58,8 @@ namespace rgl {
 		pDirtTexture = new Texture2D(new Drawable(mSize.x, mSize.y));
 		pDirtCanvas = new Canvas2D(pDirtTexture->buffer());
 		pDirtCanvas->blank();
+		wireframe();
 		if (DBG) LogV(TAG, SF("Created terrain %s", config.name.c_str()));
-		pDirtCanvas->drawCircle(0,0,100,rgl::Colors::RED);
 	};
 
 	Terrain::~Terrain() {
@@ -64,22 +68,18 @@ namespace rgl {
 		if (DBG) LogV(TAG, SF("Destroyed terrain %s", CONFIG.name.c_str()));
 	}
 
+	void Terrain::wireframe(int INC) {
 
+		for (int x = 0, l = pDirtCanvas->width(); x<l; x+=INC ) {
+			for (int y = 0, m = pDirtCanvas->height(); y<m; y+=INC ) {
+				pDirtCanvas->drawLine(x, 0, x, m, rgl::Colors::RED);
+				pDirtCanvas->drawLine(0, y, l, y, rgl::Colors::BLUE);
+			}
+		}
+	}
+	
 	void Terrain::render(TerrainShader *shader) {
 
-		
-		if (Keyboard::isHeld(Keys::A)) {
-			scaletest+=0.001;
-			LogE(TAG, SF("scale %f",scaletest));
-		}
-		
-		if (Keyboard::isHeld(Keys::Z)) {
-			scaletest-=0.001;
-			LogE(TAG, SF("scale %f",scaletest));
-		}
-		
-
-		
 		if (!bInited) init();
 		shader->textureUnit("modelTexture", pTexture);
 		shader->loadShineVariables(1, 0.7);
@@ -113,20 +113,6 @@ namespace rgl {
 
 	}
 
-	float Terrain::getHeight(glm::vec3 &posWorld3d) {
-		if (pHeightMap != nullptr) {
-			glm::vec2 posWorld = { (posWorld3d.x - CONFIG.origin.x), (posWorld3d.z - CONFIG.origin.y)};
-			return CONFIG.scaleHeight * 1000 * pHeightMap->getPixel(posWorld.x, posWorld.y).r / (float) 255;
-		}
-		return 0;
-	}
-
-	bool Terrain::contains(glm::vec3 &posWorld) {
-		return posWorld.x >= CONFIG.origin.x
-			   && posWorld.z >= CONFIG.origin.y
-			   && posWorld.x <= CONFIG.origin.x + mSize.x
-			   && posWorld.z <= CONFIG.origin.y + mSize.y;
-	}
 
 };
 
