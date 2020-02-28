@@ -37,10 +37,11 @@ namespace rgl {
 
 		std::vector<Visible_t> vVisibles;
 		std::vector<Texture2D *> vTextures;
-		std::vector<WorldObject *> vInstances;
 		glm::mat4 mPlacer;
+// todo		std::vector<WorldObject *> vInstances;
 
 	public:
+		std::vector<WorldObject *> vInstances;
 
 		const WorldConfig_t PLANET;
 		const Transformation_t PLACER;

@@ -33,7 +33,7 @@ namespace rgl {
 
 	public:
 
-		Player(const WorldConfig_t &planetConfig, PlayerFeatures_t features);
+		Player(World *world, PlayerFeatures_t features);
 
 		void process(World *world, float fTime);
 
@@ -53,8 +53,8 @@ namespace rgl {
 
 	class GameObject : public Ball {
 	public:
-		GameObject(const WorldConfig_t &planetConfig, ObjectFeatures_t features)
-				: Ball(planetConfig, features.className, features.config.position,
+		GameObject(World *world, ObjectFeatures_t features)
+				: Ball(world, features.className, features.config.position,
 					   features.config.radius, features.config.mass, features.isStatic) {}
 	};
 }

@@ -99,6 +99,8 @@ namespace rgl {
 		// Main simulation loop
 		for (int i = 0; i < Ball::SIMULATIONUPDATES; i++) {
 
+//			long cronoIter=nowns();
+
 			// Set all balls time to maximum for this epoch
 
 			iterateObjects([fSimElapsedTime](WorldObject *ball) {
@@ -113,6 +115,7 @@ namespace rgl {
 				// Update Ball Positions
 				iterateObjects([this](WorldObject *w) {
 					Ball *ball = (Ball *) w;
+
 					if (!ball->ISSTATIC && !ball->bDisabled) {
 						if (ball->fSimTimeRemaining > 0.0f) {
 
@@ -142,11 +145,17 @@ namespace rgl {
 				return pnow()-crono;
 #endif
 
+				long times[4]={0};
+				times[0]= nowns();
+
 				// Work out static collisions with walls and displace balls so no overlaps
-				iterateObjects([this, fSimElapsedTime, &edges](WorldObject *b) {
+
+				iterateObjects([this, fSimElapsedTime, &edges, &times](WorldObject *b) {
 
 					Ball *ball = (Ball *) b;
-
+				
+					long t2=nowns();
+					
 					if (!ball->ISSTATIC && !ball->bDisabled)
 						for (auto &edge : edges) {
 
@@ -215,8 +224,11 @@ namespace rgl {
 							}
 						}
 
+					times[1]=nowns()-t2;
+					t2=nowns();
+
 					// Against other balls
-					iterateObjects([this, ball](WorldObject *targ) {
+					iterateObjects([ball, this](WorldObject *targ) {
 
 						Ball *target = (Ball *) targ;
 
@@ -238,10 +250,13 @@ namespace rgl {
 							}
 						}
 					});
+					
+					times[2]=nowns()-t2;
 
 					ball->commitSimulation();
-
 				});
+
+				if (DBG) LogV(TAG, SF("iterate %ld, edges %ld, balls %ld, collid %d, future %d", nowns()-times[0], times[1], times[2], vCollidingPairs.size(), vFutureColliders.size()));
 
 				// Now work out dynamic collisions
 				for (auto c : vCollidingPairs)
@@ -257,7 +272,9 @@ namespace rgl {
 				for (auto &b : vFakeBalls) delete b;
 				vFakeBalls.clear();
 			}
+			
 		}
+		if (DBG) LogV(TAG, SF("total %ld", nowns()-crono));
 		return nowns() - crono;
 	}
 }

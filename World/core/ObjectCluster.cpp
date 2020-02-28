@@ -82,7 +82,7 @@ namespace rgl {
 			// cache object properties
 			glm::vec3 rot = object->rot();
 			glm::vec3 pos = object->pos();
-
+			
 			float radius = object->radius() / 1000;
 
 			// our shader has a Frustum class initialized already initialized with the
@@ -125,6 +125,7 @@ namespace rgl {
 
 		if (oneMesh) {
 			unbind();
+			if (DBG) LogV(TAG, SF("Frustum Hits %d", frustumHits));
 			return;
 		}
 
@@ -150,7 +151,7 @@ namespace rgl {
 			unbind();
 		}
 		vVisibles.clear();
-		//	if (DBG) LogV(TAG, SF("Frustum Hits %d", frustumHits));
+		if (DBG) LogV(TAG, SF("Frustum Hits %d", frustumHits));
 	}
 
 	void ObjectCluster::init() {

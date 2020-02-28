@@ -39,14 +39,16 @@ namespace rgl {
 			float initialPitch,
 			glm::vec3 upVector,
 			bool smooth,
-			float smoothLerp
+			float smoothLerp,
+			float distanceLerp
 	) :
 			mFrontVector(DEF_FRONTVECTOR),
 			mMouseSensitivity(DEF_MOUSE_SENS),
 			mMouseZoom(DEF_ZOOM),
 			UPVECTOR(upVector),
 			bSmooth(smooth),
-			SMOOTHLERP(smoothLerp) {
+			SMOOTHLERP(smoothLerp),
+			DISTANCELERP(distanceLerp) {
 		mPosition = mInterpolatedPosition = initialPosition;
 		fYaw = initialYaw;
 		fRoll = 0;
@@ -94,12 +96,19 @@ namespace rgl {
 
 	void Camera::update(float fElapsedTime) {
 
+		fPlayerDistanceFar += (fTargetDistance - fPlayerDistanceFar) * DISTANCELERP * fElapsedTime;
+
 		if (bTargetMode) {
 
 			float lerp = 15; // 0.1;
+			float diff =fabs(fTargetAngle - fYaw);
 
-			if (bSmooth && fabs(fTargetAngle - fYaw) < M_PI / 2) {
+			if (bSmooth && diff < 15*M_PI / 8) {
+				
+				if (diff > M_PI / 16) lerp=2;
+
 				fYaw += (fTargetAngle - fYaw) * lerp * fElapsedTime;
+
 			} else {
 				setYaw(fTargetAngle);
 			}
