@@ -109,7 +109,7 @@ namespace rgl {
 		glm::vec3 origPos;
 		float fSimTimeRemaining;
 
-		Ball(const WorldConfig_t &planetConfig, std::string className, glm::vec3 position, float radi, float mass, bool isStatic = false);
+		Ball(World *world, std::string className, glm::vec3 position, float radi, float mass, bool isStatic = false);
 
 		Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed);
 

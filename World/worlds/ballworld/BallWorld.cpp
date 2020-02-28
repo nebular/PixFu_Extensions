@@ -113,12 +113,11 @@ namespace rgl {
 				// Update Ball Positions
 				iterateObjects([this](WorldObject *w) {
 					Ball *ball = (Ball *) w;
-					if (!ball->bDisabled) {
+					if (!ball->ISSTATIC && !ball->bDisabled) {
 						if (ball->fSimTimeRemaining > 0.0f) {
-
 							Ball *obstacle = ball->process(this, NOTIME);
 
-#ifndef DBG_NOHEIGHTMAPCOLLISIONS
+							#ifndef DBG_NOHEIGHTMAPCOLLISIONS
 
 							// these are collisions against height map
 
@@ -128,7 +127,7 @@ namespace rgl {
 								vCollidingPairs.push_back({ball, obstacle});
 								if (DBG) LogV(TAG, "- Ball collided with wall");
 							}
-#endif
+							#endif
 						}
 					}
 				});
@@ -213,13 +212,13 @@ namespace rgl {
 
 					// Against other balls
 					iterateObjects([this, ball](WorldObject *targ) {
+
 						Ball *target = (Ball *) targ;
 
-						if (!ball->bDisabled
-							&& !target->bDisabled                            // disabled balls
-							&& ball->ID != target->ID                        // same ball
-							&& (!ball->ISSTATIC || !target->ISSTATIC)        // 2 static objs wont collide (opt)
-								) {
+						if ((!ball->ISSTATIC || !target->ISSTATIC)
+							&& !ball->bDisabled && !target->bDisabled                            // disabled balls
+							&& ball->ID != target->ID) {
+
 							switch (ball->overlaps(target)) {
 								case OVERLAPS:
 									// Collision has occured

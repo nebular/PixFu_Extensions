@@ -14,6 +14,8 @@
 #include <cmath>
 #include "gtx/fast_square_root.hpp"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace rgl {
 
 	constexpr int KSPEED = 1000;
@@ -22,8 +24,8 @@ namespace rgl {
 	float Ball::stfHeightScale = 1.0;
 	int Ball::instanceCounter = 0;
 
-	Ball::Ball(const WorldConfig_t &planetConfig, std::string className, glm::vec3 position, float radi, float mass, bool isStatic)
-			: WorldObject(planetConfig, std::move(className)),
+	Ball::Ball(World *world, std::string className, glm::vec3 position, float radi, float mass, bool isStatic)
+			: WorldObject(world->CONFIG, std::move(className)),
 			  ID(instanceCounter++),
 			  RADIUS(radi),
 			  MASS(mass),
@@ -31,7 +33,15 @@ namespace rgl {
 			  mPosition(position),
 			  bFlying(false) {
 		TAG = "BALL" + std::to_string(ID);
+
 		setRadiusMultiplier(1.0);
+
+		// set initial height
+		if (mPosition.y == 0) {
+			glm::vec3 chk = {mPosition.x, 0, mPosition.z + radius()};
+			mPosition.y = world->getHeight(chk);
+		}
+
 	}
 
 	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed)
@@ -315,3 +325,5 @@ namespace rgl {
 	}
 
 }
+
+#pragma clang diagnostic pop
