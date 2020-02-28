@@ -52,6 +52,8 @@ namespace rgl {
 
 		float wheelBase() const;
 
+		float speedPercent(float speed) const;
+		
 		float maxSpeed() const;
 
 		float maxSpeedBack() const;
@@ -112,8 +114,14 @@ inline void PlayerFeatures::setPassiveWeapon(const Weapon_t *weapon, Ball *playe
 
 	inline float
 	PlayerFeatures::maxSpeed() const { return tFeatures.MAXSPEED; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
+	
+	inline float PlayerFeatures::speedPercent(float speed) const {
+		return fmin(fabs(speed) / tFeatures.MAXSPEED, 1); 
+	}
+
 	inline float
 	PlayerFeatures::maxSpeedBack() const { return tFeatures.MAXSPEEDBACK; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
+
 	inline float PlayerFeatures::maxAcceleration() const { return tFeatures.ACCELERATION; } // todo
 	inline float PlayerFeatures::friction() const { return tFeatures.FRICTION; } // todo
 	inline float PlayerFeatures::handling() const { return tFeatures.HANDLING; } // todo

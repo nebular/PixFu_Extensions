@@ -23,15 +23,16 @@ namespace rgl {
 
 	class Player : public Ball {
 
-		friend class Arena;
+//		friend class Arena;
 
 		const PlayerFeatures *FEATURES;
 
 		float fAcceleration = 0;
 		float fCalcDirection = 0;
-		float fSteerAngle = 0;
+//		float fSteerAngle = 0;
 
 	public:
+		float fSteerAngle = 0;
 
 		Player(World *world, PlayerFeatures_t features);
 
@@ -49,7 +50,7 @@ namespace rgl {
 	};
 
 	// speed percent r/max speed
-	inline float Player::speedPercent() { return fmax(fabs(speed()) / FEATURES->maxSpeed(), 1); }
+	inline float Player::speedPercent() { return FEATURES->speedPercent(speed()); }
 
 	class GameObject : public Ball {
 	public:

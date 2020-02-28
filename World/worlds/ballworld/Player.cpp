@@ -6,6 +6,10 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "err_ovl_no_viable_member_function_in_call"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
+
+#define NO_DEBUG_CARPHYSICS
+
+
 namespace rgl {
 
 	Player::Player(World *world, PlayerFeatures_t features)
@@ -55,7 +59,7 @@ namespace rgl {
 			};
 
 			const float fSpeed = speed();
-			const float accAmount = fAcceleration * (FEATURES->maxSpeed() - fmin(fSpeed, FEATURES->maxSpeed())) / FEATURES->maxSpeed();
+			const float accAmount = fAcceleration * (1 - FEATURES->speedPercent(fSpeed));
 
 			mAcceleration = accAmount * head;
 
@@ -68,6 +72,7 @@ namespace rgl {
 		// http://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
 
 		const float modSpeed = speed();
+		const float steerAngle = fSteerAngle;
 
 		// when speed = 0 we dont know the car heading so use last one
 		fCalcDirection = modSpeed > STABLE ? atan2(mSpeed.z, mSpeed.x) : fCalcDirection;
@@ -77,9 +82,9 @@ namespace rgl {
 
 		// the direction vector of the back wheels
 		glm::vec3 headingBack = glm::vec3(cosf(ang), 0, sinf(ang));
-
+		
 		// the direction vector of the front wheels, that is affected by the steering
-		glm::vec3 headingFront = glm::vec3(cosf(ang + fSteerAngle), 0, sinf(ang + fSteerAngle));
+		glm::vec3 headingFront = glm::vec3(cosf(ang + steerAngle), 0, sinf(ang + steerAngle));
 
 		/**
 		 We can use geometry calculations to find the actual positions of the wheels
@@ -120,7 +125,9 @@ namespace rgl {
 
 		mPosition = (frontWheel + backWheel) / 2.0f;
 
-//		canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, rgl::Colors::BLUE);
+		#ifdef DEBUG_CARPHYSICS
+		canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, rgl::Colors::BLUE);
+		#endif
 
 		/*
 		 The new car heading can be found by calculating the angle of the line between the
@@ -134,28 +141,26 @@ namespace rgl {
 
 		mRotation.y = -newAngle;
 
-		// this is the new heading vector
-		const glm::vec3 head = {cosf(newAngle), 0, sinf(newAngle)};
-
-		// create velocity vector TODO check rotation instead
-		mSpeed = modSpeed * head;
+		// Rotate velocity vector
+		mSpeed = glm::rotate(mSpeed, newAngle - fCalcDirection, {0, 1, 0});
 
 		//////////// END CAR HANDLING. Begin speed / acceleration
 
 		// Now, acceleration, we have the modulus, and we set the new heading
-
-		float accAmount = fAcceleration * (FEATURES->maxSpeed() - fmin(modSpeed, FEATURES->maxSpeed())) / FEATURES->maxSpeed();
+		const glm::vec3 head = {cosf(newAngle), 0, sinf(newAngle)};
+		const float accAmount = fAcceleration * (1.0f - FEATURES->speedPercent(modSpeed));
 		mAcceleration = accAmount * head;
-
-		// add acceleration
-		mSpeed.x += mAcceleration.x * fElapsedTime;    // Update Velocity
-		mSpeed.z += mAcceleration.z * fElapsedTime;
-
+		
+		if (accAmount != 0) {
+			// add acceleration
+			mSpeed.x += mAcceleration.x * fElapsedTime;    // Update Velocity
+			mSpeed.z += mAcceleration.z * fElapsedTime;
+		}
 	}
 
 	void Player::steer(float perc, float fElapsedTime) {
 		//	fSteerAngle = perc * M_PI / 512; // * (- log2(fabs(speedPercent()) + 0.000001));
-		fSteerAngle = static_cast<float>(perc * M_PI * (1 - 0.7 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
+		fSteerAngle = static_cast<float>(perc * M_PI/4 * (1 - 0.85 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
 	}
 
 	void Player::accelerate(float percentage, float fElapsedTime) {

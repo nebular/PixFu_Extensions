@@ -1,6 +1,10 @@
 //
-//  BallCollisions.cpp
+//  BallWorld.cpp
 //  PixEngine
+//
+//  A world that manages Balls and their collisions. You will need to implement
+//  virtual init() and process(), and call processCollisions(edges, fElapsedTime) to
+//  perform collision calculations.
 //
 //  Created by rodo on 25/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
@@ -120,10 +124,10 @@ namespace rgl {
 						if (ball->fSimTimeRemaining > 0.0f) {
 
 							// process ball physics
-							ball->process(this, NOTIME);
+							ball->process(this);
 
 							// process heightmap collisions & ball height
-							Ball *obstacle = ball->processHeights(this, NOTIME);
+							Ball *obstacle = ball->processHeights(this);
 
 							#ifndef DBG_NOHEIGHTMAPCOLLISIONS
 

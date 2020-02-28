@@ -36,10 +36,12 @@ namespace rgl {
 
 	class Ball : public WorldObject {
 
+		// BallWorld manages all ball instances and will access private properties here
+		// to optimize perrformance
+
 		friend class BallWorld;
 
-		friend class Arena;
-		friend class Orbit;
+//		friend class Orbit;
 
 		std::string TAG;
 
@@ -64,20 +66,24 @@ namespace rgl {
 
 	public:
 
-		const int ID;                        // Ball unique ID
-		const float RADIUS;                    // ball radius
-		const float MASS;                    // ball mass
-
-		const bool ISSTATIC;                // whether this is a static object (so wont collide with another static object)
+		/** Ball ID */
+		const int ID;
+		/** Ball Radius */
+		const float RADIUS;
+		/** Ball Mass */
+		const float MASS;
+		/** whether this is a static object (so wont collide with another static object) */
+		const bool ISSTATIC;
 
 	protected:
 
 		// Circuit has the tight collision detection loops
 		// so it is cool to have private access to vars, mostly to position.
 
-		static constexpr float FEATURES_SCRATCHING_NEW = 0.6; //89;	// TODO
+		static constexpr float FEATURES_SCRATCHING_NEW = 0.6;
 		static constexpr float FEATURES_CLIMB_LIMIT = 0.3;        // TODO
 		static constexpr float FEATURES_FALL_LIMIT = 0.3;        // TODO move to features
+		static constexpr float ACCELERATION_EARTH = -9.8; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
 
 		// Threshold indicating stability of object
 		static constexpr float STABLE = 0.001;
@@ -96,9 +102,10 @@ namespace rgl {
 		float fRadiusMultiplier = 1.0;            // multiply ball radius (game powerups)
 
 		float fHeightTarget = 0.0;                // target height (gravity effect)
-		float fAccelerationZ = 0.0;            // upwards acceleration TODO move to acceleration
-		float fAngleTerrain = 0.0;                // player horizontal angle / terrain
+		float fAccelerationZ =  0.0;            // upwards acceleration TODO move to acceleration
 
+		glm::vec2 fAngleTerrain = {0,0};         // terrain angle at corners
+		
 		float fPenalty = 1.0;                    // penalty in speed percent imposed by terrain irregularities
 
 		bool bFlying = false;                    // whether the ball is currently "flying"
@@ -123,7 +130,6 @@ namespace rgl {
 
 		static void setHeightScale(float scale);
 
-	protected:
 		/**
 		 * ball normalized position is used by the camera
 		 * @return ball position, normalized
@@ -160,21 +166,28 @@ namespace rgl {
 		 * @return angle in radians
 		 */
 
-		float angle();                // ball angle (heading)
+		float angle();
 
 		/**
 		 * Ball speed modulus
 		 * @return Speed modulus
 		 */
 
-		float speed();                // ball speed
+		float speed();
 
 		/**
 		 * Ball velocity vector
 		 * @return The velocity vector
 		 */
 
-		glm::vec3 velocity();            // speed vector
+		glm::vec3 velocity();
+
+		/**
+		 * Ball acceleration vector
+		 * @return The acceleration vector
+		 */
+
+		glm::vec3 acceleration();
 
 		/**
 		 * Ball Mass
@@ -182,6 +195,8 @@ namespace rgl {
 		 */
 
 		float mass();                // ball mass
+
+	protected:
 
 		/**
 		 * Whether the ball is flying
@@ -284,10 +299,10 @@ namespace rgl {
 		 * @param fTime Frame time
 		 */
 
-		virtual void process(World *world, float fTime);
+		virtual void process(World *world, float fTime = NOTIME);
 
 		// process Height effects (height calcs separated from 2D calcs)
-		Ball *processHeights(World *world, float fTime);
+		Ball *processHeights(World *world, float fTime = NOTIME);
 
 	};
 
@@ -304,6 +319,7 @@ namespace rgl {
 	inline float Ball::angle() { return mRotation.y; }                              // ball angle (heading)
 	inline float Ball::speed() { return glm::fastSqrt(mSpeed.x * mSpeed.x + mSpeed.z * mSpeed.z); }   // TODO fabs             		// ball speed
 	inline glm::vec3 Ball::velocity() { return mSpeed; }
+	inline glm::vec3 Ball::acceleration() { return mAcceleration; }
 
 	inline bool Ball::isFlying() { return bFlying; }                                // whether ball is flying
 

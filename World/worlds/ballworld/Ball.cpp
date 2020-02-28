@@ -32,8 +32,8 @@ namespace rgl {
 			  ISSTATIC(isStatic),
 			  mPosition(position),
 			  bFlying(false) {
+				  
 		TAG = "BALL" + std::to_string(ID);
-
 		setRadiusMultiplier(1.0);
 
 		// set initial height
@@ -53,8 +53,9 @@ namespace rgl {
 			  bFlying(false),
 			  mPosition(position),
 			  mSpeed(speed) {
-		TAG = "BALL" + std::to_string(ID);
-		setRadiusMultiplier(1.0);
+
+			  TAG = "BALL" + std::to_string(ID);
+			  setRadiusMultiplier(1.0);
 	}
 
 	Ball *Ball::makeCollisionBall(float radi, glm::vec3 position) {
@@ -161,9 +162,12 @@ namespace rgl {
 		mAcceleration.z *= 0.8;
 		mAcceleration.x *= 0.8;
 
-		mSpeed.x += mAcceleration.x * fTime;    // Update Velocity
+		// Update Velocity
+		mSpeed.x += mAcceleration.x * fTime;
 		mSpeed.z += mAcceleration.z * fTime;
-		mPosition.x += mSpeed.x * fTime;            // Update position
+		
+		// Update position
+		mPosition.x += mSpeed.x * fTime;
 		mPosition.z += mSpeed.z * fTime;
 
 		// Stop ball when velocity is neglible
@@ -175,17 +179,57 @@ namespace rgl {
 
 	Ball *Ball::processHeights(World *world, float fTime) {
 
+		if (fTime == NOTIME) {
+
+			// Flag NOTIME is used from outside so the simulation loop does not
+			// need to access ball private properties to call this function
+
+			fTime = fSimTimeRemaining;
+		}
+
 		float collisionRadius = radius() * 1.2f; // TODO there are constants like this one here and there, unify them !
 
-		glm::vec3 chk = {mPosition.x, 0, mPosition.z + collisionRadius};
-		float cheight = world->getHeight(chk);
-		chk.x = mPosition.x - collisionRadius;
-		float heightl = world->getHeight(chk);
-		chk.x = mPosition.x + collisionRadius;
-		float heightr = world->getHeight(chk);
-		fAngleTerrain = atan2((10 * (heightr - heightl)), (2 * collisionRadius));
+		// get height at left, center and right
+		// to calculate terrain angle
 
-//		if (fabs((rotation.x-fAngleTerrain))>M_PI/2) rotation.x = fAngleTerrain;
+		glm::vec3 chk = {mPosition.x, 0, mPosition.z};
+		float cheight = world->getHeight(chk);
+
+		const float ang = angle();
+		glm::vec3 heading = { cosf(ang), 0, sinf(ang)};
+
+		// left side
+		glm::vec3 point = mPosition + heading*glm::vec3 {-collisionRadius,0,0};
+		float heightl = world->getHeight(point);
+
+		// right side
+		point =  mPosition + heading*glm::vec3 {collisionRadius,0,0};
+		float heightr = world->getHeight(point);
+
+		// front
+		point =  mPosition + heading*glm::vec3 {-0,0,-collisionRadius};
+		float heightt= world->getHeight(point);
+
+		// back
+		point =  mPosition + heading*glm::vec3 {-0,0,collisionRadius};
+		float heightd= world->getHeight(point);
+		float LERP = 0.5;
+		
+		fAngleTerrain = {
+			atan2( (heightr - heightl), 2 * collisionRadius),
+			atan2( (heightd - heightt), 2 * collisionRadius)
+		};
+
+//		auto toDeg = [] (float rad) { return (int)(rad*180/M_PI); };
+//		LogV(TAG, SF("angles %d %d", toDeg(fAngleTerrain.x), toDeg(fAngleTerrain.y)));
+
+		mRotation.x = -fAngleTerrain.x;
+		mRotation.z = -fAngleTerrain.y;
+
+//		mRotation.x += (mRotation.x - fAngleTerrain.x) * LERP * fTime;
+//		mRotation.z += (mRotation.z - fAngleTerrain.y) * LERP * fTime;
+
+		//		if (fabs((rotation.x-fAngleTerrain))>M_PI/2) rotation.x = fAngleTerrain;
 //		else rotation.x += (rotation.x - fAngleTerrain) * 0.5 * fTime;
 // TODO
 		//	std::cerr << "angle terr " << fAngleTerrain * 180 / 3.141592 << std::endl;
@@ -270,36 +314,39 @@ namespace rgl {
 #endif
 		}
 
-		float ACCELERATION_EARTH = 9.8; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
 //		float ACCELERATION_EARTH = 9.8 / 10 ; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
 
-		if (fAccelerationZ > -ACCELERATION_EARTH || mPosition.y != fHeightTarget) {
+		
+		if (fAccelerationZ != 0 || mPosition.y != fHeightTarget) {
 
-			float vz = fAccelerationZ * fTime * KSPEED;
+			const float EARTH = ACCELERATION_EARTH;
+			const float totalAcceleration = fAccelerationZ + EARTH;
+			float vz = totalAcceleration * fTime * 10000;
 			float sz = vz * fTime;
 
-			if (fAccelerationZ > 0) {
+			mPosition.y += sz;
+
+			if (totalAcceleration > 0) {
 
 				// upwards
-				mPosition.y += sz;
 				// if (DBG) std::cerr << "fly up  "<<fHeight<<" vz "<<vz<<" az "<<fAccelerationZ <<std::endl;
 				bFlying = true;
 
 			} else {
 
 				// falling
-//					if (DBG) std::cerr << "fall down "<<position.y<<" vz "<<vz<<" az " << fAccelerationZ << std::endl;
-				mPosition.y += sz;
+				// if (DBG) std::cerr << "fall down "<<position.y<<" vz "<<vz<<" az " << fAccelerationZ << std::endl;
+
 				if (mPosition.y < fHeightTarget) {
 					mPosition.y = fHeightTarget;
 					bFlying = false;
 				}
 			}
 
-			fAccelerationZ -= fTime;
+			fAccelerationZ *= 0.9;
 
-			if (fAccelerationZ < -ACCELERATION_EARTH)
-				fAccelerationZ = -ACCELERATION_EARTH;
+			if (fAccelerationZ < STABLE)
+				fAccelerationZ = 0;
 
 		}
 
