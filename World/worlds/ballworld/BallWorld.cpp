@@ -115,7 +115,12 @@ namespace rgl {
 					Ball *ball = (Ball *) w;
 					if (!ball->ISSTATIC && !ball->bDisabled) {
 						if (ball->fSimTimeRemaining > 0.0f) {
-							Ball *obstacle = ball->process(this, NOTIME);
+
+							// process ball physics
+							ball->process(this, NOTIME);
+
+							// process heightmap collisions & ball height
+							Ball *obstacle = ball->processHeights(this, NOTIME);
 
 							#ifndef DBG_NOHEIGHTMAPCOLLISIONS
 

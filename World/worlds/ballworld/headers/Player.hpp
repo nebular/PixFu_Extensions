@@ -35,7 +35,7 @@ namespace rgl {
 
 		Player(const WorldConfig_t &planetConfig, PlayerFeatures_t features);
 
-		Ball *process(World *world, float fTime);
+		void process(World *world, float fTime);
 
 		void steer(float angle, float fElapsedTime);
 

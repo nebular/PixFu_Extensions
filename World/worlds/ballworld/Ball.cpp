@@ -145,7 +145,7 @@ namespace rgl {
 
 	}
 
-	Ball *Ball::process(World *world, float fTime) {
+	void Ball::process(World *world, float fTime) {
 
 		if (fTime == NOTIME) {
 
@@ -171,9 +171,6 @@ namespace rgl {
 			mSpeed.x = 0;
 			mSpeed.z = 0;
 		}
-
-		// process heights from heightmap
-		return processHeights(world, fTime);
 	}
 
 	Ball *Ball::processHeights(World *world, float fTime) {

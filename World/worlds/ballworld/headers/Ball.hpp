@@ -35,11 +35,11 @@ namespace rgl {
 	} Overlaps_t;
 
 	class Ball : public WorldObject {
-		friend class Arena;
-
-		friend class Orbit;
 
 		friend class BallWorld;
+
+		friend class Arena;
+		friend class Orbit;
 
 		std::string TAG;
 
@@ -270,8 +270,15 @@ namespace rgl {
 		 */
 		void disable(bool disabled);
 
-		// process ball iteration
-		virtual Ball *process(World *world, float fTime);
+		/**
+		 * Process ball tick. Applies speed changes according to acceleration, and position changes
+		 * according to speed.  Derived classes may override this to implement a more elaborated
+		 * physics scheme
+		 * @param world World
+		 * @param fTime Frame time
+		 */
+
+		virtual void process(World *world, float fTime);
 
 		// process Height effects (height calcs separated from 2D calcs)
 		Ball *processHeights(World *world, float fTime);

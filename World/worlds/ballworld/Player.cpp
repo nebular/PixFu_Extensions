@@ -16,11 +16,11 @@ namespace rgl {
 			  FEATURES(new PlayerFeatures(features)) {
 	}
 
-// process ball iteration
-// we totally override the Ball update method as we will simulate a car more accurately
-// using axis distance and wheel positions.
+	// process ball iteration
+	// we override the Ball update method as we will simulate a car more accurately
+	// using axis distance and wheel positions.
 
-	Ball *Player::process(World *world, float fElapsedTime) {
+	void Player::process(World *world, float fElapsedTime) {
 
 		// turn off simple simulation (below) and use car simulation
 		constexpr bool SIMPLE_BALL = false;
@@ -58,9 +58,7 @@ namespace rgl {
 			mAcceleration = accAmount * head;
 
 			// process the ball parameters
-			Ball *obstacle = Ball::process(world, fElapsedTime);
-
-			return obstacle;
+			Ball::process(world, fElapsedTime);
 		}
 
 		// following is a simulation based on that website that models back and front axis
@@ -149,8 +147,6 @@ namespace rgl {
 		mSpeed.x += mAcceleration.x * fElapsedTime;    // Update Velocity
 		mSpeed.z += mAcceleration.z * fElapsedTime;
 
-		// process heights from heightmap
-		return processHeights(world, fElapsedTime);
 	}
 
 	void Player::steer(float perc, float fElapsedTime) {
