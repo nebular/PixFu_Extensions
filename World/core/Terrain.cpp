@@ -15,7 +15,7 @@
 namespace rgl {
 
 	std::string Terrain::TAG = "Terrain";
-	
+
 	Terrain::Terrain(WorldConfig_t planetConfig, TerrainConfig_t config)
 			: CONFIG(config), PLANET(planetConfig) {
 
@@ -33,9 +33,8 @@ namespace rgl {
 			pDirtCanvas->blank();
 			if (DBG) wireframe();
 		}
-				
-	
-				
+
+
 		if (DBG) LogV(TAG, SF("Created terrain %s", config.name.c_str()));
 	};
 
@@ -78,20 +77,20 @@ namespace rgl {
 	}
 
 	void Terrain::init(TerrainShader *shader) {
-			
+
 		glm::mat4 tmatrix = createTransformationMatrix(
 				{CONFIG.origin.x / 1000, 0, CONFIG.origin.y / 1000},
 				0, 0, 0, 1, false, false, false) * PLANET.terrainTransform.toMatrix();
 
 		shader->loadTransformationMatrix(tmatrix);
-		
+
 		LayerVao::add(
 				pLoader->vertices(), pLoader->verticesCount(),
 				pLoader->indices(), pLoader->indicesCount());
 
 		pTexture->upload();
 		if (pDirtTexture != nullptr) pDirtTexture->upload();
-		
+
 		bInited = true;
 	}
 };

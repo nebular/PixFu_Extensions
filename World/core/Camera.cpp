@@ -98,7 +98,7 @@ namespace rgl {
 
 			float lerp = 15; // 0.1;
 
-			if (bSmooth && fabs(fTargetAngle - fYaw) < M_PI/2) {
+			if (bSmooth && fabs(fTargetAngle - fYaw) < M_PI / 2) {
 				fYaw += (fTargetAngle - fYaw) * lerp * fElapsedTime;
 			} else {
 				setYaw(fTargetAngle);
@@ -110,7 +110,7 @@ namespace rgl {
 			if (bSmooth) {
 				mInterpolatedPosition.x += (mTargetPosition.x - mInterpolatedPosition.x) * lerp * fElapsedTime;
 				mInterpolatedPosition.y = mTargetPosition.y;
-				
+
 //				mInterpolatedPosition.y += (mTargetPosition.y - mInterpolatedPosition.y) * lerp * fElapsedTime;
 				mInterpolatedPosition.z += (mTargetPosition.z - mInterpolatedPosition.z) * lerp * fElapsedTime;
 				mPosition = mInterpolatedPosition;

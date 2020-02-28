@@ -21,7 +21,9 @@ namespace rgl {
 
 	std::string ObjectCluster::TAG = "ObjectCluster";
 
-	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale=1.0f, bool flipX = false, bool flipY = false, bool flipZ = false);
+	glm::mat4
+	createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads, float scale = 1.0f, bool flipX = false,
+							   bool flipY = false, bool flipZ = false);
 
 	ObjectCluster::ObjectCluster(World *planet, std::string name, Transformation_t initialTransform)
 			: NAME(std::move(name)),
@@ -41,7 +43,7 @@ namespace rgl {
 		}
 
 		mPlacer = PLACER.toMatrix();
-		
+
 
 		if (DBG) LogV(TAG, SF("Created ObjectCluster %s", NAME.c_str()));
 

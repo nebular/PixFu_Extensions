@@ -15,18 +15,22 @@
 namespace rgl {
 
 	class Ball;
-	class BallWorld:public World {
+
+	class BallWorld : public World {
 
 		static std::string TAG;
-		
+
 		std::vector<Ball *> vFakeBalls;
-		std::vector <std::pair<Ball *, Ball *>> vCollidingPairs;
-		std::vector <std::pair<Ball *, Ball *>> vFutureColliders;
+		std::vector<std::pair<Ball *, Ball *>> vCollidingPairs;
+		std::vector<std::pair<Ball *, Ball *>> vFutureColliders;
 
 	public:
 		BallWorld(WorldConfig_t config, Perspective_t perspective);
+
 		long processCollisions(const std::vector<sLineSegment> &edges, float fElapsedTime);
+
 		void processStaticCollision(Ball *ball, Ball *target);
+
 		void processDynamicCollision(Ball *b1, Ball *b2, float fElapsedTime);
 	};
 }

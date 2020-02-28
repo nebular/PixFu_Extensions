@@ -21,6 +21,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 include_directories(../pixFu/src)
 include_directories(../pixFu/src/core/headers)
+include_directories(../pixFu/src/core/headers)
 include_directories(../pixFu/src/items/headers)
 include_directories(../pixFu/src/input/headers)
 include_directories(../pixFu/src/thirdparty/glm)
@@ -29,6 +30,7 @@ include_directories(${CMAKE_SOURCE_DIR})
 
 include_directories(World/)
 include_directories(World/core/headers)
+include_directories(World/geom)
 include_directories(World/worlds/ballworld/headers)
 
 ## PIXENGINE
