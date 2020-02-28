@@ -40,27 +40,8 @@ namespace rgl {
 			vTextures.push_back(new Texture2D("objects/" + NAME + "/" + NAME + "-" + std::to_string(i) + ".png"));
 		}
 
-		/*
-		  create transformation matrix. can flip space.
-									 _            _
-									|  1  0  0  0  |
-									|  0  1  0  0  |
-		 Matrix_Mirrored_On_Z = M * |  0  0 -1  0  |
-									|_ 0  0  0  1 _|
-
-		 */
-
-		glm::mat4 flipMatrix = glm::identity<glm::mat4>();
-
-		if (PLACER.flipx) flipMatrix[0][0] = -1.0f;
-		if (PLACER.flipy) flipMatrix[1][1] = -1.0f;
-		if (PLACER.flipz) flipMatrix[2][2] = -1.0f;
-
-		mPlacer = createTransformationMatrix(
-				PLACER.position,
-				PLACER.rotation.x, PLACER.rotation.y, PLACER.rotation.z,
-				PLACER.scale
-		) * flipMatrix;
+		mPlacer = PLACER.toMatrix();
+		
 
 		if (DBG) LogV(TAG, SF("Created ObjectCluster %s", NAME.c_str()));
 

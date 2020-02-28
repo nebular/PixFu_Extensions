@@ -54,7 +54,8 @@ namespace rgl {
 	class Camera {
 
 		static constexpr glm::vec3 DEF_UPVECTOR = glm::vec3(0.0f, 1.0f, 0.0f);
-		static constexpr glm::vec3 DEF_FRONTVECTOR = glm::vec3(0.0f, 0.0f, -1.0f);
+//		static constexpr glm::vec3 DEF_UPVECTOR = glm::vec3(0.0f, 1.0f, 0.0f);
+		static constexpr glm::vec3 DEF_FRONTVECTOR = glm::vec3(0.0f, 0.0f, 1.0f);
 
 		static constexpr float STEP = 0.0001f * 15.0f, VSTEP = 0.05;
 
@@ -271,7 +272,9 @@ namespace rgl {
 
 	inline void Camera::follow(WorldObject *target) {
 		mTargetPosition = target->pos();
-		fTargetAngle = (float) -M_PI / 2.0f - target->rot().y;
+//		fTargetAngle = M_PI / 2 -target->rot().y; //M_PI/2.0f - target->rot().y;
+		fTargetAngle = -target->rot().y;
+//		fTargetAngle = (float) -M_PI / 2.0f - target->rot().y;
 	}
 
 	/**

@@ -11,8 +11,12 @@
 
 #include <string>
 #include "glm.hpp"
+#include "matrix_transform.hpp"
 
 namespace rgl {
+
+	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
+						   float scale, bool flipX, bool flipY, bool flipZ);
 
 	// Perspective presets (with initial camera height / pitch)
 	typedef struct sPerspective {
@@ -23,6 +27,24 @@ namespace rgl {
 		const float C_PITCH = 0;
 	} Perspective_t;
 
+	// defines an initiali transforation for the world and objects
+	typedef struct sTransformation {
+
+		glm::vec3 position = {0, 0, 0};
+		glm::vec3 rotation = {0, 0, 0};
+		float scale = 1.0;
+		bool flipx = false, flipy = false, flipz = false;
+		
+		inline glm::mat4 toMatrix() const {
+			return createTransformationMatrix(
+					position,
+					rotation.x, rotation.y, rotation.z,
+					scale, flipx, flipy, flipz
+			);
+		}
+		
+	} Transformation_t;
+
 	// World configuration
 	typedef struct sWorldConfig {
 		// determines which shader to use (assets)
@@ -32,8 +54,12 @@ namespace rgl {
 		// light position and color
 		const glm::vec3 lightPosition = {20000, 20000, 2000};
 		const glm::vec3 lightColor = {0.8, 0.8, 0.93};
+		// the global world transform to flip axis, etc
+		const Transformation_t worldTransform;
+		const Transformation_t terrainTransform;
 		// whether to create a 3d canvas to draw over the terrain
 		const bool withCanvas = true;
+		const int heightSign = -1;
 	} WorldConfig_t;
 
 	// determines  initial object properties
@@ -44,13 +70,6 @@ namespace rgl {
 		float mass = 1000.0;
 	} ObjectConfig_t;
 
-	// defines an initiali transforation for the world and objects
-	typedef struct sTransformation {
-		glm::vec3 position = {0, 0, 0};
-		glm::vec3 rotation = {0, 0, 0};
-		float scale = 1.0;
-		bool flipx = false, flipy = false, flipz = false;
-	} Transformation_t;
 
 	// Definition of a terrain
 	typedef struct sTerrainConfig {
@@ -66,10 +85,12 @@ namespace rgl {
 // base class for any object in the world
 
 	class WorldObject {
+	protected:
+		const WorldConfig_t &PLANET;
 	public:
 		const std::string CLASS;
 
-		inline WorldObject(std::string objectClass) : CLASS(objectClass) {}
+		inline WorldObject(const WorldConfig_t &worldConfig, std::string objectClass) : CLASS(objectClass), PLANET(worldConfig) {}
 
 		inline virtual ~WorldObject() = default;
 

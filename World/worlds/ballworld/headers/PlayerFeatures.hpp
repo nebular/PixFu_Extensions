@@ -18,8 +18,9 @@ typedef struct sPlayerFeatures {
 	const sObjectConfig config;
 	
 		
-	const float MAXSPEED = 0.15;				// max speed in m/h, 0.15 = 150 km/h and kind of makes sense for the map
-	const float MAXSPEEDBACK = 0.04;			// max speed backwards
+	const float MAXSPEED = 160;				// max speed in m/h, 0.15 = 150 km/h and kind of makes sense for the map
+	const float MAXSPEEDBACK = 50;			// max speed backwards
+
 	const float FRICTION = 0.001;				// speed lose on no gas. change this name, it is not friction.
 	const float ACCELERATION = 0.003;			// max car acceleration
 	const float HANDLING = 18;//12;				// max turn angle (value is not an angle, but related to it), higher = sharper

@@ -22,6 +22,7 @@ namespace rgl {
 	constexpr Perspective_t World::PERSP_FOV60_LOW;
 	constexpr Perspective_t World::PERSP_FOV60_MID;
 	constexpr Perspective_t World::PERSP_FOV60_FAR;
+	constexpr Transformation_t TRANSFORM_FLIPX, TRANSFORM_FLIPY, TRANSFORM_FLIPZ;
 
 	std::string World::TAG = "World";
 
@@ -49,14 +50,14 @@ namespace rgl {
 
 //	void World::add(const char *name, ObjectConfig_t objectConfig, ObjectConfig_t initialTransform) {
 	
-	void World::add(WorldObject *object, Transformation_t initialTransform) {
+	void World::add(WorldObject *object) {
 		
 		auto clusterItem = mCluesters.find(object->CLASS);
 		ObjectCluster *cluster;
 
 		if (clusterItem == mCluesters.end()) {
 			// create object cluster
-			cluster = new ObjectCluster(this, object->CLASS, initialTransform);
+			cluster = new ObjectCluster(this, object->CLASS, CONFIG.worldTransform);
 			vObjects.push_back(cluster);
 			mCluesters[object->CLASS] = cluster;
 		} else {
@@ -145,6 +146,36 @@ namespace rgl {
 
 	}
 
+
+glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
+									 float scale, bool flipX = true, bool flipY = false, bool flipZ = false) {
+
+	glm::mat4 flipMatrix = glm::identity<glm::mat4>();
+
+	/*
+	  create transformation matrix. can flip space.
+								 _            _
+								|  1  0  0  0  |
+								|  0  1  0  0  |
+	 Matrix_Mirrored_On_Z = M * |  0  0 -1  0  |
+								|_ 0  0  0  1 _|
+
+	 */
+
+	if (flipX) flipMatrix[0][0] = -1.0f;
+	if (flipY) flipMatrix[1][1] = -1.0f;
+	if (flipZ) flipMatrix[2][2] = -1.0f;
+
+
+	glm::mat4 matrix = glm::identity<glm::mat4>();
+
+	matrix = glm::translate(matrix, translation);
+	matrix = glm::rotate(matrix, rxrads, {1.0f, 0.0f, 0.0f});
+	matrix = glm::rotate(matrix, ryrads, {0.0f, 1.0f, 0.0f});
+	matrix = glm::rotate(matrix, rzrads, {0.0f, 0.0f, 1.0f});
+	matrix = glm::scale(matrix, {scale, scale, scale});
+	return matrix * flipMatrix;
+}
 };
 
 #pragma clang diagnostic pop

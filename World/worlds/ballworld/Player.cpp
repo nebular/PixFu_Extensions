@@ -1,60 +1,82 @@
 #include "Player.hpp"
 #include "Utils.hpp"
+#include "gtx/rotate_vector.hpp"
 
 namespace rgl {
 
-Player::Player(PlayerFeatures_t features)
-: Ball(features.className, features.config.position,
-	   features.config.radius, features.config.mass),
-FEATURES(new PlayerFeatures(features)) {
-	
+Player::Player(const WorldConfig_t &planetConfig, PlayerFeatures_t features)
+: Ball(planetConfig, features.className, features.config.position,
+	   features.config.radius,
+	   features.config.mass,
+	   false,
+	   true),
+		FEATURES(new PlayerFeatures(features)) {
 }
 
 // process ball iteration
+// we totally override the Ball update method as we will simulate a car more accurately
+// using axis distance and wheel positions.
+
 Ball *Player::process(World *world, float fElapsedTime) {
-	
-	float KHANDLING = 0.5; // 0.01;
+
+	// turn off simple simulation (below) and use car simulation
+	constexpr bool SIMPLE_BALL = false;
+
+	//	auto toDeg = [] (float rad) { return (int)(rad*180/M_PI); };
+
 	Canvas2D *canvas = world->canvas(position);
 
-	// process the ball parameters
-	Ball *obstacle = Ball::process(world, fElapsedTime);
-	float fixed = (float)(((int)(fSteerAngle * 10000)) / 10000.0f);
-	fAngle += KHANDLING * fElapsedTime * -fixed * fSpeed;
-	return obstacle;
-	
-	// trick tå use fSimTimeRemaining from outside without knowing it
-	if (fElapsedTime == NOTIME)
+	if (fElapsedTime == NOTIME) {
 		fElapsedTime = fSimTimeRemaining;
+		origPos = position;                                // Store original position this epochoverla
+	}
+	
+	// SIMPLE BALL rotates the ball speed vector according to tthe steering wheel
+	// this is the simplest simulatino
+	
+	if (SIMPLE_BALL) {
+		// rotate the speed vector ccording to the steering wheel
+		mSpeed = glm::rotate(mSpeed, fSteerAngle, {0,1,0});
+		fCalcDirection = atan2(mSpeed.z, mSpeed.x);
 
+		// visually rotate player & set camera (camera follow will use this rotation - player absolute rotation)
+		rotation.y = -fCalcDirection;
+
+		// add pedal acceleration to the car heading
+		glm::vec3 head = {
+			cosf(fCalcDirection),
+			0,
+			sinf(fCalcDirection)
+		};
+		
+		const float fSpeed = speed();
+		const float accAmount = fAcceleration * (FEATURES->maxSpeed() - fmin(fSpeed, FEATURES->maxSpeed())) / FEATURES->maxSpeed();
+
+		acceleration = accAmount * head;
+
+		// process the ball parameters
+		Ball *obstacle = Ball::process(world, fElapsedTime);
+
+		return obstacle;
+	}
+	
+	// following is a simulation based on that website that models back and front axis
+	// so steering is applied to the front wheels
 	// http://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
-	
-	//	float vx = -cosf(fAngle) * fSpeed, vy = -sinf(fAngle) * fSpeed;
-	// Update position
-	//position.x += -sinf(fAngle) * fSpeed * fElapsedTime * KSPEED;
-	//position.z += -cosf(fAngle) * fSpeed * fElapsedTime * KSPEED;
 
-	float ang = fAngle;
-	glm::vec3 headingBack = glm::vec3(-sinf(ang),0, -cosf(ang) );
-	glm::vec3 headingFront = glm::vec3(-sinf(ang + fSteerAngle),0, -cosf(ang + fSteerAngle) );
+	const float modSpeed = speed();
 
-	//	glm::vec3 headingFront = glm::vec3(-sinf(fAngle + fSteerAngle),0, -cosf(fAngle + fSteerAngle) );
-//	glm::vec3 headingBack = glm::vec3(-sinf(fAngle),0, -cosf(fAngle) );
+	// when speed = 0 we dont know the car heading so use last one
+	fCalcDirection = modSpeed > STABLE ? atan2(mSpeed.z, mSpeed.x) : fCalcDirection;
 
-	auto toDeg = [] (float rad) { return (int)(rad*180/M_PI); };
-	
-	LogV("Player", SF("angle %d steerAngle %d", toDeg(fAngle), toDeg(fSteerAngle)));
+	// the current car direction, calculated from the velocity vector
+	float ang = fCalcDirection;
 
-	/**
+	// the direction vector of the back wheels
+	glm::vec3 headingBack = glm::vec3(cosf(ang),0, sinf(ang));
 
-	 float
-		 vx = -cosf(fAngle) * fSpeed,
-		 vy = -sinf(fAngle) * fSpeed;
-
-	 // Update position
-	 position.z += vx * fTime * KSPEED;
-	 position.x += vy * fTime * KSPEED;
- 	 
- **/
+	// the direction vector of the front wheels, that is affected by the steering
+	glm::vec3 headingFront = glm::vec3(cosf(ang + fSteerAngle),0, sinf(ang + fSteerAngle) );
 	
 	/**
 	 We can use geometry calculations to find the actual positions of the wheels
@@ -63,13 +85,13 @@ Ball *Player::process(World *world, float fElapsedTime) {
 	 direction that the car is facing.
 	 */
 	
-	glm::vec3 backWheel = position - FEATURES->wheelBase() / 2 * headingBack;
-	glm::vec3 frontWheel = position + FEATURES->wheelBase() / 2 * headingFront;
-
-	
+	const glm::vec3 offset = FEATURES->wheelBase() / 2 * headingBack;
+	glm::vec3 frontWheel = position + offset;
+	glm::vec3 backWheel = position - offset;
+		
 	canvas->blank();
 	canvas->fillCircle(frontWheel.x, frontWheel.z, 2, rgl::Colors::RED);
-	canvas->fillCircle(backWheel.x, backWheel.z, 2, rgl::Colors::MAGENTA);
+	canvas->fillCircle(backWheel.x, backWheel.z, 2, rgl::Colors::GREEN);
 
 	/**
 	 Each wheel should move forward by a certain amount in the direction it is pointing.
@@ -80,72 +102,77 @@ Ball *Player::process(World *world, float fElapsedTime) {
 	
 	//	backWheel += carSpeed * dt * new Vector2(cos(carHeading) , sin(carHeading));
 	//	frontWheel += carSpeed * dt * new Vector2(cos(carHeading+steerAngle) , sin(carHeading+steerAngle));
-	// position 1000,0,800 ... angle 0 , backwheel: 1000,0,808, frontWheel:  1000,0,791
 	
-	
-	backWheel += fSpeed * fElapsedTime * headingFront * 1000.0f; // * KSPEED;
-	frontWheel += fSpeed * fElapsedTime * headingBack * 1000.0f; //  * KSPEED;
+	backWheel += modSpeed * fElapsedTime * headingBack;
+	frontWheel += modSpeed * fElapsedTime * headingFront;
 
 	canvas->fillCircle(frontWheel.x, frontWheel.z, 2, rgl::Colors::BLACK);
 	canvas->fillCircle(backWheel.x, backWheel.z, 2, rgl::Colors::GREY);
 
 	/*
 	The new car position can be calculated by averaging the two new wheel positions.
-	The new car heading can be found by calculating the angle of the line between the
-	two new wheel positions:
 	*/
 
 	position = (frontWheel + backWheel) / 2.0f;
+
 	canvas->fillCircle(position.x, position.z, 2, rgl::Colors::BLUE);
+
+	/*
+	 The new car heading can be found by calculating the angle of the line between the
+	 two new wheel positions:
+	 */
+
+	const float newAngle = atan2( frontWheel.z - backWheel.z , frontWheel.x - backWheel.x );
+
+	// rotation.y is player's rotation around y, and is used by the camera when following
+	// this player
+
+	rotation.y = -newAngle;
+
+	// this is the new heading vector
+	const glm::vec3 head = { cosf(newAngle),0,sinf(newAngle) };
+
+	// create velocity vector TODO check rotation instead
+	mSpeed = modSpeed * head;
 	
-	fAngle = -M_PI/2 - atan2( frontWheel.z - backWheel.z , frontWheel.x - backWheel.x );
+	//////////// END CAR HANDLING. Begin speed / acceleration
+	
+	// Now, acceleration, we have the modulus, and we set the new heading
+	
+	float accAmount = fAcceleration * (FEATURES->maxSpeed() - fmin(modSpeed, FEATURES->maxSpeed())) / FEATURES->maxSpeed();
+	acceleration = accAmount * head;
 
-//	fAngle = atan2( frontWheel.z - backWheel.z , frontWheel.x - backWheel.x );
-//	fAngle = atan2( frontWheel.z - backWheel.z , frontWheel.x - backWheel.x );
-//	fAngle = atan2(-frontWheel.x + backWheel.x , -frontWheel.z + backWheel.z );
-//	fAngle = atan2(frontWheel.x - backWheel.x , frontWheel.z - backWheel.z );
-
-	if (fAcceleration != 0)
-		fSpeed += fAcceleration * fElapsedTime; //  - TERRAINFRICTION * fTime * (1 - fmin(fSpeed / 0.2, 1));
-
-//	float vx = -cosf(fAngle) * fSpeed, vy = -sinf(fAngle) * fSpeed;
-
-	// Update position
-//	position.z += vx * fElapsedTime * 1000;
-//	position.x += vy * fElapsedTime * 1000;
+	// add acceleration
+	mSpeed.x 	+= acceleration.x   * fElapsedTime;    // Update Velocity
+	mSpeed.z 	+= acceleration.z   * fElapsedTime;
 
 	// process heights from heightmap
 	return processHeights(world, fElapsedTime);
-
 }
 
 void Player::steer(float perc, float fElapsedTime) {
-	
-	fSteerAngle = perc * M_PI / 16; // * (- log2(fabs(speedPercent()) + 0.000001));
-	
+//	fSteerAngle = perc * M_PI / 512; // * (- log2(fabs(speedPercent()) + 0.000001));
+	fSteerAngle = perc * M_PI  * (1 - 0.7*getSpeedPercent()); // * (- log2(fabs(speedPercent()) + 0.000001));
 }
 
 void Player::accelerate(float percentage, float fElapsedTime) {
 	
 	// MAXSPEED == speed -> 0;
 	// MINSPEED -> KACCEL
-	
+
+	float KACCEL = 100;
+
 	bReverse = false;
 	bForward = true;
-	
-	bForward = fSpeed > 0 && percentage != 0;
-	bReverse = fSpeed < 0 && fAcceleration < 0 && percentage != 0;
-
-	fAcceleration = KACCEL * percentage * (FEATURES->maxSpeed() - fmin(fSpeed, FEATURES->maxSpeed())) / FEATURES->maxSpeed();
-	
-//	if (!bReverse && fSpeed <0.01 ) fAcceleration = fmax(fAcceleration, 0.05);
-	
-//	fAcceleration = 0;
+		
+	fAcceleration = KACCEL * percentage;
 }
 
 void Player::brake(float percentage, float fElapsedTime) {
-	float brake = -KDECCEL * fSpeed * percentage;
-	fAcceleration = brake;
+
+	float KDECCEL = 200*(1-getSpeedPercent());
+	fAcceleration = -KDECCEL * percentage;
+	
 }
 
 void Player::jump() {

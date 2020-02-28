@@ -22,16 +22,19 @@ namespace rgl {
 	} ObjectFeatures_t;
 
 	class Player : public Ball {
-
+		friend class Arena;
 		const PlayerFeatures *FEATURES;
 
 		const int MAX_STEER_MOMENTUM = 20 * 10;
 
+		float fAcceleration = 0;
+		float fCalcDirection = 0;
+		float fHeading = 0;
 		float fSteerAngle = 0;
 		float fSteerMomentum = 0;
 		
 	public: 
-		Player(PlayerFeatures_t features);
+		Player(const WorldConfig_t &planetConfig, PlayerFeatures_t features);
 		Ball *process(World *world, float fTime);
 		void steer(float angle, float fElapsedTime);
 		void accelerate(float percentage, float fElapsedTime);
@@ -42,12 +45,12 @@ namespace rgl {
 	};
 
 	// speed percent r/max speed
-	inline float Player::getSpeedPercent() { return fmax(fabs(fSpeed) / FEATURES->maxSpeed(), 1); }
+	inline float Player::getSpeedPercent() { return fmax(fabs(speed()) / FEATURES->maxSpeed(), 1); }
 
 	class GameObject : public Ball {
 	public:
-		GameObject(ObjectFeatures_t features)
-				: Ball(features.className, features.config.position,
+		GameObject(const WorldConfig_t &planetConfig, ObjectFeatures_t features)
+				: Ball(planetConfig, features.className, features.config.position,
 					   features.config.radius, features.config.mass, features.isStatic) {}
 	};
 }

@@ -9,6 +9,7 @@
 #include "Ball.hpp"
 #include "Utils.hpp"
 #include "World.hpp"
+#include "WorldMeta.hpp"
 #include "Config.hpp"
 #include <cmath>
 
@@ -20,25 +21,36 @@ namespace rgl {
 	float Ball::stfHeightScale = 1.0;
 	int Ball::instanceCounter = 0;
 
-	Ball::Ball(std::string className, glm::vec3 position, float radi, float mass, bool isStatic)
-	: WorldObject(std::move(className)), position(position), nId(instanceCounter++), fRadius(radi), fMass(mass), bFlying(false), bStatic(isStatic) {
-		TAG = "BALL" + std::to_string(nId);
-		setRadiusMultiplier(1.0);
+	Ball::Ball(const WorldConfig_t &planetConfig, std::string className, glm::vec3 position, float radi, float mass, bool isStatic, bool isPlayer)
+	: WorldObject(planetConfig, std::move(className)),
+		position(position),
+		nId(instanceCounter++),
+		fRadius(radi),
+		fMass(mass),
+		bFlying(false),
+		bPlayer(isPlayer),
+		bStatic(isStatic) {
+			TAG = "BALL" + std::to_string(nId);
+			setRadiusMultiplier(1.0);
 	}
 
-	Ball::Ball(glm::vec3 position, float radi, float mass, float angle)
-	: WorldObject("FAKE"), nId(FAKE_BALL_ID), position(position), fRadius(radi), fMass(mass),bFlying(false) {
-		TAG = "BALL" + std::to_string(nId);
-		setRadiusMultiplier(1.0);
+	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass,  glm::vec3 position, glm::vec3 speed)
+	: WorldObject(planetConfig, "FAKE"),
+		nId(FAKE_BALL_ID),
+		position(position),
+		mSpeed(speed),
+		fRadius(radi),
+		fMass(mass),
+		bStatic(false),
+		bPlayer(false),
+		bFlying(false) {
+		
+			TAG = "BALL" + std::to_string(nId);
+			setRadiusMultiplier(1.0);
 	}
 
-	Ball *Ball::makeCollisionBall(float radi, float nmass) {
-		Ball *obstacle = new Ball({
-				position.x - cosf(fAngle) * (radi + radius() - 2),
-				position.y,
-				position.z - sinf(fAngle) * (radi + radius() - 2)
-		}, radi, nmass, -fAngle);
-		return obstacle;
+	Ball *Ball::makeCollisionBall(float radi, glm::vec3 position) {
+		return new Ball(PLANET, radi, fMass * 0.8f, position, { -mSpeed.x, 0, -mSpeed.z });
 	}
 
 	void Ball::disable(bool disabled) {
@@ -111,10 +123,9 @@ namespace rgl {
 	}
 
 // subclasses MUST call this
-	void Ball::onCollision(Ball *other, float fElapsedTime, float newSpeed, float newAngle) {
-		LogV(TAG, SF("I crashed, former speed %f, new speed %f, angle %f,  new angle %f", fSpeed, newSpeed, fAngle, newAngle));
-		fAngle = newAngle;
-		fSpeed = newSpeed;
+	void Ball::onCollision(Ball *other, float fElapsedTime, glm::vec3 newSpeed) {
+		LogV(TAG, SF("I crashed"));
+		mSpeed = newSpeed;
 	}
 
 	void Ball::onFutureCollision(Ball *other) {}
@@ -126,22 +137,20 @@ namespace rgl {
 		// point and calculate how much time that journey would have taken using the speed of the object. Therefore
 		// we can now work out how much time remains in that timestep.
 
-		if (fSpeed != 0 || true) {
 
-			float fIntendedSpeed = fSpeed;
-			
-			float fActualDistance = sqrtf(
-					(position.x - origPos.x) * (position.x - origPos.x) + (position.z - origPos.z) * (position.z - origPos.z));
-			
-			float fActualTime = fActualDistance / fIntendedSpeed;
+		float fIntendedSpeed = speed();
 
-			// After static resolution, there may be some time still left for this epoch,
-			// so allow simulation to continue
+		float fActualDistance = sqrtf(
+				(position.x - origPos.x) * (position.x - origPos.x) + (position.z - origPos.z) * (position.z - origPos.z));
+		
+		float fActualTime = fActualDistance / fIntendedSpeed;
 
-			fSimTimeRemaining = fSimTimeRemaining - fabs(fActualTime);
-			if (fSimTimeRemaining < 0) fSimTimeRemaining = 0;
+		// After static resolution, there may be some time still left for this epoch,
+		// so allow simulation to continue
 
-		}
+		fSimTimeRemaining = fSimTimeRemaining - fabs(fActualTime);
+		if (fSimTimeRemaining < 0) fSimTimeRemaining = 0;
+
 
 	}
 
@@ -158,45 +167,20 @@ namespace rgl {
 
 		fMetronome += fTime;
 		
-//		bool wasPositive = fSpeed >= 0;
-
-		if (fAcceleration != 0)
-			fSpeed += fAcceleration * fTime; //  - TERRAINFRICTION * fTime * (1 - fmin(fSpeed / 0.2, 1));
-
-		//		if (fSpeed < 0 && !bReverse) fSpeed = 0;
-		//		if (fSpeed < 0 && wasPositive & !bReverse) fSpeed = 0;
-
-//		LogV(TAG, SF("Accel %f, speed %f", fAcceleration, fSpeed));
+		acceleration.z *= 0.8;
+		acceleration.x *= 0.8;
 		
-		// Speed vector
+		mSpeed.x 	+= acceleration.x   * fTime;    // Update Velocity
+		mSpeed.z 	+= acceleration.z   * fTime;
+		position.x 	+= mSpeed.x * fTime;    		// Update position
+		position.z 	+= mSpeed.z * fTime;
 
-//		 LA QUE SI VA AJUSTADA
-		float
-			vx = -cosf(fAngle) * fSpeed,
-			vy = -sinf(fAngle) * fSpeed;
-
-		// Update position
-		position.z += vx * fTime * KSPEED;
-		position.x += vy * fTime * KSPEED;
-
-		
-		//		 LA QUE NO VA AJUSTADA
-		/*
-		float ang = fAngle; // - M_PI/2;
-		
-//		glm::vec3 v = -speedVector();
-		// Speed vector
-		float	vx = cosf(ang) * fSpeed,
-				vy = sinf(ang) * fSpeed;
-
-		// Update position
-		position.x += vx * fTime * KSPEED;
-		position.z += vy * fTime * KSPEED;
-		 */
-
+			
 		// Stop ball when velocity is neglible
-//		if (fabs(fSpeed) < STABLE && !bForward && !bReverse && fAcceleration == 0)
-//			fSpeed = fAcceleration = fOverAcceleration = 0;
+		if (fabs(mSpeed.x * mSpeed.x + mSpeed.z * mSpeed.z) < STABLE) {
+			mSpeed.x = 0;
+			mSpeed.z = 0;
+		}
 
 		// process heights from heightmap
 		return processHeights(world, fTime);
@@ -208,29 +192,32 @@ namespace rgl {
 			float collisionRadius = radius() * 1.2f; // TODO there are constants like this one here and there, unify them !
 
 			glm::vec3 chk ={position.x, 0, position.z + collisionRadius};
-			float height = world->getHeight(chk);
+			float cheight = world->getHeight(chk);
 			chk.x =position.x - collisionRadius;
 			float heightl = world->getHeight(chk);
 			chk.x =position.x + collisionRadius;
 			float heightr = world->getHeight(chk);
 			fAngleTerrain = atan2((10 * (heightr - heightl)), (2 * collisionRadius));
+		
+//		if (fabs((rotation.x-fAngleTerrain))>M_PI/2) rotation.x = fAngleTerrain;
+//		else rotation.x += (rotation.x - fAngleTerrain) * 0.5 * fTime;
 // TODO
 			//	std::cerr << "angle terr " << fAngleTerrain * 180 / 3.141592 << std::endl;
 			//	std::cerr << "height  terr " << height << " ply " << fHeight << std::endl;
 
-			if (position.y > height) {
+			if (position.y > cheight) {
 
 				// downhill
-				if (position.y - height < FEATURES_FALL_LIMIT) {
+				if (position.y - cheight < FEATURES_FALL_LIMIT) {
 					// gong down
-					fHeightTarget = height;
+					fHeightTarget = cheight;
 				} else {
 					// fell from high
 					// std::cerr << "GOING DOWN !!" << std::endl;
-					fHeightTarget = height;
+					fHeightTarget = cheight;
 				}
 
-			} else if (position.y < height) {
+			} else if (position.y < cheight) {
 
 #ifdef DBG_NOHEIGHTMAPCOLLISIONS
 
@@ -238,14 +225,14 @@ namespace rgl {
 				// because it is a little random as the heights are very irregular. So we only use it to
 				// impose penalties on the speed depending on the gradient
 
-				float delta = height - position.y;
+				float delta = cheight - position.y;
 				if (delta < RIDEHEIGHT_SEAMLESS) {
 
 					// we can ride seamlessly across this irregularity
 
-					position.y = height;
-					fHeightTarget = height;		// accept new height
-					fPenalty = 1;							// seamlessly drive
+					position.y = cheight;
+					fHeightTarget = cheight;		// accept new height
+					fPenalty = 1;					// seamlessly drive
 
 				} else {
 
@@ -254,11 +241,11 @@ namespace rgl {
 
 					fPenalty =  FEATURES_SCRATCHING_NEW + (1 - fmin(delta, FEATURES_CLIMB_LIMIT)/FEATURES_CLIMB_LIMIT) * (1-FEATURES_SCRATCHING_NEW);
 
-					fSpeed*= fPenalty;	// this only affects human player as CPU uses acceleration to drive
+					mSpeed *= fPenalty;	// this only affects human player as CPU uses acceleration to drive
 										// but that's why we keep the calculated penalty so it can be
 										// added in the CPU car drive routines where it makes sense
 
-					position.y = fHeightTarget = height;		// accept new height
+					position.y = fHeightTarget = cheight;		// accept new height
 					
 					if (DBG) std::cerr << "Height Delta " << delta<< " penalty " << fPenalty << std::endl;
 
@@ -281,15 +268,15 @@ namespace rgl {
 
 				} else {
 
-					Ball *obstacle = makeCollisionBall(4.0,mass()); // mass*0.8
-					float fDistance =distance(obstacle);
+					Ball *obstacle = makeCollisionBall(4.0,position); // mass*0.8
+					float fDistance = distance(obstacle);
 					
 					// Calculate displacement required
 					float fOverlap = 1.0f * (fDistance - radius() - obstacle->radius());
 					
 					// Displace Current Ball away from collision
-					position.x -= fOverlap*cos(-fAngle); //  * (position.x - obstacle->position.x) / fDistance;
-					position.z -= fOverlap*sin(-fAngle); //  * (position.y - obstacle->position.y) / fDistance;
+					position.x -= fOverlap*(position.x - obstacle->position.x) / fDistance;
+					position.z -= fOverlap*(position.z - obstacle->position.z) / fDistance;
 
 					return obstacle;
 				}

@@ -48,7 +48,7 @@ namespace rgl {
 
 		bool bInited = false;
 
-		void init();
+		void init(TerrainShader *shader);
 
 		void initMesh(unsigned vertexCount, unsigned twidth, unsigned theight);
 
@@ -81,7 +81,7 @@ namespace rgl {
 
 	inline float Terrain::getHeight(glm::vec3 &posWorld3d) {
 		return (pHeightMap != nullptr)
-			   ? CONFIG.scaleHeight * 1000 * pHeightMap->getPixel(posWorld3d.x - CONFIG.origin.x, posWorld3d.z - CONFIG.origin.y).r /
+			   ? CONFIG.scaleHeight * 1000 * pHeightMap->getPixel(posWorld3d.x - CONFIG.origin.x, (posWorld3d.z) - CONFIG.origin.y).r /
 				 (float) 255
 			   : 0;
 	}

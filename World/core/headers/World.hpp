@@ -18,12 +18,12 @@
 #include <vector>
 #include <map>
 #include <cmath>
-#include "ext.hpp"
 
 namespace rgl {
 
 //////////////////////////////////////////////////////////////////////////////////////////
-
+	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
+						   float scale, bool flipX, bool flipY, bool flipZ);
 
 	// Base World class
 	class World : public PixFuExtension {
@@ -38,11 +38,11 @@ namespace rgl {
 		Light *pLight;
 		Camera *pCamera;
 
-		std::vector<Terrain *> vTerrains;
 		std::vector<ObjectCluster *> vObjects;
 		std::map<std::string, ObjectCluster *> mCluesters;
 
 	protected:
+		std::vector<Terrain *> vTerrains;
 
 		virtual bool init(PixFu *engine);
 
@@ -50,7 +50,7 @@ namespace rgl {
 
 		void add(TerrainConfig_t terrainConfig);
 
-		void add(WorldObject *object, Transformation_t initialTransform = Transformation_t());
+		void add(WorldObject *object);
 
 		template<typename Func>
 		void iterateObjects(Func callback) {
@@ -71,6 +71,41 @@ namespace rgl {
 		static constexpr Perspective_t PERSP_FOV60_LOW = {90, 0.005, 0.1, 0.25};
 		static constexpr Perspective_t PERSP_FOV60_MID = {70, 0.005, 1000.0, 0.25};
 		static constexpr Perspective_t PERSP_FOV60_FAR = {60, 0.5, 1000.0, 0.25};
+
+		
+		static constexpr Transformation_t TRANSFORM_NONE = {};
+		static constexpr Transformation_t TRANSFORM_FLIPX = {
+			{0,0,0},				// global translation
+			{0,0,0},				// global rotation
+			1.0,					// global scale
+			true, false, false		// global xyz flip
+		};
+		static constexpr Transformation_t TRANSFORM_FLIPXY = {
+			{0,0,0},				// global translation
+			{0,0,0},				// global rotation
+			1.0,					// global scale
+			true, true, false		// global xyz flip
+		};
+		static constexpr Transformation_t TRANSFORM_FLIPY = {
+			{0,0,0},				// global translation
+			{0,0,0},				// global rotation
+			1.0,					// global scale
+			false, true, false		// global xyz flip
+		};
+		
+		static constexpr Transformation_t TRANSFORM_FLIPZ = {
+			{0,0,0},				// global translation
+			{0,0,0},				// global rotation
+			1.0,					// global scale
+			false, false, true		// global xyz flip
+		};
+
+		static constexpr Transformation_t TRANSFORM_FLIPZ_ROT = {
+			{0,0,0},				// global translation
+			{0,M_PI/2,0},			// global rotation
+			1.0,					// global scale
+			false, false, 0		// global xyz flip
+		};
 
 		World(WorldConfig_t config, Perspective_t perspective = PERSP_FOV90_LOW);
 

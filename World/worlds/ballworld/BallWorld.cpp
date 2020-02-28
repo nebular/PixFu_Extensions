@@ -42,6 +42,8 @@ namespace rgl {
 
 	void BallWorld::processDynamicCollision(Ball *b1, Ball *b2, float fElapsedTime) {
 		
+		constexpr float fEfficiency = 0.6;
+		
 		//	auto grados = [](float rads) { return std::to_string(rads*180/PI); };
 		glm::vec3 pos1 = b1->position, pos2 = b2->position;
 		
@@ -53,48 +55,45 @@ namespace rgl {
 		float nx = (pos2.x - pos1.x) / fDistance;
 		float nz = (pos2.z - pos1.z) / fDistance;
 
-		// this "-" is because the map is rotated, I would like to avoid this but I
-		// dont know where to put this fix
-	//	glm::vec3 b1vel = -b1->speedVector();
-	//	glm::vec3 b2vel = -b2->speedVector();
+		// Tangent
+		float tx = -nz;
+		float tz = nx;
 		
-		glm::vec3 b1vel = -b1->speedVector();
-		glm::vec3 b2vel = -b2->speedVector();
+		// Dot Product Tangent
+		float dpTan1 = b1->mSpeed.x * tx + b1->mSpeed.z * tz;
+		float dpTan2 = b2->mSpeed.x * tx + b2->mSpeed.z * tz;
 
-		
-		float b1mass = b1->mass(), b2mass = b2->mass();
-		
-		// Wikipedia Version - Maths is smarter but same
-		float kx = b1vel.x - b2vel.x;
-		float kz = b1vel.z - b2vel.z;
-		float p = 2.0 * (nx * kx + nz * kz) / (b1mass + b2mass) ;
-		
-		b1vel.x = b1vel.x - p * b2mass * nx;
-		b1vel.z = b1vel.z - p * b2mass * nz;
-		
-		b2vel.x = b2vel.x + p * b1mass * nx;
-		b2vel.z = b2vel.z + p * b1mass * nz;
-		
-		float b2speed = sqrt(b2vel.x * b2vel.x + b2vel.z * b2vel.z)* KCRASH_EFFICIENCY;
-		float b1speed = sqrt(b1vel.x * b1vel.x + b1vel.z * b1vel.z)* KCRASH_EFFICIENCY;
-		
-		float b1Angle = atan2(b1vel.z, b1vel.x);
-		float b2Angle = atan2(b2vel.z, b2vel.x);
+		// Dot Product Normal
+		float dpNorm1 = b1->mSpeed.x * nx + b1->mSpeed.z * nz;
+		float dpNorm2 = b2->mSpeed.x * nx + b2->mSpeed.z * nz;
 
-		b1->onCollision(b2, fElapsedTime, b1speed, b1Angle);
-		b2->onCollision(b1, fElapsedTime, b2speed, b2Angle);
+		// Conservation of momentum in 1D
+		float m1 = fEfficiency *
+				   (dpNorm1 * (b1->mass() - b2->mass()) + 2.0f * b2->mass() * dpNorm2) /
+				   (b1->mass() + b2->mass());
+		
+		float m2 = fEfficiency *
+				   (dpNorm2 * (b2->mass() - b1->mass()) + 2.0f * b1->mass() * dpNorm1) /
+				   (b1->mass() + b2->mass());
+		
+		// Update ball velocities
+		glm::vec3 newSpeed1 = { tx * dpTan1 + nx * m1, b1->mSpeed.y, tz * dpTan1 + nz * m1};
+		glm::vec3 newSpeed2 = { tx * dpTan2 + nx * m2, b2->mSpeed.y, tz * dpTan2 + nz * m2};
+
+		b1->onCollision(b2, fElapsedTime, newSpeed1);
+		b2->onCollision(b1, fElapsedTime, newSpeed2);
 		
 	}
 
 	long BallWorld::processCollisions(const std::vector<sLineSegment> &edges, float fElapsedTime) {
 		
-		long crono = nowns();
+		const long crono = nowns();
 		
 		vFakeBalls.clear();
 		vCollidingPairs.clear();
 		
 		// Break up the frame elapsed time into smaller deltas for each simulation update
-		float fSimElapsedTime = fElapsedTime / (float) Ball::SIMULATIONUPDATES;
+		const float fSimElapsedTime = fElapsedTime / (float) Ball::SIMULATIONUPDATES;
 		
 		// Main simulation loop
 		for (int i = 0; i < Ball::SIMULATIONUPDATES; i++) {
@@ -115,11 +114,14 @@ namespace rgl {
 					Ball *ball = (Ball*)w;
 					if (!ball->bDisabled) {
 						if (ball->fSimTimeRemaining > 0.0f) {
+							
 							Ball *obstacle;
-							Player *player = dynamic_cast<Player *>(ball);
-							obstacle = player
-							? player->process(this, NOTIME)
-							: ball->process(this, NOTIME);
+							if (ball->bPlayer) {
+								Player *player = (Player *)ball;
+								obstacle = player->process(this, NOTIME);
+							} else {
+								obstacle = ball->process(this, NOTIME);
+							}
 							
 	#ifndef DBG_NOHEIGHTMAPCOLLISIONS
 							
@@ -153,32 +155,32 @@ namespace rgl {
 							// Against Edges
 							
 							// Check that line formed by velocity vector, intersects with line segment
-							float fLineX1 = edge.ex - edge.sx;
-							float fLineY1 = edge.ey - edge.sy;
+							const float fLineX1 = edge.ex - edge.sx;
+							const float fLineY1 = edge.ey - edge.sy;
 							
-							float fLineX2 = ball->position.x - edge.sx;
-							float fLineY2 = ball->position.z - edge.sy;
+							const float fLineX2 = ball->position.x - edge.sx;
+							const float fLineY2 = ball->position.z - edge.sy;
 							
-							float fEdgeLength = fLineX1 * fLineX1 + fLineY1 * fLineY1;
+							const float fEdgeLength = fLineX1 * fLineX1 + fLineY1 * fLineY1;
 							
 							// This is nifty - It uses the DP of the line segment vs the line to the object, to work out
 							// how much of the segment is in the "shadow" of the object vector. The min and max clamp
 							// this to lie between 0 and the line segment length, which is then normalised. We can
 							// use this to calculate the closest point on the line segment
 							
-							float t = fmax(0, fmin(fEdgeLength, (fLineX1 * fLineX2 + fLineY1 * fLineY2))) / fEdgeLength;
+							const float t = fmax(0, fmin(fEdgeLength, (fLineX1 * fLineX2 + fLineY1 * fLineY2))) / fEdgeLength;
 							
 							// Which we do here
-							float fClosestPointX = edge.sx + t * fLineX1;
-							float fClosestPointY = edge.sy + t * fLineY1;
+							const float fClosestPointX = edge.sx + t * fLineX1;
+							const float fClosestPointY = edge.sy + t * fLineY1;
 							
 							// And once we know the closest point, we can check if the ball has collided with the segment in the
 							// same way we check if two balls have collided
 							
-							float fDistance = sqrtf((ball->position.x - fClosestPointX) * (ball->position.x - fClosestPointX) +
+							const float fDistance = sqrtf((ball->position.x - fClosestPointX) * (ball->position.x - fClosestPointX) +
 													(ball->position.z - fClosestPointY) * (ball->position.z - fClosestPointY));
 
-							if (ball->height() < HEIGHT_EDGE_FLYOVER) {
+							if (ball->position.y < HEIGHT_EDGE_FLYOVER) {
 
 								if (fDistance <= ball->radius() + edge.radius) {
 									
@@ -189,15 +191,10 @@ namespace rgl {
 									// compatible with the dynamic resolution code below, we add a fake ball with an infinite mass
 									// so it behaves like a solid object when the momentum calculations are performed
 									
-									Ball *fakeball = ball->makeCollisionBall((edge.radius + 2.0f), ball->mass()*1000); // ball->mass() * .8f);
-									fakeball->position = {fClosestPointX, ball->position.y, fClosestPointY};
+									Ball *fakeball = ball->makeCollisionBall(
+																			 edge.radius,
+																			{fClosestPointX, ball->position.y, fClosestPointY});
 									
-									//						fakeball->fSpeed=ball->fSpeed;
-									fakeball->fSpeed = 0;
-									//						fakeball->fMass = ball->fMass; // 900000;
-									//fakeball->fAngle = 0;
-									// fakeball->fAngle = -ball->fAngle;
-
 									// TODO: smartly calculating fHeight and Radius here will allow
 									// us to jump over walls if so desired. Idea is to make edges
 									// jumpable unless their height in the heightmap is 1
@@ -206,7 +203,7 @@ namespace rgl {
 									vCollidingPairs.push_back({ball, fakeball});
 									
 									// Calculate displacement required
-									float fOverlap = 1.00f * (fDistance - ball->radius() - fakeball->radius());
+									const float fOverlap = 1.00f * (fDistance - ball->radius() - fakeball->radius());
 									
 									// Displace Current Ball away from collision
 									ball->position.x -= fOverlap * (ball->position.x - fakeball->position.x) / fDistance;
@@ -216,7 +213,7 @@ namespace rgl {
 										LogV(TAG, SF("overlap %f and after displacement %d", fOverlap, ball->overlaps(fakeball)));
 									
 								}
-								}
+							}
 						}
 					
 					// Against other balls

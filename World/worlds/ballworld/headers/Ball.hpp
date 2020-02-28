@@ -13,12 +13,6 @@
 // Flag No Time Info
 #define NOTIME -1
 // car decceleration constant TODO move to sFeatures
-#define KDECCEL 0.12
-// car acceleration constant TODO move to sFeatures
-#define KACCEL 0.1
-// speed brke constant TODO move to sFeatures
-#define KBRAKE 0.2
-// terrain friction on height irrgularities constant TODO move to sCircuitInfo  and sFeatures
 #define TERRAINFRICTION 0.005
 // height irregularities gradient we can ignore and drive through unaffected
 #define RIDEHEIGHT_SEAMLESS 5
@@ -43,7 +37,10 @@ namespace rgl {
 		friend class BallWorld;
 		
 		std::string TAG;
+		
 		static int instanceCounter;
+		
+		float fMetronome = 0;
 
 	protected:
 
@@ -75,75 +72,71 @@ namespace rgl {
 
 		static constexpr int MAXSIMULATIONSTEPS = 15; // 15
 
-		const int nId;                        // Ball ID
-	
-		int iWorldWidth, iWorldHeight;        // world size
-
-		glm::vec3 position = {0, 0, 0};        // current ball position in world coordinates
-		glm::vec3 rotation = { 0,0,0 };
-		float fRadius, fMass;
-		float fAngle = 0;                    // ball angle (heading)
-
-		float fSpeed = 0.0;                    // first space derivative
-		float fAcceleration = 0.0;            // second space derivative
-		float fOverAcceleration = 0.0;        // third space derivative TODO is it worth ?
+		const int nId;					// Ball unique ID
+		const float fRadius;			// ball radius
+		const float fMass;				// ball mass
+		const bool bStatic;				// whether this is a static object (so wont collide with another static object)
+		const bool bPlayer;				// (cheat/optimization) to avoid using dynamic cast, flag is set if this is a player descendent class
+		
+		glm::vec3 position = { 0, 0, 0};        // ball position in world coordinates
+		glm::vec3 rotation = { 0,0,0 };			// ball rotation
+		glm::vec3 mSpeed = { 0,0,0 };			// ball speed
+		glm::vec3 acceleration = { 0,0,0 };		// ball acceleration
 
 		// extensions
-		static float stfBaseScale;            // A Base scale for all balls in the simulation
-		static float stfHeightScale;        // heights pixel height
+		static float stfBaseScale;				// A Base scale for all balls in the simulation
+		static float stfHeightScale; 			// heights pixel height
 
-		float fOuterRadius = 0;                // outer radius to predict next collisions
-		float fMassMultiplier = 1.0;        // multiply ball mass (game powerups)
-		float fRadiusMultiplier = 1.0;        // multiply ball radius (game powerups)
-
+		float fOuterRadius = 0;					// outer radius to predict next collisions
+		float fMassMultiplier = 1.0;			// multiply ball mass (game powerups)
+		float fRadiusMultiplier = 1.0;			// multiply ball radius (game powerups)
 
 		// Height extensions
-		float fHeightTarget = 0.0;            // target height (gravity effect)
-		float fAccelerationZ = 0.0;            // upwards acceleration
-		float fAngleTerrain = 0.0;            // player horizontal angle / terrain
-		float fPenalty = 1.0;                // penalty in speed percent imposed by terrain irregularities
+		float fHeightTarget = 0.0;				// target height (gravity effect)
 
-		float fMetronome = 0;
+		float fAccelerationZ = 0.0; 			// upwards acceleration TODO move to acceleration
 
-		bool  bFlying = false;                // whether the ball is currently "flying"
+		float fAngleTerrain = 0.0;				// player horizontal angle / terrain
+
+		float fPenalty = 1.0;					// penalty in speed percent imposed by terrain irregularities
+
+		bool  bFlying = false;					// whether the ball is currently "flying"
 		
-		bool bReverse = false;                // reverse gear flag
-		bool bForward = false;                // forward gear flag
-		bool bDisabled = false;                // disable the player (will not be updated & behave as ghost) (debug)
+		bool bReverse = false; 					// reverse gear flag
+		bool bForward = false; 					// forward gear flag
+		bool bDisabled = false;					// disable the player (will not be updated & behave as ghost) (debug)
 
-		bool bStatic = false;				// whether this is a static object that wont collide with another static object
 
 		// Internal Simulation vars
 		glm::vec3 origPos;
 		float fSimTimeRemaining;
 
-		Ball(std::string className, glm::vec3 position, float radi, float mass, bool isStatic = false);
-		Ball(glm::vec3 position, float radi, float mass, float angle);
+		Ball(const WorldConfig_t &planetConfig, std::string className, glm::vec3 position, float radi, float mass, bool isStatic = false, bool isPlayer = false);
+		Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed);
 
 	public:
 
 		static void setBaseScale(float scale);
-
 		static void setHeightScale(float scale);
 
-		float id();
-		glm::vec3 pos() override;            	// ball normalized position
-		glm::vec3 &posWorld();            	// ball normalized position
-		glm::vec3 rot() override;            	// ball world position
-		float radius() override;            	// ball radius
+	protected:
+		
+		float id() const;
 
-		float xWorld();            				// get x world coord
-		float yWorld();            				// get y world coord
-		float xNorm();            				// get x normalized coord
-		float yNorm();            				// get y normalized coord
-		float angle();            // ball angle (heading)
-		float speed();            // ball speed
-		float mass();            // ball mass
-		float outerRadius();    // outer radius (collision prediction)
+		glm::vec3 pos() override;		// ball normalized position
+		glm::vec3 &posWorld();			// ball world position
 
-		glm::vec3 speedVector();    // speed vector
-		float height();            // ball height
-		bool flying();            // whether ball is flying
+		glm::vec3 rot() override;		// ball 3d rotation
+
+		float radius() override;		// ball radius
+
+		float angle();  				// ball angle (heading)
+		float speed();  				// ball speed
+		float mass();   				// ball mass
+		float outerRadius();    		// outer radius (collision prediction)
+
+		glm::vec3 speedVector();    	// speed vector
+		bool flying();            		// whether ball is flying
 
 		// Mass and radius multipliers (generic game powerups)
 		void setMassMultiplier(float massMultiplier);
@@ -157,7 +150,7 @@ namespace rgl {
 
 		bool intersects(Ball *b2, bool outerRadius);
 		
-		bool isStatic();
+		bool isStatic() const;
 
 		// whether a ball overlaps this one
 		Overlaps_t overlaps(Ball *b2);
@@ -169,10 +162,10 @@ namespace rgl {
 		glm::vec3 calculateOverlapDisplacement(Ball *target, bool outer = false);
 
 		// make a collision ball (used to model crashes against walls & terrain)
-		Ball *makeCollisionBall(float radius = 2.0, float nmass = 10000);
+		Ball *makeCollisionBall(float radi, glm::vec3 position);
 
 		// subclasses MUST call this
-		virtual void onCollision(Ball *other, float fElapsedTime, float newSpeed, float newAngle);
+		virtual void onCollision(Ball *other, float fElapsedTime, glm::vec3 newSpeed);
 
 		virtual void onFutureCollision(Ball *other);
 
@@ -195,34 +188,25 @@ namespace rgl {
 
 // INLINE IMPLEMENTATION BELOW THIS POINT
 
-	inline float Ball::id() { return nId; }
-
+	inline float Ball::id() const { return nId; }
 	inline glm::vec3 Ball::pos() { return position/1000.0f; }                        // ball world position
-
 	inline glm::vec3 &Ball::posWorld() { return position; }                        // ball world position
-	inline glm::vec3 Ball::rot() { return { 0,fAngle,0};}                        // ball world position
-	inline float Ball::xWorld() { return position.x; }                        // get x world coord
-	inline float Ball::yWorld() { return position.z; }                        // get y world coord
-	inline float Ball::xNorm() { return position.x / iWorldWidth; }        // get x normalized coord
-	inline float Ball::yNorm() { return position.z / iWorldHeight; }        // get y normalized coord
-	inline float Ball::angle() { return fAngle; }                            // ball angle (heading)
-	inline float Ball::speed() { return fSpeed; }   // TODO fabs             		// ball speed
+	inline glm::vec3 Ball::rot() { return rotation;}                        // ball world position
+
 	inline float Ball::mass() { return fMass * fMassMultiplier; }            // ball final mass
 	inline float Ball::radius() { return fRadius * fRadiusMultiplier; }        // ball final radius
 	inline float Ball::outerRadius() { return fOuterRadius * fRadiusMultiplier; }
+	inline float Ball::angle() { return rotation.y; }                            // ball angle (heading)
+	inline float Ball::speed() { return sqrtf(mSpeed.x * mSpeed.x + mSpeed.z * mSpeed.z); }   // TODO fabs             		// ball speed
+	inline glm::vec3 Ball::speedVector() { return mSpeed; }
 
-	inline bool Ball::isStatic() { return bStatic;}
-
-	// todo
-	inline glm::vec3 Ball::speedVector() { return {fSpeed * cos(fAngle), 0,fSpeed * sin(fAngle)}; }
-
-	inline float Ball::height() { return position.y; }                            // ball height
+	inline bool Ball::isStatic() const { return bStatic;}
 	inline bool Ball::flying() { return bFlying; }                            // whether ball is flying
-	inline void Ball::setMassMultiplier(float massMultiplier) { fMassMultiplier = massMultiplier; }
 
+	inline void Ball::setMassMultiplier(float massMultiplier) { fMassMultiplier = massMultiplier; }
 	inline void Ball::setRadiusMultiplier(float radiusMultiplier) { fRadiusMultiplier = radiusMultiplier * stfBaseScale; }
 
-// distance to another ball
+	// distance to another ball
 	inline float Ball::distance(Ball *target) {
 		return sqrtf(
 				(position.x - target->position.x) * (position.x - target->position.x)
