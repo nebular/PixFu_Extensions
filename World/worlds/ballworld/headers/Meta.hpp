@@ -14,12 +14,13 @@
 #include <map>
 
 namespace rgl {
-
+/* todo arena
 	typedef struct sObjectPlacement {
 		glm::vec3 position;
 		float radius;
 		int oid;
 	} ObjectPlacement_t;
+ */
 
 	typedef struct sObjectInfo {
 		int oid;

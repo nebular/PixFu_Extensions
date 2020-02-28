@@ -12,8 +12,7 @@ namespace rgl {
 			: Ball(planetConfig, features.className, features.config.position,
 				   features.config.radius,
 				   features.config.mass,
-				   false,
-				   true),
+				   false),
 			  FEATURES(new PlayerFeatures(features)) {
 	}
 
@@ -156,7 +155,7 @@ namespace rgl {
 
 	void Player::steer(float perc, float fElapsedTime) {
 //	fSteerAngle = perc * M_PI / 512; // * (- log2(fabs(speedPercent()) + 0.000001));
-		fSteerAngle = static_cast<float>(perc * M_PI * (1 - 0.7 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
+		fSteerAngle = -static_cast<float>(perc * M_PI * (1 - 0.7 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
 	}
 
 	void Player::accelerate(float percentage, float fElapsedTime) {

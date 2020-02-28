@@ -22,13 +22,11 @@ namespace rgl {
 	float Ball::stfHeightScale = 1.0;
 	int Ball::instanceCounter = 0;
 
-	Ball::Ball(const WorldConfig_t &planetConfig, std::string className, glm::vec3 position, float radi, float mass, bool isStatic,
-			   bool isPlayer)
+	Ball::Ball(const WorldConfig_t &planetConfig, std::string className, glm::vec3 position, float radi, float mass, bool isStatic)
 			: WorldObject(planetConfig, std::move(className)),
 			  ID(instanceCounter++),
 			  RADIUS(radi),
 			  MASS(mass),
-			  ISPLAYER(isPlayer),
 			  ISSTATIC(isStatic),
 			  mPosition(position),
 			  bFlying(false) {
@@ -42,7 +40,6 @@ namespace rgl {
 			  RADIUS(radi),
 			  MASS(mass),
 			  ISSTATIC(false),
-			  ISPLAYER(false),
 			  bFlying(false),
 			  mPosition(position),
 			  mSpeed(speed) {
@@ -159,7 +156,6 @@ namespace rgl {
 		mPosition.x += mSpeed.x * fTime;            // Update position
 		mPosition.z += mSpeed.z * fTime;
 
-
 		// Stop ball when velocity is neglible
 		if (fabs(mSpeed.x * mSpeed.x + mSpeed.z * mSpeed.z) < STABLE) {
 			mSpeed.x = 0;
@@ -169,7 +165,6 @@ namespace rgl {
 		// process heights from heightmap
 		return processHeights(world, fTime);
 	}
-
 
 	Ball *Ball::processHeights(World *world, float fTime) {
 

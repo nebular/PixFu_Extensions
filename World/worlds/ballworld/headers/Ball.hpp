@@ -54,7 +54,6 @@ namespace rgl {
 		const float MASS;                    // ball mass
 
 		const bool ISSTATIC;                // whether this is a static object (so wont collide with another static object)
-		const bool ISPLAYER;                // (cheat/optimization) to avoid using dynamic cast, flag is set if this is a player descendent class
 
 	protected:
 
@@ -81,7 +80,6 @@ namespace rgl {
 		// can clamp it here
 
 		static constexpr int MAXSIMULATIONSTEPS = 15; // 15
-
 
 		glm::vec3 mPosition = {0, 0, 0};        // ball position in world coordinates
 		glm::vec3 mRotation = {0, 0, 0};        // ball rotation
@@ -111,8 +109,7 @@ namespace rgl {
 		glm::vec3 origPos;
 		float fSimTimeRemaining;
 
-		Ball(const WorldConfig_t &planetConfig, std::string className, glm::vec3 position, float radi, float mass, bool isStatic = false,
-			 bool isPlayer = false);
+		Ball(const WorldConfig_t &planetConfig, std::string className, glm::vec3 position, float radi, float mass, bool isStatic = false);
 
 		Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed);
 

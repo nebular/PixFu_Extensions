@@ -116,13 +116,7 @@ namespace rgl {
 					if (!ball->bDisabled) {
 						if (ball->fSimTimeRemaining > 0.0f) {
 
-							Ball *obstacle;
-							if (ball->ISPLAYER) {
-								Player *player = (Player *) ball;
-								obstacle = player->process(this, NOTIME);
-							} else {
-								obstacle = ball->process(this, NOTIME);
-							}
+							Ball *obstacle = ball->process(this, NOTIME);
 
 #ifndef DBG_NOHEIGHTMAPCOLLISIONS
 
