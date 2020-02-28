@@ -99,7 +99,7 @@ namespace rgl {
 		// Main simulation loop
 		for (int i = 0; i < Ball::SIMULATIONUPDATES; i++) {
 
-			long cronoIter=nowns();
+//			long cronoIter=nowns();
 
 			// Set all balls time to maximum for this epoch
 

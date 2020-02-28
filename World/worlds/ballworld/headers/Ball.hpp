@@ -194,11 +194,12 @@ namespace rgl {
 		 * Mass multiplier (generic game powerups)
 		 * @param massMultiplier Mass multiplier
 		 */
+		
 		void setMassMultiplier(float massMultiplier);
 
 		/**
 		 * Radius multiplier (generic game powerups)
-		 * @param radiusMultiplier
+		 * @param radiusMultiplier Radius scalar multiplier
 		 */
 
 		void setRadiusMultiplier(float radiusMultiplier);
@@ -208,11 +209,12 @@ namespace rgl {
 		 * @param target TArget ball
 		 * @return distance in world units
 		 */
+		
 		float distance(Ball *target);
 
 		/**
 		 * Whether a point is inside a ball
-		 * @param point
+		 * @param point Point to test
 		 * @return Whether
 		 */
 
@@ -239,6 +241,7 @@ namespace rgl {
 		glm::vec3 calculateOverlapDisplacement(Ball *target, bool outer = false);
 
 		// make a collision ball (used to model crashes against walls & terrain)
+
 		/**
 		 * Make a collision ball using this one as reference
 		 * @param radi The new ball radius
@@ -256,6 +259,7 @@ namespace rgl {
 		 * @param fElapsedTime time
 		 * @param newSpeedVector The new speed vector
 		 */
+		
 		virtual void onCollision(Ball *otherBall, glm::vec3 newSpeedVector, float fElapsedTime);
 
 		/**
@@ -263,6 +267,7 @@ namespace rgl {
 		 * maybe implement logic to avoid the collision
 		 * @param other The ball that collided on the outer radius
 		 */
+		
 		virtual void onFutureCollision(Ball *other);
 
 		/**
@@ -282,22 +287,20 @@ namespace rgl {
 // INLINE IMPLEMENTATION BELOW THIS POINT
 
 	inline glm::vec3 &Ball::position() { return mPosition; }                        // ball world position
-
 	inline glm::vec3 Ball::pos() { return mPosition / 1000.0f; }                    // ball world position
-	inline glm::vec3 Ball::rot() { return mRotation; }                                // ball world position
+	inline glm::vec3 Ball::rot() { return mRotation; }                              // ball world position
 
 	inline float Ball::mass() { return MASS * fMassMultiplier; }                    // ball final mass
-	inline float Ball::radius() { return RADIUS * fRadiusMultiplier; }                // ball final radius
+	inline float Ball::radius() { return RADIUS * fRadiusMultiplier; }              // ball final radius
 	inline float Ball::outerRadius() { return fOuterRadius * fRadiusMultiplier; }
 
-	inline float Ball::angle() { return mRotation.y; }                            // ball angle (heading)
+	inline float Ball::angle() { return mRotation.y; }                              // ball angle (heading)
 	inline float Ball::speed() { return glm::fastSqrt(mSpeed.x * mSpeed.x + mSpeed.z * mSpeed.z); }   // TODO fabs             		// ball speed
 	inline glm::vec3 Ball::velocity() { return mSpeed; }
 
-	inline bool Ball::isFlying() { return bFlying; }                            // whether ball is flying
+	inline bool Ball::isFlying() { return bFlying; }                                // whether ball is flying
 
 	inline void Ball::setMassMultiplier(float massMultiplier) { fMassMultiplier = massMultiplier; }
-
 	inline void Ball::setRadiusMultiplier(float radiusMultiplier) { fRadiusMultiplier = radiusMultiplier * stfBaseScale; }
 
 	// distance to another ball
@@ -307,13 +310,8 @@ namespace rgl {
 				+ (mPosition.z - target->mPosition.z) * (mPosition.z - target->mPosition.z));
 	}
 
-	inline void Ball::setBaseScale(float scale) {
-		stfBaseScale = scale;
-	}
-
-	inline void Ball::setHeightScale(float scale) {
-		stfHeightScale = scale;
-	}
+	inline void Ball::setBaseScale(float scale) { stfBaseScale = scale; }
+	inline void Ball::setHeightScale(float scale) { stfHeightScale = scale; }
 
 	class LinearDelayer {
 

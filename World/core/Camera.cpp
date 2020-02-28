@@ -105,7 +105,7 @@ namespace rgl {
 
 			if (bSmooth && diff < 15*M_PI / 8) {
 				
-				if (diff > M_PI / 32) lerp=2;
+				if (diff > M_PI / 16) lerp=2;
 
 				fYaw += (fTargetAngle - fYaw) * lerp * fElapsedTime;
 

@@ -20,6 +20,7 @@ namespace rgl {
 
 		// keey this for frustum calculations
 		glm::mat4 mProjectionMatrix;
+		
 		// we wil evaluate each draw() to check if inside the frustum
 		Frustum *mFrustum;
 

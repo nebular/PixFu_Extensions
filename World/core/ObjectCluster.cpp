@@ -151,7 +151,7 @@ namespace rgl {
 			unbind();
 		}
 		vVisibles.clear();
-			if (DBG) LogV(TAG, SF("Frustum Hits %d", frustumHits));
+		if (DBG) LogV(TAG, SF("Frustum Hits %d", frustumHits));
 	}
 
 	void ObjectCluster::init() {

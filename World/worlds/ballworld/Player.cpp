@@ -27,7 +27,9 @@ namespace rgl {
 
 		//	auto toDeg = [] (float rad) { return (int)(rad*180/M_PI); };
 
+		#ifdef DEBUG_CARPHYSICS
 		Canvas2D *canvas = world->canvas(mPosition);
+		#endif
 
 		if (fElapsedTime == NOTIME) {
 			fElapsedTime = fSimTimeRemaining;
