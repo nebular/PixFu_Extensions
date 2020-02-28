@@ -83,7 +83,7 @@ namespace rgl {
 		const float SMOOTHLERP;
 		bool bSmooth = true;
 		bool bTargetMode = false;
-		float fTargetDistance;
+		long lDistantMode = 0;
 		float fTargetAngle;
 		glm::vec3 mTargetPosition, mInterpolatedPosition;
 
@@ -97,7 +97,11 @@ namespace rgl {
 		float fPlayerDistanceUp = 0.1f;
 		float fPlayerDistanceFar = 0.3f; // 0.05;
 		float fPlayerPitch = -0.05f;
-
+		
+		const float DEFAULT_DISTANCE_FAR = 0.3f;
+		float fTargetDistance = fPlayerDistanceFar;
+		const float DISTANCELERP;
+		
 	public:
 
 		// Constructor with vectors
@@ -107,7 +111,8 @@ namespace rgl {
 				float initialPitch = DEF_PITCH,
 				glm::vec3 upVector = DEF_UPVECTOR,
 				bool smooth = true,
-				float smoothLerp = 15
+				float smoothLerp = 15,
+				float distanceLerp = 5
 		);
 
 		void update(float fElapsedTime);

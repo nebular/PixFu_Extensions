@@ -8,8 +8,8 @@
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace rgl {
 
-	Player::Player(const WorldConfig_t &planetConfig, PlayerFeatures_t features)
-			: Ball(planetConfig, features.className, features.config.position,
+	Player::Player(World *world, PlayerFeatures_t features)
+			: Ball(world, features.className, features.config.position,
 				   features.config.radius,
 				   features.config.mass,
 				   false),
@@ -92,10 +92,11 @@ namespace rgl {
 		glm::vec3 frontWheel = mPosition + offset;
 		glm::vec3 backWheel = mPosition - offset;
 
+		#ifdef DEBUG_CARPHYSICS
 		canvas->blank();
 		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, rgl::Colors::RED);
 		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, rgl::Colors::GREEN);
-
+		#endif
 		/**
 		 Each wheel should move forward by a certain amount in the direction it is pointing.
 		 The distance it needs to move depends on the car speed, and the time between frames
@@ -108,17 +109,18 @@ namespace rgl {
 
 		backWheel += modSpeed * fElapsedTime * headingBack;
 		frontWheel += modSpeed * fElapsedTime * headingFront;
-
+		
+		#ifdef DEBUG_CARPHYSICS
 		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, rgl::Colors::BLACK);
 		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, rgl::Colors::GREY);
-
+		#endif
 		/*
 		The new car position can be calculated by averaging the two new wheel positions.
 		*/
 
 		mPosition = (frontWheel + backWheel) / 2.0f;
 
-		canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, rgl::Colors::BLUE);
+//		canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, rgl::Colors::BLUE);
 
 		/*
 		 The new car heading can be found by calculating the angle of the line between the
@@ -154,8 +156,8 @@ namespace rgl {
 	}
 
 	void Player::steer(float perc, float fElapsedTime) {
-//	fSteerAngle = perc * M_PI / 512; // * (- log2(fabs(speedPercent()) + 0.000001));
-		fSteerAngle = -static_cast<float>(perc * M_PI * (1 - 0.7 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
+		//	fSteerAngle = perc * M_PI / 512; // * (- log2(fabs(speedPercent()) + 0.000001));
+		fSteerAngle = static_cast<float>(perc * M_PI * (1 - 0.7 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
 	}
 
 	void Player::accelerate(float percentage, float fElapsedTime) {

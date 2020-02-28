@@ -38,10 +38,10 @@ namespace rgl {
 		Light *pLight;
 		Camera *pCamera;
 
-		std::vector<ObjectCluster *> vObjects;
 		std::map<std::string, ObjectCluster *> mCluesters;
 
 	protected:
+		std::vector<ObjectCluster *> vObjects;
 		std::vector<Terrain *> vTerrains;
 
 		virtual bool init(PixFu *engine);
