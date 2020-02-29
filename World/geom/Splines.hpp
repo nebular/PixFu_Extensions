@@ -352,7 +352,7 @@ namespace rgl {
 
 		bool Save(std::ofstream *file, int scaleFactor = 0) {
 			if (!file->is_open()) return false;
-			unsigned s = points.size();
+			unsigned s = (unsigned)points.size();
 			file->write((char *) &s, sizeof(long));
 
 			for (unsigned x = 0; x < s; x++) {

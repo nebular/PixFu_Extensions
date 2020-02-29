@@ -216,7 +216,7 @@ namespace rgl {
 		// back
 		point =  mPosition + heading*glm::vec3 {-0,0,collisionRadius};
 		float heightd= world->getHeight(point);
-		float LERP = 0.5;
+//		float LERP = 0.5;
 		
 		fAngleTerrain = {
 			atan2( (heightr - heightl), 2 * collisionRadius),
