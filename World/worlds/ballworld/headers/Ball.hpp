@@ -21,11 +21,13 @@
 
 #define FAKE_BALL_ID 9999
 
-#include "glm.hpp"
 #include "Drawable.hpp"
 #include "World.hpp"
 #include "BallWorld.hpp"
-#include "gtx/fast_square_root.hpp"
+
+#include "glm/vec2.hpp"
+#include "glm/vec3.hpp"
+#include "glm/gtx/fast_square_root.hpp"
 
 namespace rgl {
 

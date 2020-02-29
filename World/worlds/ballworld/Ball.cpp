@@ -6,13 +6,14 @@
 //  Copyright © 2020 rodo. All rights reserved.
 //	Copyright ©
 
+#include <cmath>
+
 #include "Ball.hpp"
 #include "Utils.hpp"
 #include "World.hpp"
 #include "WorldMeta.hpp"
 #include "Config.hpp"
-#include <cmath>
-#include "gtx/fast_square_root.hpp"
+#include "glm/gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
@@ -51,9 +52,10 @@ namespace rgl {
 			  RADIUS(radi),
 			  MASS(mass),
 			  ISSTATIC(false),
-			  bFlying(false),
 			  mPosition(position),
-			  mSpeed(speed) {
+			  mSpeed(speed),
+			  bFlying(false)
+			  {
 
 			  TAG = "BALL" + std::to_string(ID);
 			  setRadiusMultiplier(1.0);

@@ -9,7 +9,7 @@
 #pragma once
 
 #include "Shader.hpp"
-#include "glm.hpp"
+#include "glm/mat4x4.hpp"
 
 namespace rgl {
 

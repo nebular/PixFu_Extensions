@@ -8,7 +8,7 @@
 
 #include "ObjectShader.hpp"
 #include "Frustum.hpp"
-#include "gtc/matrix_inverse.hpp"
+#include "glm/gtc/matrix_inverse.hpp"
 
 namespace rgl {
 

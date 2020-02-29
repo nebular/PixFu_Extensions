@@ -8,9 +8,8 @@
 
 #include "TerrainShader.hpp"
 #include "Camera.hpp"
-#include "ext.hpp"
-#include "matrix.hpp"
-#include "gtc/matrix_inverse.hpp"
+#include "glm/vec3.hpp"
+#include "glm/gtc/matrix_inverse.hpp"
 
 namespace rgl {
 

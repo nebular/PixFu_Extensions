@@ -12,7 +12,8 @@
 #include "ObjLoader.hpp"
 #include "ObjectCluster.hpp"
 
-#include "glm.hpp"
+#include "glm/mat4x4.hpp"
+#include "glm/vec3.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
@@ -27,10 +28,10 @@ namespace rgl {
 							   bool flipY = false, bool flipZ = false);
 
 	ObjectCluster::ObjectCluster(World *planet, std::string name, Transformation_t initialTransform)
-			: NAME(std::move(name)),
-			  PLANET(planet->CONFIG),
-			  WORLD(planet),
-			  PLACER(std::move(initialTransform)) {
+			: PLANET(planet->CONFIG),
+			  NAME(std::move(name)),
+			  PLACER(std::move(initialTransform)),
+			  WORLD(planet) {
 
 		if (DBG) LogV(TAG, "New Object Cluster " + NAME);
 

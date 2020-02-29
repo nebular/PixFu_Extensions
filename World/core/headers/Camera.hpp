@@ -16,9 +16,8 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma once
 
-#include "glm.hpp"
-#include "gtc/matrix_transform.hpp"
-#include "matrix.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/vec3.hpp"
 
 #include "Keyboard.hpp"
 #include "WorldMeta.hpp"

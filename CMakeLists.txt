@@ -24,7 +24,7 @@ include_directories(../pixFu/src/core/headers)
 include_directories(../pixFu/src/core/headers)
 include_directories(../pixFu/src/items/headers)
 include_directories(../pixFu/src/input/headers)
-include_directories(../pixFu/src/thirdparty/glm)
+include_directories(../pixFu/src/thirdparty)
 
 include_directories(${CMAKE_SOURCE_DIR})
 

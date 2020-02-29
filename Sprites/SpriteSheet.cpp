@@ -15,12 +15,14 @@
 
 #include "SpriteSheet.hpp"
 #include "OpenGL.h"
-#include "glm.hpp"
-#include "ext.hpp"
 #include "Texture2D.hpp"
 #include "PixFu.hpp"
 #include "Utils.hpp"
 #include "SpriteSheets.hpp"
+
+#include "glm/vec2.hpp"
+#include "glm/vec4.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 namespace rgl {
 

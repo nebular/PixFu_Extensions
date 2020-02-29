@@ -11,13 +11,17 @@
 #pragma ide diagnostic ignored "OCUnusedStructInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
+#include <vector>
+#include <map>
+
 #include "Shader.hpp"
-#include "glm.hpp"
 #include "Drawable.hpp"
 #include "Texture2D.hpp"
 #include "PixFu.hpp"
-#include <vector>
-#include <map>
+
+#include "glm/vec4.hpp"
+#include "glm/vec2.hpp"
+#include "glm/mat4x4.hpp"
 
 namespace rgl {
 

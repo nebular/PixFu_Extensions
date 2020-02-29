@@ -1,6 +1,6 @@
 #include "Player.hpp"
 #include "Utils.hpp"
-#include "gtx/rotate_vector.hpp"
+#include "glm/gtx/rotate_vector.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"

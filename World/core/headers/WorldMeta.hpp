@@ -10,8 +10,8 @@
 #pragma once
 
 #include <string>
-#include "glm.hpp"
-#include "gtc/matrix_transform.hpp"
+#include "glm/mat4x4.hpp"
+#include "glm/vec3.hpp"
 
 namespace rgl {
 
@@ -90,7 +90,7 @@ namespace rgl {
 	public:
 		const std::string CLASS;
 
-		inline WorldObject(const WorldConfig_t &worldConfig, std::string objectClass) : CLASS(objectClass), PLANET(worldConfig) {}
+		inline WorldObject(const WorldConfig_t &worldConfig, std::string objectClass) : PLANET(worldConfig),CLASS(objectClass) {}
 
 		inline virtual ~WorldObject() = default;
 

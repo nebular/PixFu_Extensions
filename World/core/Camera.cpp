@@ -10,8 +10,8 @@
 #include "World.hpp"
 #include "Player.hpp"
 #include "Utils.hpp"
-#include "gtc/matrix_transform.hpp"
-#include "gtx/fast_square_root.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
@@ -42,12 +42,12 @@ namespace rgl {
 			float smoothLerp,
 			float distanceLerp
 	) :
+			UPVECTOR(upVector),
 			mFrontVector(DEF_FRONTVECTOR),
+			SMOOTHLERP(smoothLerp),
+			bSmooth(smooth),
 			mMouseSensitivity(DEF_MOUSE_SENS),
 			mMouseZoom(DEF_ZOOM),
-			UPVECTOR(upVector),
-			bSmooth(smooth),
-			SMOOTHLERP(smoothLerp),
 			DISTANCELERP(distanceLerp) {
 		mPosition = mInterpolatedPosition = initialPosition;
 		fYaw = initialYaw;
@@ -101,11 +101,11 @@ namespace rgl {
 		if (bTargetMode) {
 
 			float lerp = 15; // 0.1;
-			float diff =fabs(fTargetAngle - fYaw);
+			float diff = fabs(fTargetAngle - fYaw);
 
-			if (bSmooth && diff < 15*M_PI / 8) {
-				
-				if (diff > M_PI / 16) lerp=2;
+			if (bSmooth && diff < 15 * M_PI / 8) {
+
+				if (diff > M_PI / 16) lerp = 2;
 
 				fYaw += (fTargetAngle - fYaw) * lerp * fElapsedTime;
 

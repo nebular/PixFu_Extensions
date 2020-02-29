@@ -15,7 +15,7 @@
 #include "Player.hpp"
 #include "Splines.hpp"
 #include "LineSegment.hpp"
-#include "gtx/fast_square_root.hpp"
+#include "glm/gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
@@ -155,7 +155,7 @@ namespace rgl {
 
 				// Work out static collisions with walls and displace balls so no overlaps
 
-				iterateObjects([this, fSimElapsedTime, &edges, &times](WorldObject *b) {
+				iterateObjects([this, &edges, &times](WorldObject *b) {
 
 					Ball *ball = (Ball *) b;
 				
