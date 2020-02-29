@@ -9,6 +9,7 @@
 #include "TerrainShader.hpp"
 #include "Camera.hpp"
 #include "ext.hpp"
+#include "matrix.hpp"
 
 namespace rgl {
 
@@ -39,6 +40,9 @@ namespace rgl {
 	void TerrainShader::loadViewMatrix(Camera *camera) {
 		glm::mat4 viewMatrix = camera->getViewMatrix();
 		setMat4("viewMatrix", (float *) &viewMatrix);
+
+		glm::mat4 invViewMatrix = glm::inverse(viewMatrix);
+		setMat4("invViewMatrix", (float *) &invViewMatrix);
 	}
 
 	void TerrainShader::loadProjectionMatrix(glm::mat4 &projection) {

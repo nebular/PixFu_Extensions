@@ -15,10 +15,10 @@
 #include "gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace rgl {
 
-	constexpr int KSPEED = 1000;
 	// global scale for ball radius
 	float Ball::stfBaseScale = 1.0;
 	float Ball::stfHeightScale = 1.0;

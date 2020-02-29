@@ -8,11 +8,15 @@
 
 #include "ObjLoader.hpp"
 #include "Obj_Loader.hpp"
+#include "PixFu.hpp"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "RedundantCast"
 namespace rgl {
 	ObjLoader::ObjLoader(std::string filename) {
 		pLoader = new objl::Loader();
-		if (!pLoader->LoadFile(filename))
+
+		if (!pLoader->LoadFile(rgl::PixFuPlatform::getPath(filename)))
 			throw std::runtime_error("Problem loading object " + filename);
 	}
 
@@ -36,3 +40,5 @@ namespace rgl {
 		return (unsigned) pLoader->LoadedMeshes[mesh].Indices.size();
 	}
 }
+
+#pragma clang diagnostic pop

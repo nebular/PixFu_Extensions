@@ -11,6 +11,7 @@
 #include "Config.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace rgl {
 
@@ -28,7 +29,7 @@ namespace rgl {
 
 		// 3d canvas
 		if (PLANET.withCanvas) {
-			pDirtTexture = new Texture2D(new Drawable(mSize.x, mSize.y));
+			pDirtTexture = new Texture2D(new Drawable(static_cast<int>(mSize.x), static_cast<int>(mSize.y)));
 			pDirtCanvas = new Canvas2D(pDirtTexture->buffer());
 			pDirtCanvas->blank();
 			if (DBG) wireframe();

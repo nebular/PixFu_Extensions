@@ -12,17 +12,9 @@
 #include <fstream>
 
 #include "PixFu.hpp"
-#include "Common.h"
 #include "Canvas2D.hpp"
 #include "Utils.hpp"
-
-
-struct sPoint3D
-{
-	float x;
-	float y;
-	float z;
-};
+;
 
 struct sPoint2D
 {

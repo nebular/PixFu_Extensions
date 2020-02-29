@@ -3,6 +3,7 @@
 #include "gtx/rotate_vector.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "err_ovl_no_viable_member_function_in_call"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
@@ -102,6 +103,7 @@ namespace rgl {
 		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, rgl::Colors::RED);
 		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, rgl::Colors::GREEN);
 		#endif
+
 		/**
 		 Each wheel should move forward by a certain amount in the direction it is pointing.
 		 The distance it needs to move depends on the car speed, and the time between frames

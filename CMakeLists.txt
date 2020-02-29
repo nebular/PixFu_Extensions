@@ -32,6 +32,7 @@ include_directories(World/)
 include_directories(World/core/headers)
 include_directories(World/geom)
 include_directories(World/worlds/ballworld/headers)
+include_directories(Sprites/headers)
 
 ## PIXENGINE
 

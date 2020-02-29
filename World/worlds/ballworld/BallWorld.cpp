@@ -17,6 +17,7 @@
 #include "gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 namespace rgl {

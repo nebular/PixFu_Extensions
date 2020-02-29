@@ -11,7 +11,7 @@
 
 #include <string>
 #include "glm.hpp"
-#include "matrix_transform.hpp"
+#include "gtc/matrix_transform.hpp"
 
 namespace rgl {
 

@@ -38,6 +38,10 @@ namespace rgl {
 	void ObjectShader::loadViewMatrix(Camera *camera) {
 		glm::mat4 viewMatrix = camera->getViewMatrix();
 		setMat4("viewMatrix", (float *) &viewMatrix);
+
+		glm::mat4 invViewMatrix = glm::inverse(viewMatrix);
+		setMat4("invViewMatrix", (float *) &invViewMatrix);
+
 		mFrustum = new Frustum(mProjectionMatrix * viewMatrix);
 	}
 
