@@ -10,18 +10,18 @@
 
 namespace rgl {
 
-	typedef struct sLineSegment {
+	typedef struct structLineSegment {
 		float sx, sy;
 		float ex, ey;
 		float radius;
 
 		inline float angle() { return atan2(ey - sy, ex - sx); }
 
-		inline sLineSegment scaled(float s) { return {sx * s, sy * s, ex * s, ey * s, radius}; }
+		inline structLineSegment scaled(float s) { return {sx * s, sy * s, ex * s, ey * s, radius}; }
 
-		inline sLineSegment translated(float x, float y) { return {sx + x, sy + y, ex + x, ey + y, radius}; }
+		inline structLineSegment translated(float x, float y) { return {sx + x, sy + y, ex + x, ey + y, radius}; }
 
-		inline sLineSegment rotated(float rads) {
+		inline structLineSegment rotated(float rads) {
 			// rotation of points about the orgin using http://en.wikipedia.org/wiki/Transformation_matrix#Rotation
 			float c = cosf(rads), s = sinf(rads);
 			return {sx * c - sy * s, sy * c + sx * s, ex * c - ey * s, ey * c + ex * s};
