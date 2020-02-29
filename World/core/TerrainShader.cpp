@@ -10,6 +10,7 @@
 #include "Camera.hpp"
 #include "ext.hpp"
 #include "matrix.hpp"
+#include "gtc/matrix_inverse.hpp"
 
 namespace rgl {
 
@@ -41,7 +42,7 @@ namespace rgl {
 		glm::mat4 viewMatrix = camera->getViewMatrix();
 		setMat4("viewMatrix", (float *) &viewMatrix);
 
-		glm::mat4 invViewMatrix = glm::inverse(viewMatrix);
+		glm::mat4 invViewMatrix = glm::affineInverse(viewMatrix);
 		setMat4("invViewMatrix", (float *) &invViewMatrix);
 	}
 

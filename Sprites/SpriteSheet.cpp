@@ -1,4 +1,5 @@
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "cert-err58-cpp"
 #pragma ide diagnostic ignored "readability-magic-numbers"
 #pragma ide diagnostic ignored "cppcoreguidelines-avoid-magic-numbers"

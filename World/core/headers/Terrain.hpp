@@ -24,19 +24,6 @@ namespace rgl {
 
 		static std::string TAG;
 
-		static constexpr float VERTICES[32]{
-				// positions          // colors           // texture coords
-				1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
-				1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
-				-1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-				-1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
-		};
-
-		static constexpr unsigned int INDICES[6]{
-				0, 1, 3, // first triangle
-				1, 2, 3  // second triangle
-		};
-
 		Canvas2D *pDirtCanvas = nullptr;
 		Texture2D *pDirtTexture = nullptr;
 		Texture2D *pTexture = nullptr;
@@ -49,8 +36,6 @@ namespace rgl {
 		bool bInited = false;
 
 		void init(TerrainShader *shader);
-
-		void initMesh(unsigned vertexCount, unsigned twidth, unsigned theight);
 
 	public:
 

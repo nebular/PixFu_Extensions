@@ -13,7 +13,8 @@
 #include "BallWorld.hpp"
 #include "Ball.hpp"
 #include "Player.hpp"
-#include "Splines.h"
+#include "Splines.hpp"
+#include "LineSegment.hpp"
 #include "gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
@@ -43,7 +44,6 @@ namespace rgl {
 		target->mPosition.x += displacement.x;
 		target->mPosition.y += displacement.y;
 		target->mPosition.z += displacement.z;
-
 	}
 
 	void BallWorld::processDynamicCollision(Ball *b1, Ball *b2, float fElapsedTime) {
@@ -91,7 +91,7 @@ namespace rgl {
 
 	}
 
-	long BallWorld::processCollisions(const std::vector<sLineSegment> &edges, float fElapsedTime) {
+	long BallWorld::processCollisions(const std::vector<LineSegment_t> &edges, float fElapsedTime) {
 
 		const long crono = nowns();
 

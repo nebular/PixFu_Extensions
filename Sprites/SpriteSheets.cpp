@@ -9,6 +9,8 @@
 #include "SpriteSheets.hpp"
 #include "Utils.hpp"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
 namespace rgl {
 
 	int SpriteSheets::instanceCounter = 0;
@@ -56,3 +58,5 @@ namespace rgl {
 	}
 
 }
+
+#pragma clang diagnostic pop
