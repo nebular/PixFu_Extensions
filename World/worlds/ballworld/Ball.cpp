@@ -17,6 +17,7 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
+
 namespace rgl {
 
 	// global scale for ball radius
