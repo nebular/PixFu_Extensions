@@ -38,7 +38,7 @@ namespace rgl {
 	typedef struct SpriteSheetInfo {
 		std::string filename;                // png filename
 		int numX, numY;                        // number of sprites x,y
-		std::string shader = "default";
+		std::string shader = "sprites";
 		float spriteRadiusConstant = 1.0;    // sphere rdius vs full radius width
 		int width, height;                    // calculated size of spritesheet png
 		int spriteWidth, spriteHeight;        // calculated size of each sprite

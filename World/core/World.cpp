@@ -30,9 +30,6 @@ namespace rgl {
 	World::World(WorldConfig_t config, Perspective_t perspective)
 			: PERSPECTIVE(perspective), CONFIG(config) {
 
-		pShader = new TerrainShader(CONFIG.shaderName);
-		pShaderObjects = new ObjectShader(CONFIG.shaderName + "_objects");
-
 	};
 
 	World::~World() {
@@ -71,6 +68,9 @@ namespace rgl {
 	bool World::init(PixFu *engine) {
 
 		auto toRad = [](float degs) { return degs * M_PI / 180; };
+
+		pShader = new TerrainShader(CONFIG.shaderName);
+		pShaderObjects = new ObjectShader(CONFIG.shaderName + "_objects");
 
 		pLight = new Light(CONFIG.lightPosition, CONFIG.lightColor);
 		pCamera = new Camera();
