@@ -19,7 +19,7 @@
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 
-namespace rgl {
+namespace Pix {
 
 	// global scale for ball radius
 	float Ball::stfBaseScale = 1.0;
@@ -93,7 +93,7 @@ namespace rgl {
 		return fabs(distance) < radius() * radius();
 	}
 
-	bool Ball::intersects(rgl::Ball *point, bool outer) {
+	bool Ball::intersects(Pix::Ball *point, bool outer) {
 		// we are using multiplications because is faster than calling Math.pow
 
 		glm::vec3 *p = &point->mPosition;
@@ -109,7 +109,7 @@ namespace rgl {
 
 	}
 
-	Overlaps_t Ball::overlaps(rgl::Ball *point) {
+	Overlaps_t Ball::overlaps(Pix::Ball *point) {
 		// we are using multiplications because is faster than calling Math.pow
 		if (intersects(point, false)) return OVERLAPS;
 		if (outerRadius() > 0 && intersects(point, true)) return OVERLAPS_OUTER;

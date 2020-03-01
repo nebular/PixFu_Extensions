@@ -13,7 +13,7 @@
 
 #include <map>
 
-namespace rgl {
+namespace Pix {
 /* todo arena
 	typedef struct sObjectPlacement {
 		glm::vec3 position;

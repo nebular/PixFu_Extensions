@@ -10,7 +10,7 @@
 #include "Frustum.hpp"
 #include "glm/gtc/matrix_inverse.hpp"
 
-namespace rgl {
+namespace Pix {
 
 	ObjectShader::ObjectShader(std::string name) : Shader(std::move(name)) {}
 

@@ -11,7 +11,7 @@
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
-namespace rgl {
+namespace Pix {
 
 	int SpriteSheets::instanceCounter = 0;
 	std::string SpriteSheets::TAG = "SpriteSheets";

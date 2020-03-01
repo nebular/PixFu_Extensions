@@ -19,7 +19,7 @@
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 // glm warnngs in idea
 
-namespace rgl {
+namespace Pix {
 
 	constexpr glm::vec3 Camera::DEF_UPVECTOR;
 	constexpr glm::vec3 Camera::DEF_FRONTVECTOR;

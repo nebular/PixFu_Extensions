@@ -13,7 +13,7 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
-namespace rgl {
+namespace Pix {
 
 	std::string Terrain::TAG = "Terrain";
 
@@ -55,8 +55,8 @@ namespace rgl {
 
 		for (int x = 0, l = pDirtCanvas->width(); x < l; x += INC) {
 			for (int y = 0, m = pDirtCanvas->height(); y < m; y += INC) {
-				pDirtCanvas->drawLine(x, 0, x, m, rgl::Colors::RED);
-				pDirtCanvas->drawLine(0, y, l, y, rgl::Colors::BLUE);
+				pDirtCanvas->drawLine(x, 0, x, m, Pix::Colors::RED);
+				pDirtCanvas->drawLine(0, y, l, y, Pix::Colors::BLUE);
 			}
 		}
 	}

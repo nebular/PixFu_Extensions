@@ -8,7 +8,7 @@
 #include <string>
 #include <cmath>
 
-namespace rgl {
+namespace Pix {
 
 	typedef struct structLineSegment {
 		float sx, sy;

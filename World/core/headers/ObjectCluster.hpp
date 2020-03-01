@@ -13,7 +13,7 @@
 #include "ObjectShader.hpp"
 
 
-namespace rgl {
+namespace Pix {
 
 	class World;
 

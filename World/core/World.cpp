@@ -8,14 +8,14 @@
 //
 
 #include "World.hpp"
-#include "PixFu.hpp"
+#include "Fu.hpp"
 #include "OpenGL.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
-namespace rgl {
+namespace Pix {
 
 	constexpr Perspective_t World::PERSP_FOV90_LOW;
 	constexpr Perspective_t World::PERSP_FOV90_MID;
@@ -65,7 +65,7 @@ namespace rgl {
 		cluster->add(object, false);
 	}
 
-	bool World::init(PixFu *engine) {
+	bool World::init(Fu *engine) {
 
 		auto toRad = [](float degs) { return degs * M_PI / 180; };
 
@@ -113,7 +113,7 @@ namespace rgl {
 		return true;
 	}
 
-	void World::tick(PixFu *engine, float fElapsedTime) {
+	void World::tick(Fu *engine, float fElapsedTime) {
 
 		pCamera->update(fElapsedTime);
 

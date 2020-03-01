@@ -11,7 +11,7 @@
 #define NO_DEBUG_CARPHYSICS
 
 
-namespace rgl {
+namespace Pix {
 
 	Player::Player(World *world, PlayerFeatures_t features)
 			: Ball(world, features.className, features.config.position,
@@ -100,8 +100,8 @@ namespace rgl {
 
 		#ifdef DEBUG_CARPHYSICS
 		canvas->blank();
-		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, rgl::Colors::RED);
-		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, rgl::Colors::GREEN);
+		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::RED);
+		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREEN);
 		#endif
 
 		/**
@@ -118,8 +118,8 @@ namespace rgl {
 		frontWheel += modSpeed * fElapsedTime * headingFront;
 		
 		#ifdef DEBUG_CARPHYSICS
-		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, rgl::Colors::BLACK);
-		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, rgl::Colors::GREY);
+		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::BLACK);
+		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREY);
 		#endif
 		/*
 		The new car position can be calculated by averaging the two new wheel positions.
@@ -128,7 +128,7 @@ namespace rgl {
 		mPosition = (frontWheel + backWheel) / 2.0f;
 
 		#ifdef DEBUG_CARPHYSICS
-		canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, rgl::Colors::BLUE);
+		canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, Pix::Colors::BLUE);
 		#endif
 
 		/*

@@ -16,7 +16,7 @@
 #include "SpriteSheet.hpp"
 #include "OpenGL.h"
 #include "Texture2D.hpp"
-#include "PixFu.hpp"
+#include "Fu.hpp"
 #include "Utils.hpp"
 #include "SpriteSheets.hpp"
 
@@ -24,11 +24,11 @@
 #include "glm/vec4.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace rgl {
+namespace Pix {
 
 	std::string SpriteSheet::TAG = "SpriteSheet";
 
-	SpriteSheet::SpriteSheet(PixFu *engine, SpriteSheetInfo_t info) : sInfo(std::move(info)) {
+	SpriteSheet::SpriteSheet(Fu *engine, SpriteSheetInfo_t info) : sInfo(std::move(info)) {
 		pShader = new Shader(sInfo.shader);
 		pTexture = new Texture2D(sInfo.filename);
 		SPRSIZE = {pTexture->width() / sInfo.numX, pTexture->height() / sInfo.numY};
@@ -186,7 +186,7 @@ namespace rgl {
 		mSprites.clear();
 	}
 
-	bool SpriteSheet::init(PixFu *engine) {
+	bool SpriteSheet::init(Fu *engine) {
 
 		if (pTexture == nullptr) return false;
 
@@ -220,7 +220,7 @@ namespace rgl {
 
 	}
 
-	void SpriteSheet::tick(PixFu *engine, float fElapsedTime) {
+	void SpriteSheet::tick(Fu *engine, float fElapsedTime) {
 
 		long ms = nowms();
 

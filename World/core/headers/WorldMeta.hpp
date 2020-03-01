@@ -13,7 +13,7 @@
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 
-namespace rgl {
+namespace Pix {
 
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
 						   float scale, bool flipX, bool flipY, bool flipZ);

@@ -12,7 +12,7 @@
 #include "Shader.hpp"
 #include "glm/mat4x4.hpp"
 
-namespace rgl {
+namespace Pix {
 
 	class Frustum;
 

@@ -8,7 +8,7 @@
 #include "Meta.hpp"
 #include "PlayerFeatures.hpp"
 
-namespace rgl {
+namespace Pix {
 
 	typedef struct sWorldMeta {
 		std::string name;

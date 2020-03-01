@@ -19,14 +19,14 @@
 #include <map>
 #include <cmath>
 
-namespace rgl {
+namespace Pix {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
 						   float scale, bool flipX, bool flipY, bool flipZ);
 
 	// Base World class
-	class World : public PixFuExtension {
+	class World : public FuExtension {
 
 		static std::string TAG;
 
@@ -44,9 +44,9 @@ namespace rgl {
 		std::vector<ObjectCluster *> vObjects;
 		std::vector<Terrain *> vTerrains;
 
-		virtual bool init(PixFu *engine);
+		virtual bool init(Fu *engine);
 
-		virtual void tick(PixFu *engine, float fElapsedTime);
+		virtual void tick(Fu *engine, float fElapsedTime);
 
 		void add(TerrainConfig_t terrainConfig);
 

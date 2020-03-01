@@ -15,7 +15,7 @@ namespace objl {
 	class Loader;
 }
 
-namespace rgl {
+namespace Pix {
 
 	class ObjLoader {
 

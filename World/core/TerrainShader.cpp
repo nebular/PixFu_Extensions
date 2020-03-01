@@ -11,7 +11,7 @@
 #include "glm/vec3.hpp"
 #include "glm/gtc/matrix_inverse.hpp"
 
-namespace rgl {
+namespace Pix {
 
 	TerrainShader::TerrainShader(std::string name) : Shader(name) {}
 

@@ -10,7 +10,7 @@
 
 #include "World.hpp"
 
-namespace rgl {
+namespace Pix {
 
 	typedef struct sPlayerFeatures {
 

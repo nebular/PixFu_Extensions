@@ -17,13 +17,13 @@
 #include "Shader.hpp"
 #include "Drawable.hpp"
 #include "Texture2D.hpp"
-#include "PixFu.hpp"
+#include "Fu.hpp"
 
 #include "glm/vec4.hpp"
 #include "glm/vec2.hpp"
 #include "glm/mat4x4.hpp"
 
-namespace rgl {
+namespace Pix {
 
 
 // a handy way to refer to a sprite: spritesheet + spriteindex
@@ -53,9 +53,9 @@ namespace rgl {
 		glm::vec4 pos, def, fx, raw;
 	} SpriteMeta_t;
 
-	class PixFu;
+	class Fu;
 
-	class SpriteSheet : public PixFuExtension {
+	class SpriteSheet : public FuExtension {
 
 		static std::string TAG;
 
@@ -67,14 +67,14 @@ namespace rgl {
 
 	public:
 
-		SpriteSheet(PixFu *engine, SpriteSheetInfo_t info);
+		SpriteSheet(Fu *engine, SpriteSheetInfo_t info);
 
 		~SpriteSheet();
 
 
-		bool init(PixFu *engine);
+		bool init(Fu *engine);
 
-		void tick(PixFu *engine, float fElapsedTime);
+		void tick(Fu *engine, float fElapsedTime);
 
 		/**
 		 * Adds a new sprite into the screen

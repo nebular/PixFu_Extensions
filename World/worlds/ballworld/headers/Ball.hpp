@@ -29,7 +29,7 @@
 #include "glm/vec3.hpp"
 #include "glm/gtx/fast_square_root.hpp"
 
-namespace rgl {
+namespace Pix {
 
 
 	typedef enum eOverlaps {

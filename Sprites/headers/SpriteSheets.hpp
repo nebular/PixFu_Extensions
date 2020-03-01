@@ -10,7 +10,7 @@
 
 #include "SpriteSheet.hpp"
 
-namespace rgl {
+namespace Pix {
 
 	class SpriteSheets {
 

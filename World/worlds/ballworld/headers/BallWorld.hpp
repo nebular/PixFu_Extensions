@@ -14,7 +14,7 @@
 #include "LineSegment.hpp"
 #include <vector>
 
-namespace rgl {
+namespace Pix {
 
 	class Ball;
 

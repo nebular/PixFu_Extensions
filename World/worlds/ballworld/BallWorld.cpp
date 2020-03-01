@@ -21,7 +21,7 @@
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
-namespace rgl {
+namespace Pix {
 
 	std::string BallWorld::TAG = "BallWorld";
 

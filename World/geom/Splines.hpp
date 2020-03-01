@@ -14,11 +14,11 @@
 #include <cmath>
 #include <fstream>
 
-#include "PixFu.hpp"
+#include "Fu.hpp"
 #include "Canvas2D.hpp"
 #include "Utils.hpp"
 
-namespace rgl {
+namespace Pix {
 	struct sPoint2D {
 		float x;
 		float y;
@@ -134,7 +134,7 @@ namespace rgl {
 			nearInfo->rawPoint = targetPoint;
 
 //		if (nearInfo->near)
-//			if (rgl::DBG) rgl::LogV(TAG, rgl::SF("player near cp %d", index));
+//			if (Pix::DBG) Pix::LogV(TAG, Pix::SF("player near cp %d", index));
 		}
 
 		sPoint2D GetSplinePoint(float t) {
@@ -290,8 +290,8 @@ namespace rgl {
 			}
 		}
 
-		void DrawSelf(rgl::Canvas2D *gfx, float ox, float oy, rgl::Pixel col = 0x000F, float scale = 1.0f, bool drawPoints = false,
-					  int currentPoint = -1, rgl::Pixel colProgress = 0, float fTime = 0) {
+		void DrawSelf(Pix::Canvas2D *gfx, float ox, float oy, Pix::Pixel col = 0x000F, float scale = 1.0f, bool drawPoints = false,
+					  int currentPoint = -1, Pix::Pixel colProgress = 0, float fTime = 0) {
 			if (colProgress.n == 0) colProgress = col;
 
 			if (bIsLooped) {
@@ -312,19 +312,19 @@ namespace rgl {
 			if (drawPoints) DrawPoints(gfx, ox, oy, currentPoint, colProgress, scale, fTime);
 		}
 
-		void DrawPoints(rgl::Canvas2D *gfx, float ox, float oy, int currentPoint = -1, rgl::Pixel colProgress = 0, float scale = 1.0f,
+		void DrawPoints(Pix::Canvas2D *gfx, float ox, float oy, int currentPoint = -1, Pix::Pixel colProgress = 0, float scale = 1.0f,
 						float fTime = 0, bool noPast = false) {
 			for (unsigned l = 0; l < points.size(); l++) {
 				if (noPast && l < currentPoint - 1) continue;
 				sPoint2D i = points.at(l);
-				rgl::Pixel curr = fTime < 0.5 ? rgl::Colors::YELLOW : rgl::Colors::BLACK;
+				Pix::Pixel curr = fTime < 0.5 ? Pix::Colors::YELLOW : Pix::Colors::BLACK;
 				gfx->fillRect(static_cast<int32_t>(ox + i.x * scale - 2), static_cast<int32_t>(oy + i.y * scale - 2), 4, 4,
-							  l < currentPoint - 1 ? rgl::Colors::GREEN.scale(0.5) : l == currentPoint - 1 ? curr : rgl::Colors::RED.scale(
+							  l < currentPoint - 1 ? Pix::Colors::GREEN.scale(0.5) : l == currentPoint - 1 ? curr : Pix::Colors::RED.scale(
 									  0.5));
 			}
 		}
 
-		void DrawSprite(rgl::Drawable *gfx, float ox, float oy, rgl::Pixel col = 0x000F) {
+		void DrawSprite(Pix::Drawable *gfx, float ox, float oy, Pix::Pixel col = 0x000F) {
 			if (bIsLooped) {
 				for (float t = 0; t < (float) points.size() - 0; t += 0.005f) {
 					sPoint2D pos = GetSplinePoint(t);

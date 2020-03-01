@@ -8,15 +8,15 @@
 
 #include "ObjLoader.hpp"
 #include "Obj_Loader.hpp"
-#include "PixFu.hpp"
+#include "Fu.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "RedundantCast"
-namespace rgl {
+namespace Pix {
 	ObjLoader::ObjLoader(std::string filename) {
 		pLoader = new objl::Loader();
 
-		if (!pLoader->LoadFile(rgl::PixFuPlatform::getPath(filename)))
+		if (!pLoader->LoadFile(Pix::FuPlatform::getPath(filename)))
 			throw std::runtime_error("Problem loading object " + filename);
 	}
 
