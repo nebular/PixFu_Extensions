@@ -11,6 +11,8 @@
 #include <vector>
 #include <string>
 
+#include "WorldMeta.hpp"
+
 namespace objl {
 	class Loader;
 }
@@ -24,6 +26,7 @@ namespace Pix {
 	public:
 
 		ObjLoader(std::string name);
+		ObjLoader(const Static3DObject_t *object);
 
 		float *vertices(int mesh = 0);
 

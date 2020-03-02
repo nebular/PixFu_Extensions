@@ -28,6 +28,7 @@
 //	is needed and used for the OBJ Model Loader
 namespace objl
 {
+
 	// Structure: Vector2
 	//
 	// Description: A 2D Vector that Holds Positional Data
@@ -424,6 +425,13 @@ namespace objl
 			LoadedMeshes.clear();
 		}
 
+		
+		// load a supplied static object
+		void LoadObject(std::vector<Vertex> &vertices, std::vector<unsigned> &indices) {
+			objl::Mesh *tempMesh = new objl::Mesh(vertices, indices);
+			LoadedMeshes.push_back(*tempMesh);
+		}
+		
 		// Load a file into the loader
 		//
 		// If file is loaded return true

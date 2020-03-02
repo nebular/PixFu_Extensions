@@ -48,9 +48,25 @@ namespace Pix {
 
 		virtual void tick(Fu *engine, float fElapsedTime);
 
-		void add(TerrainConfig_t terrainConfig);
+		/**
+		 Adds a terrain to the world
+		 @param terrainConfig The therrain configuration object
+		 */
+		Terrain *add(TerrainConfig_t terrainConfig);
 
+		/**
+		 Adds an object to the world
+		 @param object The object to add
+		 */
 		void add(WorldObject *object);
+
+		/**
+		 Adds an static object to the world.
+		 @param object The object to add
+		 @param setHeight whether to set object height to terrain height
+		 */
+
+		void add(ObjectFeatures_t object, bool setHeight = true);
 
 		template<typename Func>
 		void iterateObjects(Func callback) {
@@ -65,14 +81,9 @@ namespace Pix {
 		const Perspective_t PERSPECTIVE;
 		const WorldConfig_t CONFIG;
 
-		static constexpr Perspective_t PERSP_FOV90_LOW = {90, 0.005, 0.1, 0.25};
-		static constexpr Perspective_t PERSP_FOV90_MID = {90, 0.005, 100.0, 0.25};
-		static constexpr Perspective_t PERSP_FOV90_FAR = {90, 0.5, 1000.0, 0.25};
-		static constexpr Perspective_t PERSP_FOV60_LOW = {90, 0.005, 0.1, 0.25};
-		static constexpr Perspective_t PERSP_FOV60_MID = {70, 0.005, 1000.0, 0.25};
-		static constexpr Perspective_t PERSP_FOV60_FAR = {60, 0.5, 1000.0, 0.25};
-
-		
+		static constexpr Perspective_t PERSP_FOV90 = {90, 0.005, 1000.0, 0.25};
+		static constexpr Perspective_t PERSP_FOV70 = {70, 0.005, 1000.0, 0.25};
+	
 		static constexpr Transformation_t TRANSFORM_NONE = {};
 		static constexpr Transformation_t TRANSFORM_FLIPX = {
 			{0,0,0},				// global translation
@@ -107,18 +118,39 @@ namespace Pix {
 			false, false, 0		// global xyz flip
 		};
 
-		World(WorldConfig_t config, Perspective_t perspective = PERSP_FOV90_LOW);
+		World(WorldConfig_t config, Perspective_t perspective = PERSP_FOV70);
 
 		virtual ~World();
 
-		// get camera
+		/**
+		 Gets camera
+		 @return camera
+		 */
 		Camera *camera();
 
-		// query heightmap
+		/**
+		 Looks up the terrain height (+Y) for a world position. Height will be adjusted using the height scale
+		 parameter passed on the TerrainConfig object.
+		 @param posWorld Position to check
+		 @return height in world coordinates
+		 */
+
 		float getHeight(glm::vec3 &posWorld);
 
-		// get 3d canvas
+		/**
+		 Gets the 3D canvas. A
+		 @param posWorld Any world position. As we can have several terrains, we need to supply this world coordinates
+		 so the engine knows what terrain canvas to return (each terrain has a 3D canvas)
+		 @return The 3D canvas
+		 */
+
 		Canvas2D *canvas(glm::vec3 &posWorld);
+
+		/**
+		 Convenience function to return the 3D canvas of the first terrain.
+		 @return The 3D canvas
+		 */
+		Canvas2D *canvas();
 
 	};
 
@@ -148,6 +180,10 @@ namespace Pix {
 		}
 
 		return nullptr;
+	}
+
+	inline Canvas2D *World::canvas() {
+		return vTerrains[0]->canvas();
 	}
 
 }

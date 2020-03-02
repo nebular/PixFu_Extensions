@@ -17,19 +17,14 @@
 
 namespace Pix {
 
-	constexpr Perspective_t World::PERSP_FOV90_LOW;
-	constexpr Perspective_t World::PERSP_FOV90_MID;
-	constexpr Perspective_t World::PERSP_FOV90_FAR;
-	constexpr Perspective_t World::PERSP_FOV60_LOW;
-	constexpr Perspective_t World::PERSP_FOV60_MID;
-	constexpr Perspective_t World::PERSP_FOV60_FAR;
+	constexpr Perspective_t World::PERSP_FOV90;
+	constexpr Perspective_t World::PERSP_FOV70;
 	constexpr Transformation_t World::TRANSFORM_FLIPX, World::TRANSFORM_FLIPY, World::TRANSFORM_FLIPZ;
 
 	std::string World::TAG = "World";
 
 	World::World(WorldConfig_t config, Perspective_t perspective)
 			: PERSPECTIVE(perspective), CONFIG(config) {
-
 	};
 
 	World::~World() {
@@ -41,15 +36,22 @@ namespace Pix {
 		vTerrains.clear();
 	}
 
-	void World::add(TerrainConfig_t terrainConfig) {
+	Terrain *World::add(TerrainConfig_t terrainConfig) {
 		Terrain *world = new Terrain(CONFIG, terrainConfig);
 		vTerrains.push_back(world);
+		return world;
 	}
 
-//	void World::add(const char *name, ObjectConfig_t objectConfig, ObjectConfig_t initialTransform) {
+	void World::add(ObjectFeatures_t features, bool setHeight) {
+		if (setHeight) {
+			float height = getHeight(features.config.position);
+			features.config.position.y = height;
+		}
+		add(new WorldStaticObject(CONFIG, features));
+	}
 
 	void World::add(WorldObject *object) {
-
+		
 		auto clusterItem = mCluesters.find(object->CLASS);
 		ObjectCluster *cluster;
 
@@ -62,7 +64,7 @@ namespace Pix {
 			cluster = clusterItem->second;
 		}
 
-		cluster->add(object, false);
+		cluster->add(object);
 	}
 
 	bool World::init(Fu *engine) {

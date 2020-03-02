@@ -13,11 +13,18 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "RedundantCast"
 namespace Pix {
-	ObjLoader::ObjLoader(std::string filename) {
-		pLoader = new objl::Loader();
 
+	// Load an OBJ Model
+	ObjLoader::ObjLoader(std::string filename):pLoader(new objl::Loader()) {
 		if (!pLoader->LoadFile(Pix::FuPlatform::getPath(filename)))
 			throw std::runtime_error("Problem loading object " + filename);
+	}
+
+	// Load a static mesh
+	ObjLoader::ObjLoader(const Static3DObject_t *staticObject):pLoader(new objl::Loader()) {
+		std::vector<unsigned> *Indices = new std::vector(staticObject->indices, staticObject->indices+staticObject->indicesCount);
+		std::vector<objl::Vertex> *Vertices = new std::vector((objl::Vertex*)staticObject->vertices, (objl::Vertex*)(staticObject->vertices+staticObject->verticesCount) );
+		pLoader->LoadObject(*Vertices, *Indices);
 	}
 
 	unsigned ObjLoader::meshCount() {

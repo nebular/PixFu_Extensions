@@ -20,7 +20,8 @@ namespace Pix {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-	class Terrain : public LayerVao {
+
+class Terrain : public LayerVao {
 
 		static std::string TAG;
 
@@ -60,9 +61,14 @@ namespace Pix {
 
 		/** Canvas rendered over the 3D texture */
 		Canvas2D *canvas();
-
+	
+		/** Gets Terrain pixel dimensions. Terrain pixel dimensions are the ones of the supporting texture. */
+		int xPixels();
+		int zPixels();
 	};
 
+	inline int Terrain::xPixels() { return pTexture->width(); }
+	inline int Terrain::zPixels() { return pTexture->height(); }
 
 	inline float Terrain::getHeight(glm::vec3 &posWorld3d) {
 		return (pHeightMap != nullptr)

@@ -51,9 +51,9 @@ namespace Pix {
 
 	};
 
-	void ObjectCluster::add(WorldObject *object, bool setHeight) {
+	void ObjectCluster::add(WorldObject *object) {
 		glm::vec3 pos = object->pos();
-		if (setHeight) pos.y = WORLD->getHeight(pos);
+// TODO	if (setHeight) pos.y = WORLD->getHeight(pos);
 		vInstances.push_back(object);
 		if (DBG) LogV(TAG, SF("Add to cluster %s, total %d", NAME.c_str(), vInstances.size()));
 	}

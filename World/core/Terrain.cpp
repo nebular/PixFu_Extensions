@@ -13,6 +13,7 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
+
 namespace Pix {
 
 	std::string Terrain::TAG = "Terrain";
@@ -21,18 +22,31 @@ namespace Pix {
 			: CONFIG(config), PLANET(planetConfig) {
 
 		std::string path = std::string(PATH_LEVELS) + "/" + config.name;
-		// load resources
-		pLoader = new ObjLoader(path + "/" + config.name + ".obj");
-		pTexture = new Texture2D(path + "/" + config.name + ".png");
-		pHeightMap = Drawable::fromFile(path + "/" + config.name + ".heights.png");
+
+		if (config.staticMesh == nullptr) {
+
+			// load resources
+			pLoader = new ObjLoader(path + "/" + config.name + ".obj");
+			pTexture = new Texture2D(path + "/" + config.name + ".heights.png");
+			pHeightMap = Drawable::fromFile(path + "/" + config.name + ".heights.png");
+
+		} else {
+
+			pLoader = new ObjLoader(config.staticMesh);
+			pTexture = new Texture2D(2000,2000);
+			pTexture->buffer()->clear(Pix::Colors::GREEN.scale(0.3));
+			pHeightMap = nullptr;
+
+		}
+
 		mSize = {pTexture->width(), pTexture->height()};
 
 		// 3d canvas
 		if (PLANET.withCanvas) {
 			pDirtTexture = new Texture2D(new Drawable(static_cast<int>(mSize.x), static_cast<int>(mSize.y)));
-			pDirtCanvas = new Canvas2D(pDirtTexture->buffer());
+			pDirtCanvas = new Canvas2D(pDirtTexture->buffer(), PLANET.withFont!="" ? new Font(PLANET.withFont): nullptr);
 			pDirtCanvas->blank();
-			if (DBG) wireframe();
+			if (config.wireframe) wireframe();
 		}
 
 
@@ -40,8 +54,10 @@ namespace Pix {
 	};
 
 	Terrain::~Terrain() {
-		delete pTexture;
-		pTexture = nullptr;
+		if (pTexture != nullptr) {
+			delete pTexture;
+			pTexture = nullptr;
+		}
 		if (PLANET.withCanvas) {
 			delete pDirtCanvas;
 			delete pDirtTexture;
@@ -80,7 +96,7 @@ namespace Pix {
 	void Terrain::init(TerrainShader *shader) {
 
 		glm::mat4 tmatrix = createTransformationMatrix(
-				{CONFIG.origin.x / 1000, 0, CONFIG.origin.y / 1000},
+				{ CONFIG.origin.x / 1000, 0, CONFIG.origin.y / 1000 },
 				0, 0, 0, 1, false, false, false) * PLANET.terrainTransform.toMatrix();
 
 		shader->loadTransformationMatrix(tmatrix);
