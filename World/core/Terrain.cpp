@@ -27,7 +27,7 @@ namespace Pix {
 
 			// load resources
 			pLoader = new ObjLoader(path + "/" + config.name + ".obj");
-			pTexture = new Texture2D(path + "/" + config.name + ".heights.png");
+			pTexture = new Texture2D(path + "/" + config.name + ".png");
 			pHeightMap = Drawable::fromFile(path + "/" + config.name + ".heights.png");
 
 		} else {
