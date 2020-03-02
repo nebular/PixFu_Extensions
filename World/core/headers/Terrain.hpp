@@ -14,18 +14,17 @@
 #include "ObjLoader.hpp"
 #include "TerrainShader.hpp"
 
-
 namespace Pix {
 
-class Terrain : public LayerVao {
+	class Terrain : public LayerVao {
 
 		static std::string TAG;
 
-		Texture2D *pTexture = nullptr;		// Terrain texture
-		Texture2D *pDirtTexture = nullptr;	// 3D canvas texture
-		Canvas2D *pDirtCanvas = nullptr;	// 3D canvas over the texture
-		Drawable *pHeightMap = nullptr;		// Height Map
-		ObjLoader *pLoader = nullptr;		// 3D model loader
+		Texture2D *pTexture = nullptr;        // Terrain texture
+		Texture2D *pDirtTexture = nullptr;    // 3D canvas texture
+		Canvas2D *pDirtCanvas = nullptr;    // 3D canvas over the texture
+		Drawable *pHeightMap = nullptr;        // Height Map
+		ObjLoader *pLoader = nullptr;        // 3D model loader
 
 		/** Terrain Size */
 		glm::vec2 mSize;
@@ -46,6 +45,7 @@ class Terrain : public LayerVao {
 		virtual ~Terrain();
 
 		/** Renders the terrain */
+
 		void render(TerrainShader *shader);
 
 		/** Queries heightmap */
@@ -59,13 +59,15 @@ class Terrain : public LayerVao {
 
 		/** Canvas rendered over the 3D texture */
 		Canvas2D *canvas();
-	
+
 		/** Gets Terrain pixel dimensions. Terrain pixel dimensions are the ones of the supporting texture. */
 		int xPixels();
+
 		int zPixels();
 	};
 
 	inline int Terrain::xPixels() { return pTexture->width(); }
+
 	inline int Terrain::zPixels() { return pTexture->height(); }
 
 	inline float Terrain::getHeight(glm::vec3 &posWorld3d) {

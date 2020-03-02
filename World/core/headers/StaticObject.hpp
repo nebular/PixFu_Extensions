@@ -20,19 +20,19 @@ namespace Pix {
 
 	// these are wrong, instead of colors we have to provide the normals !!
 	const Static3DObject_t PLANEXY = {
-		6,
-		( unsigned *)(new unsigned[6] {
-				0, 1, 3, // first triangle
-				1, 2, 3  // second triangle
-		}),
-		32,
-		( float *)new float[32]  {
-				// positions          // colors           // texture coords
-				 1.0f,  1.0f, 0.0f, 	1.0f, 0.0f, 0.0f, 	1.0f, 1.0f, // top right
-				 1.0f, -1.0f, 0.0f, 	0.0f, 1.0f, 0.0f, 	1.0f, 0.0f, // bottom right
-				-1.0f, -1.0f, 0.0f, 	0.0f, 0.0f, 1.0f, 	0.0f, 0.0f, // bottom left
-				-1.0f,  1.0f, 0.0f, 	1.0f, 1.0f, 0.0f, 	0.0f, 1.0f  // top left
-		}
+			6,
+			(unsigned *) (new unsigned[6]{
+					0, 1, 3, // first triangle
+					1, 2, 3  // second triangle
+			}),
+			32,
+			(float *) new float[32]{
+					// positions          // colors           // texture coords
+					1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, // top right
+					1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // bottom right
+					-1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
+					-1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f  // top left
+			}
 	};
 
 

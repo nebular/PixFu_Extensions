@@ -84,7 +84,7 @@ namespace Pix {
 			// cache object properties
 			glm::vec3 rot = object->rot();
 			glm::vec3 pos = object->pos();
-			
+
 			float radius = object->radius() / 1000;
 
 			// our shader has a Frustum class initialized already initialized with the

@@ -7,6 +7,7 @@
 //
 
 #pragma once
+
 #include <string>
 
 #define DBG_NOEDGESCOLLISIONS

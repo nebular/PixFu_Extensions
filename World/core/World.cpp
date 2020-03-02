@@ -51,7 +51,7 @@ namespace Pix {
 	}
 
 	void World::add(WorldObject *object) {
-		
+
 		auto clusterItem = mCluesters.find(object->CLASS);
 		ObjectCluster *cluster;
 

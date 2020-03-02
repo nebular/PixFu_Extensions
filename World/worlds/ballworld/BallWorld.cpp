@@ -55,7 +55,7 @@ namespace Pix {
 
 		// Distance between balls TODO
 		float fDistance = glm::fastSqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
-								+ (pos1.z - pos2.z) * (pos1.z - pos2.z));
+										+ (pos1.z - pos2.z) * (pos1.z - pos2.z));
 
 		// Normal
 		float nx = (pos2.x - pos1.x) / fDistance;
@@ -130,7 +130,7 @@ namespace Pix {
 							// process heightmap collisions & ball height
 							Ball *obstacle = ball->processHeights(this);
 
-							#ifndef DBG_NOHEIGHTMAPCOLLISIONS
+#ifndef DBG_NOHEIGHTMAPCOLLISIONS
 
 							// these are collisions against height map
 
@@ -140,7 +140,7 @@ namespace Pix {
 								vCollidingPairs.push_back({ball, obstacle});
 								if (DBG) LogV(TAG, "- Ball collided with wall");
 							}
-							#endif
+#endif
 						}
 					}
 				});
@@ -150,17 +150,17 @@ namespace Pix {
 				return pnow()-crono;
 #endif
 
-				long times[4]={0};
-				times[0]= nowns();
+				long times[4] = {0};
+				times[0] = nowns();
 
 				// Work out static collisions with walls and displace balls so no overlaps
 
 				iterateObjects([this, &edges, &times](WorldObject *b) {
 
 					Ball *ball = (Ball *) b;
-				
-					long t2=nowns();
-					
+
+					long t2 = nowns();
+
 					if (!ball->ISSTATIC && !ball->bDisabled)
 						for (auto &edge : edges) {
 
@@ -181,7 +181,7 @@ namespace Pix {
 							// this to lie between 0 and the line segment length, which is then normalised. We can
 							// use this to calculate the closest point on the line segment
 
-							const float t = (float)fmax(0, fmin(fEdgeLength, (fLineX1 * fLineX2 + fLineY1 * fLineY2))) / fEdgeLength;
+							const float t = (float) fmax(0, fmin(fEdgeLength, (fLineX1 * fLineX2 + fLineY1 * fLineY2))) / fEdgeLength;
 
 							// Which we do here
 							const float fClosestPointX = edge.sx + t * fLineX1;
@@ -190,8 +190,9 @@ namespace Pix {
 							// And once we know the closest point, we can check if the ball has collided with the segment in the
 							// same way we check if two balls have collided
 
-							const float fDistance = glm::fastSqrt((ball->mPosition.x - fClosestPointX) * (ball->mPosition.x - fClosestPointX) +
-														  (ball->mPosition.z - fClosestPointY) * (ball->mPosition.z - fClosestPointY));
+							const float fDistance = glm::fastSqrt(
+									(ball->mPosition.x - fClosestPointX) * (ball->mPosition.x - fClosestPointX) +
+									(ball->mPosition.z - fClosestPointY) * (ball->mPosition.z - fClosestPointY));
 
 							if (ball->mPosition.y < HEIGHT_EDGE_FLYOVER) {
 
@@ -229,8 +230,8 @@ namespace Pix {
 							}
 						}
 
-					times[1]=nowns()-t2;
-					t2=nowns();
+					times[1] = nowns() - t2;
+					t2 = nowns();
 
 					// Against other balls
 					iterateObjects([ball, this](WorldObject *targ) {
@@ -255,13 +256,15 @@ namespace Pix {
 							}
 						}
 					});
-					
-					times[2]=nowns()-t2;
+
+					times[2] = nowns() - t2;
 
 					ball->commitSimulation();
 				});
 
-				if (DBG) LogV(TAG, SF("iterate %ld, edges %ld, balls %ld, collid %d, future %d", nowns()-times[0], times[1], times[2], vCollidingPairs.size(), vFutureColliders.size()));
+				if (DBG)
+					LogV(TAG, SF("iterate %ld, edges %ld, balls %ld, collid %d, future %d", nowns() - times[0], times[1], times[2],
+								 vCollidingPairs.size(), vFutureColliders.size()));
 
 				// Now work out dynamic collisions
 				for (auto c : vCollidingPairs)
@@ -277,9 +280,9 @@ namespace Pix {
 				for (auto &b : vFakeBalls) delete b;
 				vFakeBalls.clear();
 			}
-			
+
 		}
-		if (DBG) LogV(TAG, SF("total %ld", nowns()-crono));
+		if (DBG) LogV(TAG, SF("total %ld", nowns() - crono));
 		return nowns() - crono;
 	}
 }

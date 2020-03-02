@@ -34,7 +34,7 @@ namespace Pix {
 			  ISSTATIC(isStatic),
 			  mPosition(position),
 			  bFlying(false) {
-				  
+
 		TAG = "BALL" + std::to_string(ID);
 		setRadiusMultiplier(1.0);
 
@@ -54,11 +54,10 @@ namespace Pix {
 			  ISSTATIC(false),
 			  mPosition(position),
 			  mSpeed(speed),
-			  bFlying(false)
-			  {
+			  bFlying(false) {
 
-			  TAG = "BALL" + std::to_string(ID);
-			  setRadiusMultiplier(1.0);
+		TAG = "BALL" + std::to_string(ID);
+		setRadiusMultiplier(1.0);
 	}
 
 	Ball *Ball::makeCollisionBall(float radi, glm::vec3 position) {
@@ -168,7 +167,7 @@ namespace Pix {
 		// Update Velocity
 		mSpeed.x += mAcceleration.x * fTime;
 		mSpeed.z += mAcceleration.z * fTime;
-		
+
 		// Update position
 		mPosition.x += mSpeed.x * fTime;
 		mPosition.z += mSpeed.z * fTime;
@@ -199,28 +198,28 @@ namespace Pix {
 		float cheight = world->getHeight(chk);
 
 		const float ang = angle();
-		glm::vec3 heading = { cosf(ang), 0, sinf(ang)};
+		glm::vec3 heading = {cosf(ang), 0, sinf(ang)};
 
 		// left side
-		glm::vec3 point = mPosition + heading*glm::vec3 {-collisionRadius,0,0};
+		glm::vec3 point = mPosition + heading * glm::vec3{-collisionRadius, 0, 0};
 		float heightl = world->getHeight(point);
 
 		// right side
-		point =  mPosition + heading*glm::vec3 {collisionRadius,0,0};
+		point = mPosition + heading * glm::vec3{collisionRadius, 0, 0};
 		float heightr = world->getHeight(point);
 
 		// front
-		point =  mPosition + heading*glm::vec3 {-0,0,-collisionRadius};
-		float heightt= world->getHeight(point);
+		point = mPosition + heading * glm::vec3{-0, 0, -collisionRadius};
+		float heightt = world->getHeight(point);
 
 		// back
-		point =  mPosition + heading*glm::vec3 {-0,0,collisionRadius};
-		float heightd= world->getHeight(point);
+		point = mPosition + heading * glm::vec3{-0, 0, collisionRadius};
+		float heightd = world->getHeight(point);
 //		float LERP = 0.5;
-		
+
 		fAngleTerrain = {
-			atan2( (heightr - heightl), 2 * collisionRadius),
-			atan2( (heightd - heightt), 2 * collisionRadius)
+				atan2((heightr - heightl), 2 * collisionRadius),
+				atan2((heightd - heightt), 2 * collisionRadius)
 		};
 
 //		auto toDeg = [] (float rad) { return (int)(rad*180/M_PI); };
@@ -319,7 +318,7 @@ namespace Pix {
 
 //		float ACCELERATION_EARTH = 9.8 / 10 ; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
 
-		
+
 		if (fAccelerationZ != 0 || mPosition.y != fHeightTarget) {
 
 			const float EARTH = ACCELERATION_EARTH;

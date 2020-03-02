@@ -33,7 +33,7 @@ namespace Pix {
 		} else {
 
 			pLoader = new ObjLoader(config.staticMesh);
-			pTexture = new Texture2D(2000,2000);
+			pTexture = new Texture2D(2000, 2000);
 			pTexture->buffer()->clear(Pix::Colors::GREEN.scale(0.3));
 			pHeightMap = nullptr;
 
@@ -44,7 +44,7 @@ namespace Pix {
 		// 3d canvas
 		if (PLANET.withCanvas) {
 			pDirtTexture = new Texture2D(new Drawable(static_cast<int>(mSize.x), static_cast<int>(mSize.y)));
-			pDirtCanvas = new Canvas2D(pDirtTexture->buffer(), PLANET.withFont!="" ? new Font(PLANET.withFont): nullptr);
+			pDirtCanvas = new Canvas2D(pDirtTexture->buffer(), PLANET.withFont != "" ? new Font(PLANET.withFont) : nullptr);
 			pDirtCanvas->blank();
 			if (config.wireframe) wireframe();
 		}
@@ -96,7 +96,7 @@ namespace Pix {
 	void Terrain::init(TerrainShader *shader) {
 
 		glm::mat4 tmatrix = createTransformationMatrix(
-				{ CONFIG.origin.x / 1000, 0, CONFIG.origin.y / 1000 },
+				{CONFIG.origin.x / 1000, 0, CONFIG.origin.y / 1000},
 				0, 0, 0, 1, false, false, false) * PLANET.terrainTransform.toMatrix();
 
 		shader->loadTransformationMatrix(tmatrix);

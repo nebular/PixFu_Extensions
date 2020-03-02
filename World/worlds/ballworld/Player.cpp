@@ -32,9 +32,9 @@ namespace Pix {
 
 		//	auto toDeg = [] (float rad) { return (int)(rad*180/M_PI); };
 
-		#ifdef DEBUG_CARPHYSICS
+#ifdef DEBUG_CARPHYSICS
 		Canvas2D *canvas = world->canvas(mPosition);
-		#endif
+#endif
 
 		if (fElapsedTime == NOTIME) {
 			fElapsedTime = fSimTimeRemaining;
@@ -83,7 +83,7 @@ namespace Pix {
 
 		// the direction vector of the back wheels
 		glm::vec3 headingBack = glm::vec3(cosf(ang), 0, sinf(ang));
-		
+
 		// the direction vector of the front wheels, that is affected by the steering
 		glm::vec3 headingFront = glm::vec3(cosf(ang + steerAngle), 0, sinf(ang + steerAngle));
 
@@ -98,11 +98,11 @@ namespace Pix {
 		glm::vec3 frontWheel = mPosition + offset;
 		glm::vec3 backWheel = mPosition - offset;
 
-		#ifdef DEBUG_CARPHYSICS
+#ifdef DEBUG_CARPHYSICS
 		canvas->blank();
 		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::RED);
 		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREEN);
-		#endif
+#endif
 
 		/**
 		 Each wheel should move forward by a certain amount in the direction it is pointing.
@@ -116,20 +116,20 @@ namespace Pix {
 
 		backWheel += modSpeed * fElapsedTime * headingBack;
 		frontWheel += modSpeed * fElapsedTime * headingFront;
-		
-		#ifdef DEBUG_CARPHYSICS
+
+#ifdef DEBUG_CARPHYSICS
 		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::BLACK);
 		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREY);
-		#endif
+#endif
 		/*
 		The new car position can be calculated by averaging the two new wheel positions.
 		*/
 
 		mPosition = (frontWheel + backWheel) / 2.0f;
 
-		#ifdef DEBUG_CARPHYSICS
+#ifdef DEBUG_CARPHYSICS
 		canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, Pix::Colors::BLUE);
-		#endif
+#endif
 
 		/*
 		 The new car heading can be found by calculating the angle of the line between the
@@ -152,7 +152,7 @@ namespace Pix {
 		const glm::vec3 head = {cosf(newAngle), 0, sinf(newAngle)};
 		const float accAmount = fAcceleration * (1.0f - FEATURES->speedPercent(modSpeed));
 		mAcceleration = accAmount * head;
-		
+
 		if (accAmount != 0) {
 			// add acceleration
 			mSpeed.x += mAcceleration.x * fElapsedTime;    // Update Velocity
@@ -162,7 +162,7 @@ namespace Pix {
 
 	void Player::steer(float perc, float fElapsedTime) {
 		//	fSteerAngle = perc * M_PI / 512; // * (- log2(fabs(speedPercent()) + 0.000001));
-		fSteerAngle = static_cast<float>(perc * M_PI/4 * (1 - 0.85 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
+		fSteerAngle = static_cast<float>(perc * M_PI / 4 * (1 - 0.85 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
 	}
 
 	void Player::accelerate(float percentage, float fElapsedTime) {
