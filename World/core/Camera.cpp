@@ -8,7 +8,7 @@
 
 #include "Camera.hpp"
 #include "World.hpp"
-#include "Player.hpp"
+#include "BallPlayer.hpp"
 #include "Utils.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/fast_square_root.hpp"

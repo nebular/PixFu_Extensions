@@ -2,9 +2,24 @@
 //  BallWorld.cpp
 //  PixEngine
 //
-//  A world that manages Balls and their collisions. You will need to implement
-//  virtual init() and process(), and call processCollisions(edges, fElapsedTime) to
-//  perform collision calculations.
+//  A world that manages Balls and their collisions.
+//
+//  Objects will behave according to the laws of physics: Each object has 3D acceleration,
+//  speed and position, and mass and elasticity, and their different properties will affect
+//  the collision.
+//
+//  Just extend this class (it is a PixFu extension), and call its add() methods
+//  to add new objects to the world.
+//
+//  This class introduces the concept of "levels", to group the terrain, initial objects,
+//  a list of edges and a list of splines
+//
+//  Just providing a level name, all resources will be loaded from assets, where the folders
+//  are organized as well known locations.
+//
+//  The gravity section needs more work, ideally to upgrade the collision detection core
+//  routine enhanced to 3D (that is heavy math). At the moment the height claculations are
+//  done separately and not really considered for vectors calculation on a collision.
 //
 //  Created by rodo on 25/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
@@ -12,7 +27,7 @@
 
 #include "BallWorld.hpp"
 #include "Ball.hpp"
-#include "Player.hpp"
+#include "BallPlayer.hpp"
 #include "Splines.hpp"
 #include "LineSegment.hpp"
 #include "glm/gtx/fast_square_root.hpp"
@@ -26,7 +41,7 @@ namespace Pix {
 	std::string BallWorld::TAG = "BallWorld";
 
 	// heigh over which
-	constexpr int HEIGHT_EDGE_FLYOVER = 1000;
+	constexpr int HEIGHT_EDGE_FLYOVER = 100;
 
 	BallWorld::BallWorld(std::string levelName, WorldConfig_t config)
 			: World(config) {
@@ -244,7 +259,7 @@ namespace Pix {
 									(ball->mPosition.x - fClosestPointX) * (ball->mPosition.x - fClosestPointX) +
 									(ball->mPosition.z - fClosestPointY) * (ball->mPosition.z - fClosestPointY));
 
-							if (ball->mPosition.y < HEIGHT_EDGE_FLYOVER) {
+							if (ball->mPosition.y < ball->fHeightTerrain + HEIGHT_EDGE_FLYOVER) {
 
 								if (fDistance <= ball->radius() + edge.radius) {
 
@@ -286,23 +301,40 @@ namespace Pix {
 					// Against other balls
 					iterateObjects([ball, this](WorldObject *targ) {
 
-						if (targ->CLASSID!=Ball::CLASSID) return;
+						// discard non-ball objects
+						if (targ->CLASSID != Ball::CLASSID) return;
 							
 						Ball *target = (Ball *) targ;
 
+						// isstatic: a tree, a stone. something that will not move
+						// but can be crashed against. The point of declaring objects
+						// static is that a lot of processing power is saved as it is
+						// assumed that 2 static objects will never collide with each
+						// other. Mind that if you declare an object static, you should
+						// set a very big mass so the crash offset doesnt make it overlap
+						// another static object (or else the collision will be allowed).
+						// If you declare all your scenery decoration or obstacles as static
+						// it will be relatively cheap to have lots of them
+						
 						if ((!ball->ISSTATIC || !target->ISSTATIC)
 							&& !ball->bDisabled && !target->bDisabled                            // disabled balls
 							&& ball->ID != target->ID) {
 
 							switch (ball->overlaps(target)) {
+
 								case OVERLAPS:
 									// Collision has occured
 									vCollidingPairs.push_back({ball, target});
 									processStaticCollision(ball, target);
 									break;
+
 								case OVERLAPS_OUTER:
+
+									// the outer radius reports a collision
+									// desdendent classes may use this to feed AI
 									vFutureColliders.push_back({ball, target});
 									break;
+
 								default:
 									break;
 							}

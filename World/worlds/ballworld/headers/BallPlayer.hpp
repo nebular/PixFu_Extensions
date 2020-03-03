@@ -15,22 +15,22 @@ namespace Pix {
 		int xMas, yMax;
 	} WorldMeta_t;
 
-	class Player : public Ball {
+	class BallPlayer : public Ball {
 
-//		friend class Arena;
-
+	protected:
+		
 		const PlayerFeatures *FEATURES;
-
 		float fAcceleration = 0;
 		float fCalcDirection = 0;
 //		float fSteerAngle = 0;
 
 	public:
+
 		float fSteerAngle = 0;
 
-		Player(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features = {});
+		BallPlayer(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features = {});
 
-		void process(World *world, float fTime);
+		virtual void process(World *world, float fTime);
 
 		void steer(float angle, float fElapsedTime);
 
@@ -44,7 +44,18 @@ namespace Pix {
 	};
 
 	// speed percent r/max speed
-	inline float Player::speedPercent() { return FEATURES->speedPercent(speed()); }
+	inline float BallPlayer::speedPercent() { return FEATURES->speedPercent(speed()); }
+
+	/**
+	 * A more convincing simulation of a 4-wheel car
+	 */
+
+	class BallPlayer4wheels : public BallPlayer {
+	public:
+		BallPlayer4wheels(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features = {});
+		void process(World *world, float fTime);
+	};
+
 
 	class GameObject : public Ball {
 	public:

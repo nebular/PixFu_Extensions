@@ -112,6 +112,7 @@ namespace Pix {
 		glm::vec3 rotation = {0, 0, 0};
 		float radius = 1.0;
 		float mass = 1.0;
+		float elasticity = 0.8;
 		ObjectAnimation_t animation={};
 		glm::vec3 initialSpeed = {0,0,0};
 		glm::vec3 initialAcceleration = {0,0,0};

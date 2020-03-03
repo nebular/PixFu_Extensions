@@ -166,39 +166,42 @@ namespace Pix {
 
 	void Ball::processGravity(World *world, float fTime) {
 
-	//		float ACCELERATION_EARTH = 9.8 / 10 ; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
 
+		// if there is acceleration (not counting earths) and object is not at terrain level
+		if (mAcceleration.y != 0 || mPosition.y != fHeightTerrain) {
 
-		if (fAccelerationZ != 0 || mPosition.y != fHeightTarget) {
+			const float totalAcceleration = mAcceleration.y + ACCELERATION_EARTH;
+			const bool overTerrainBefore = mPosition.y > fHeightTerrain;
 
-			const float EARTH = ACCELERATION_EARTH;
-			const float totalAcceleration = fAccelerationZ + EARTH;
-			float vz = totalAcceleration * fTime * 10000;
-			float sz = vz * fTime;
+			// update vertical speed
+			mSpeed.y += totalAcceleration * fTime;
+			
+			// update position
+			mPosition.y +=  mSpeed.y * fTime;
 
-			mPosition.y += sz;
+			const bool overTerrainAfter = mPosition.y > fHeightTerrain;
 
-			if (totalAcceleration > 0) {
+			if (overTerrainBefore && !overTerrainAfter) {
 
-				// upwards
-				// if (DBG) std::cerr << "fly up  "<<fHeight<<" vz "<<vz<<" az "<<fAccelerationZ <<std::endl;
-				bFlying = true;
+				// terrain crash or land
+				// rebound ?
 
-			} else {
-
-				// falling
-				// if (DBG) std::cerr << "fall down "<<position.y<<" vz "<<vz<<" az " << fAccelerationZ << std::endl;
-
-				if (mPosition.y < fHeightTarget) {
-					mPosition.y = fHeightTarget;
-					bFlying = false;
-				}
+				const float STABLEHEIGHT = 1;
+				
+				mSpeed.y = -mSpeed.y * CONFIG.elasticity;
+				mPosition.y = fHeightTerrain + (fHeightTerrain - mPosition.y);
+	
 			}
 
-			fAccelerationZ *= 0.9;
+			if (mPosition.y < fHeightTerrain)
+				mPosition.y = fHeightTerrain;
 
-			if (fAccelerationZ < STABLE)
-				fAccelerationZ = 0;
+			bFlying = overTerrainAfter;
+
+			mAcceleration.y *= 0.9;
+
+			if (mAcceleration.y < STABLE)
+				mAcceleration.y = 0;
 
 		}
 	}
@@ -241,6 +244,9 @@ namespace Pix {
 		float heightd = world->getHeight(point);
 //		float LERP = 0.5;
 
+		// terrain angle, x and z
+		// todo properly
+		
 		fAngleTerrain = {
 				atan2((heightr - heightl), 2 * collisionRadius),
 				atan2((heightd - heightt), 2 * collisionRadius)
@@ -267,12 +273,12 @@ namespace Pix {
 			
 			if (mPosition.y - cheight < FEATURES_FALL_LIMIT) {
 				// gong down
-				fHeightTarget = cheight;
+				fHeightTerrain = cheight;
 			
 			} else {
 				// fell from high
 				// std::cerr << "GOING DOWN !!" << std::endl;
-				fHeightTarget = cheight;
+				fHeightTerrain = cheight;
 			}
 
 		} else if (mPosition.y < cheight) {
@@ -289,7 +295,7 @@ namespace Pix {
 				// we can ride seamlessly across this irregularity
 
 				mPosition.y = cheight;
-				fHeightTarget = cheight;        // accept new height
+				fHeightTerrain = cheight;        // accept new height
 				fPenalty = 1;                    // seamlessly drive
 
 			} else {
@@ -304,7 +310,7 @@ namespace Pix {
 				// but that's why we keep the calculated penalty so it can be
 				// added in the CPU car drive routines where it makes sense
 
-				mPosition.y = fHeightTarget = cheight;        // accept new height
+				mPosition.y = fHeightTerrain = cheight;        // accept new height
 
 				if (DBG) std::cerr << "Height Delta " << delta << " penalty " << fPenalty << std::endl;
 
