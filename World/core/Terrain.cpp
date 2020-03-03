@@ -44,7 +44,7 @@ namespace Pix {
 		// 3d canvas
 		if (PLANET.withCanvas) {
 			pDirtTexture = new Texture2D(new Drawable(static_cast<int>(mSize.x), static_cast<int>(mSize.y)));
-			pDirtCanvas = new Canvas2D(pDirtTexture->buffer(), PLANET.withFont != "" ? new Font(PLANET.withFont) : nullptr);
+			pDirtCanvas = new Canvas2D(pDirtTexture->buffer(), new Font(PLANET.withFont));
 			pDirtCanvas->blank();
 			if (config.wireframe) wireframe();
 		}
