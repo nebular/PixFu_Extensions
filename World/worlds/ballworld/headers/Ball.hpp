@@ -39,6 +39,8 @@ namespace Pix {
 
 	class Ball : public WorldObject {
 
+		static constexpr unsigned CLASSID = 2;
+
 		// BallWorld manages all ball instances and will access private properties here
 		// to optimize perrformance
 
@@ -65,16 +67,11 @@ namespace Pix {
 
 		static constexpr int MAXSIMULATIONSTEPS = 3; // 15
 
-		float fMetronome = 0;
-
 	public:
 
 		/** Ball ID */
 		const int ID;
-		/** Ball Radius */
-		const float RADIUS;
-		/** Ball Mass */
-		const float MASS;
+
 		/** whether this is a static object (so wont collide with another static object) */
 		const bool ISSTATIC;
 
@@ -118,14 +115,19 @@ namespace Pix {
 
 		// Internal Simulation vars
 		glm::vec3 origPos;
+
+		// simulation time remaining for current iteration
 		float fSimTimeRemaining;
 
-		Ball(World *world, std::string className, glm::vec3 position, float radi, float mass, bool isStatic = false);
+		Ball(const WorldConfig_t &planetConfig, ObjectFeatures_t meta, bool isStatic = false, int overrideId = -1);
 
 		Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed);
 
 		// internal loop function to commit simulation steps
 		void commitSimulation();
+
+		// process Height effects (height calcs separated from 2D calcs)
+		void processGravity(World *world, float fTime);
 
 	public:
 
@@ -137,19 +139,13 @@ namespace Pix {
 		 * ball normalized position is used by the camera
 		 * @return ball position, normalized
 		 */
-		glm::vec3 pos() override;        // ball normalized position
-
-		/**
-		 * Ball world position
-		 * @return ball world position
-		 */
-		glm::vec3 &position();            // ball world position
+		glm::vec3 &pos() override;        // ball position
 
 		/**
 		 * Ball rotation
 		 * @return rotation in radians
 		 */
-		glm::vec3 rot() override;        // ball 3d rotation
+		glm::vec3 &rot() override;        // ball 3d rotation
 
 		/**
 		 * Ball radius
@@ -302,7 +298,7 @@ namespace Pix {
 		 * @param fTime Frame time
 		 */
 
-		virtual void process(World *world, float fTime = NOTIME);
+		virtual void process(World *world, float fTime = NOTIME) override;
 
 		// process Height effects (height calcs separated from 2D calcs)
 		Ball *processHeights(World *world, float fTime = NOTIME);
@@ -311,13 +307,12 @@ namespace Pix {
 
 // INLINE IMPLEMENTATION BELOW THIS POINT
 
-	inline glm::vec3 &Ball::position() { return mPosition; }                        // ball world position
-	inline glm::vec3 Ball::pos() { return mPosition / 1000.0f; }                    // ball world position
-	inline glm::vec3 Ball::rot() { return mRotation; }                              // ball world position
+	inline glm::vec3 &Ball::pos() { return mPosition; }                        // ball world position
+	inline glm::vec3 &Ball::rot() { return mRotation; }                              // ball world position
 
-	inline float Ball::mass() { return MASS * fMassMultiplier; }                    // ball final mass
-	inline float Ball::radius() { return RADIUS * fRadiusMultiplier; }              // ball final radius
-	inline float Ball::outerRadius() { return fOuterRadius * fRadiusMultiplier; }
+	inline float Ball::mass() { return CONFIG.mass * fMassMultiplier; }                    		// ball final mass
+	inline float Ball::radius() { return CONFIG.radius * fRadiusMultiplier + fRadiusAnimator * CONFIG.radius; } // ball final radius
+	inline float Ball::outerRadius() { return fOuterRadius * fRadiusMultiplier + fRadiusAnimator * CONFIG.radius; }
 
 	inline float Ball::angle() { return mRotation.y; }                              // ball angle (heading)
 	inline float Ball::speed() {

@@ -28,7 +28,7 @@ namespace Pix {
 	public:
 		float fSteerAngle = 0;
 
-		Player(World *world, PlayerFeatures_t features);
+		Player(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features = {});
 
 		void process(World *world, float fTime);
 
@@ -49,7 +49,6 @@ namespace Pix {
 	class GameObject : public Ball {
 	public:
 		GameObject(World *world, ObjectFeatures_t features)
-				: Ball(world, features.className, features.config.position,
-					   features.config.radius, features.config.mass, features.isStatic) {}
+		: Ball(world->CONFIG, features) {}
 	};
 }

@@ -13,10 +13,6 @@
 namespace Pix {
 
 	typedef struct sPlayerFeatures {
-
-		const std::string className;
-		const sObjectConfig config;
-
 		const float MAXSPEED = 160;                // max speed in m/h, 0.15 = 150 km/h and kind of makes sense for the map
 		const float MAXSPEEDBACK = 50;            // max speed backwards
 
@@ -37,13 +33,14 @@ namespace Pix {
 
 	class PlayerFeatures {
 
+		const ObjectFeatures_t OBJECT;
 		const PlayerFeatures_t tFeatures;
 		//	const Weapon_t *pActiveWeapon = nullptr;	// player active weapon
 		//	const Weapon_t *pPassiveWeapon = nullptr;	// other player's weapon side effects
 
 	public:
 
-		PlayerFeatures(PlayerFeatures_t features);
+		PlayerFeatures(ObjectFeatures_t objectMeta, PlayerFeatures_t features);
 
 //		void setActiveWeapon(const Weapon_t *weapon, Ball *player);
 //		void setPassiveWeapon(const Weapon_t *weapon, Ball *player, bool enable = true);
@@ -84,7 +81,7 @@ namespace Pix {
 
 // PLAYER FEATURES
 
-	inline PlayerFeatures::PlayerFeatures(PlayerFeatures_t features) : tFeatures(std::move(features)) {}
+	inline PlayerFeatures::PlayerFeatures(ObjectFeatures_t objectMeta, PlayerFeatures_t features) : tFeatures(std::move(features)), OBJECT(std::move(objectMeta)) {}
 
 /*
 inline void PlayerFeatures::setActiveWeapon(const Weapon_t *weapon, Ball *player)  {
@@ -109,7 +106,7 @@ inline void PlayerFeatures::setPassiveWeapon(const Weapon_t *weapon, Ball *playe
 }
 */
 	inline float PlayerFeatures::wheelBase() const {
-		return tFeatures.config.radius * 1.7;
+		return OBJECT.config.radius * 1.7;
 	} // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 
 	inline float

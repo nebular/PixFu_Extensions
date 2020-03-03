@@ -16,4 +16,5 @@
 constexpr int LEVEL_MAXPLAYERS = 8;
 
 constexpr char PATH_LEVELS[] = "levels";
+constexpr char PATH_OBJECTS[] = "objects";
 

@@ -8,6 +8,7 @@
 //
 
 #include "World.hpp"
+#include "WorldMeta.hpp"
 #include "Fu.hpp"
 #include "OpenGL.h"
 
@@ -17,14 +18,14 @@
 
 namespace Pix {
 
-	constexpr Perspective_t World::PERSP_FOV90;
-	constexpr Perspective_t World::PERSP_FOV70;
+
 	constexpr Transformation_t World::TRANSFORM_FLIPX, World::TRANSFORM_FLIPY, World::TRANSFORM_FLIPZ;
 
 	std::string World::TAG = "World";
+	float World::METRONOME = 0;
 
-	World::World(WorldConfig_t config, Perspective_t perspective)
-			: PERSPECTIVE(perspective), CONFIG(config) {
+	World::World(WorldConfig_t config)
+			: CONFIG(config) {
 	};
 
 	World::~World() {
@@ -43,14 +44,36 @@ namespace Pix {
 	}
 
 	void World::add(ObjectFeatures_t features, bool setHeight) {
-		if (setHeight) {
-			float height = getHeight(features.config.position);
-			features.config.position.y = height;
-		}
-		add(new WorldStaticObject(CONFIG, features));
+		add(new WorldObject(CONFIG, features), setHeight);
 	}
 
-	void World::add(WorldObject *object) {
+	void WorldObject::process(World *world, float fElapsedTime) {
+
+		// process intrinsic animation
+		if (CONFIG.animation.enabled) {
+
+			// apply rotation
+			rot().x += CONFIG.animation.deltaRotationX * fElapsedTime;
+			rot().y += CONFIG.animation.deltaRotationY * fElapsedTime;
+			rot().z += CONFIG.animation.deltaRotationZ * fElapsedTime;
+
+			// apply scale pulse
+			if (CONFIG.animation.scalePulse > 0)
+				fRadiusAnimator=sinf(World::METRONOME) * CONFIG.animation.scalePulse;
+
+		}
+	
+		world->canvas()->drawCircle(pos().x, pos().z, radius(), Pix::Colors::RED);
+		
+	}
+
+
+	void World::add(WorldObject *object, bool setHeight) {
+
+		if (setHeight) {
+			float height = getHeight(object->pos());
+			object->pos().y = height;
+		}
 
 		auto clusterItem = mCluesters.find(object->CLASS);
 		ObjectCluster *cluster;
@@ -77,16 +100,21 @@ namespace Pix {
 		pLight = new Light(CONFIG.lightPosition, CONFIG.lightColor);
 		pCamera = new Camera();
 
-		pCamera->setHeight(PERSPECTIVE.C_HEIGHT);
-		pCamera->setPitch(PERSPECTIVE.C_PITCH);
+		pCamera->setHeight(CONFIG.perspective.C_HEIGHT);
+		pCamera->setPitch(CONFIG.perspective.C_PITCH);
 
 		pShader->use();
 		pShader->bindAttributes();
 
 		// load projection matrix
 		float aspectRatio = (float) engine->screenWidth() / (float) engine->screenHeight();
-		projectionMatrix = glm::perspective((float) toRad(PERSPECTIVE.FOV), aspectRatio, PERSPECTIVE.NEAR_PLANE,
-											PERSPECTIVE.FAR_PLANE);
+
+		projectionMatrix = glm::perspective(
+											(float) toRad(CONFIG.perspective.FOV),
+											aspectRatio,
+											CONFIG.perspective.NEAR_PLANE,
+											CONFIG.perspective.FAR_PLANE
+											);
 
 		pShader->loadProjectionMatrix(projectionMatrix);
 		//		pShader->loadLight(pLight);
@@ -110,12 +138,14 @@ namespace Pix {
 
 		if (DBG)
 			LogV(TAG, SF("Init World, FOV %f, aspectRatio %f",
-						 PERSPECTIVE.FOV, aspectRatio));
+						 CONFIG.perspective.FOV, aspectRatio));
 
 		return true;
 	}
 
 	void World::tick(Fu *engine, float fElapsedTime) {
+
+		METRONOME += fElapsedTime;
 
 		pCamera->update(fElapsedTime);
 

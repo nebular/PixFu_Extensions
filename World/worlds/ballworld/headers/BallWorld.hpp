@@ -11,6 +11,7 @@
 #pragma once
 
 #include "World.hpp"
+#include "BallWorldMap.hpp"
 #include "LineSegment.hpp"
 #include <vector>
 
@@ -21,10 +22,21 @@ namespace Pix {
 	class BallWorld : public World {
 
 		static std::string TAG;
+		static constexpr float EFFICIENCY = 1.00;
+
+	protected:
+
+		BallWorldMap_t *pMap = nullptr;
 
 		std::vector<Ball *> vFakeBalls;
 		std::vector<std::pair<Ball *, Ball *>> vCollidingPairs;
 		std::vector<std::pair<Ball *, Ball *>> vFutureColliders;
+
+		/**
+		 * Processes ball updates and collisions.
+		 */
+
+		long processCollisions(const std::vector<LineSegment_t> &edges, float fElapsedTime);
 
 		// process static collisions
 		void processStaticCollision(Ball *ball, Ball *target);
@@ -34,15 +46,11 @@ namespace Pix {
 
 	public:
 
-		BallWorld(WorldConfig_t config, Perspective_t perspective);
+		BallWorld(std::string levelName, WorldConfig_t config);
 
-		/**
-		 * Processes ball updates and collisions.
-		 * This must be called from your overriden process() with the vector of world edges
-		 */
+		virtual void tick(Pix::Fu *engine, float fElapsedTime) override;
 
-		long processCollisions(const std::vector<LineSegment_t> &edges, float fElapsedTime);
-
+		void load(std::string levelName);
 	};
 }
 

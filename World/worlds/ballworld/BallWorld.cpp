@@ -28,8 +28,54 @@ namespace Pix {
 	// heigh over which
 	constexpr int HEIGHT_EDGE_FLYOVER = 1000;
 
-	BallWorld::BallWorld(WorldConfig_t config, Perspective_t perspective)
-			: World(config, perspective) {}
+	BallWorld::BallWorld(std::string levelName, WorldConfig_t config)
+			: World(config) {
+				vObjects.clear();
+				load(levelName);
+			}
+
+	void BallWorld::load(std::string levelName) {
+
+		if (pMap != nullptr)
+			throw new std::runtime_error("The map was already loaded.");
+
+		pMap = new BallWorldMap_t(levelName);
+		
+		// our terrain configuration object. You can add several terrains at different coordinates
+		// in that case the coordinates should be adjacent (there are no voids between worlds). This
+		// might be allowed in the future.
+		
+		add({
+			
+			// Terrain Name. Maps to the assets folder /levels/<name>/ and determines
+			// the terrain texture (PNG), the terraim mesh (Wavefront OBJ) and heightmap (PNG)
+			// inside that folder
+
+			levelName,
+			
+			// terrain placement in world coordinated (mainly for multi-terrain).
+			// REMEMBER YOUR TERRAIN MODEL MUST HAVE THE ORIGIN AT THE TOP LEFT (0,0) - no negative vertexes !
+			// This is required to ease queries to the heightmap (coordinates will exactly match)
+			{0,0},
+			
+			// height (Y) model scale. As our Heightmap texture is normalized, we need to know the maximum height (+Y)
+			// on the loaded model, so we can translate the heighmap normalized value into world coordinates.
+			// MIND THAT NO SCALING IS PERFORMED ON THE MODEL, this is the opposite, we learn about the loaded model
+			// height to connect it with our separate heightmap, that we use for example to stick objects to the ground.
+			pMap->fModelScale,
+
+			// render a wireframe grid over the texture. You can also access that canvas and draw additional stuff.
+			true
+			
+		});
+
+	}
+	
+	void BallWorld::tick(Pix::Fu *engine, float fElapsedTime) {
+		World::tick(engine, fElapsedTime);
+		processCollisions(pMap->vecLines, fElapsedTime);
+	}
+
 
 	void BallWorld::processStaticCollision(Ball *ball, Ball *target) {
 
@@ -47,8 +93,6 @@ namespace Pix {
 	}
 
 	void BallWorld::processDynamicCollision(Ball *b1, Ball *b2, float fElapsedTime) {
-
-		constexpr float fEfficiency = 0.6;
 
 		//	auto grados = [](float rads) { return std::to_string(rads*180/PI); };
 		glm::vec3 pos1 = b1->mPosition, pos2 = b2->mPosition;
@@ -74,11 +118,11 @@ namespace Pix {
 		float dpNorm2 = b2->mSpeed.x * nx + b2->mSpeed.z * nz;
 
 		// Conservation of momentum in 1D
-		float m1 = fEfficiency *
+		float m1 = EFFICIENCY *
 				   (dpNorm1 * (b1->mass() - b2->mass()) + 2.0f * b2->mass() * dpNorm2) /
 				   (b1->mass() + b2->mass());
 
-		float m2 = fEfficiency *
+		float m2 = EFFICIENCY *
 				   (dpNorm2 * (b2->mass() - b1->mass()) + 2.0f * b1->mass() * dpNorm1) /
 				   (b1->mass() + b2->mass());
 
@@ -109,7 +153,8 @@ namespace Pix {
 			// Set all balls time to maximum for this epoch
 
 			iterateObjects([fSimElapsedTime](WorldObject *ball) {
-				static_cast<Ball *>(ball)->fSimTimeRemaining = fSimElapsedTime;
+				if (ball->CLASSID == Ball::CLASSID)
+					static_cast<Ball *>(ball)->fSimTimeRemaining = fSimElapsedTime;
 			});
 
 			// Erode simulation time on a per objec tbasis, depending upon what happens
@@ -119,6 +164,9 @@ namespace Pix {
 
 				// Update Ball Positions
 				iterateObjects([this](WorldObject *w) {
+
+					if (w->CLASSID != Ball::CLASSID) return;
+
 					Ball *ball = (Ball *) w;
 
 					if (!ball->ISSTATIC && !ball->bDisabled) {
@@ -156,6 +204,8 @@ namespace Pix {
 				// Work out static collisions with walls and displace balls so no overlaps
 
 				iterateObjects([this, &edges, &times](WorldObject *b) {
+
+					if (b->CLASSID != Ball::CLASSID) return;
 
 					Ball *ball = (Ball *) b;
 
@@ -236,6 +286,8 @@ namespace Pix {
 					// Against other balls
 					iterateObjects([ball, this](WorldObject *targ) {
 
+						if (targ->CLASSID!=Ball::CLASSID) return;
+							
 						Ball *target = (Ball *) targ;
 
 						if ((!ball->ISSTATIC || !target->ISSTATIC)

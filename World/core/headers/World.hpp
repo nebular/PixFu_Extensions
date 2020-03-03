@@ -42,9 +42,10 @@ namespace Pix {
 		std::map<std::string, ObjectCluster *> mCluesters;
 
 	protected:
+
 		std::vector<ObjectCluster *> vObjects;
 		std::vector<Terrain *> vTerrains;
-
+		
 		virtual bool init(Fu *engine);
 
 		virtual void tick(Fu *engine, float fElapsedTime);
@@ -59,7 +60,7 @@ namespace Pix {
 		 * Adds an object to the world
 		 * @param object The object to add
 		 */
-		void add(WorldObject *object);
+		void add(WorldObject *object, bool setHeight = true);
 
 		/**
 		 * Adds an static object to the world.
@@ -79,11 +80,8 @@ namespace Pix {
 
 	public:
 
-		const Perspective_t PERSPECTIVE;
 		const WorldConfig_t CONFIG;
-
-		static constexpr Perspective_t PERSP_FOV90 = {90, 0.005, 1000.0, 0.25};
-		static constexpr Perspective_t PERSP_FOV70 = {70, 0.005, 1000.0, 0.25};
+		static float METRONOME;
 
 		static constexpr Transformation_t TRANSFORM_NONE = {};
 		static constexpr Transformation_t TRANSFORM_FLIPX = {
@@ -119,7 +117,7 @@ namespace Pix {
 				false, false, 0        // global xyz flip
 		};
 
-		World(WorldConfig_t config, Perspective_t perspective = PERSP_FOV70);
+		World(WorldConfig_t config);
 
 		virtual ~World();
 

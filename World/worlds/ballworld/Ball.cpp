@@ -26,42 +26,26 @@ namespace Pix {
 	float Ball::stfHeightScale = 1.0;
 	int Ball::instanceCounter = 0;
 
-	Ball::Ball(World *world, std::string className, glm::vec3 position, float radi, float mass, bool isStatic)
-			: WorldObject(world->CONFIG, std::move(className)),
-			  ID(instanceCounter++),
-			  RADIUS(radi),
-			  MASS(mass),
-			  ISSTATIC(isStatic),
-			  mPosition(position),
-			  bFlying(false) {
+	Ball::Ball(const WorldConfig_t &planetConfig, ObjectFeatures_t meta, bool isStatic, int overrideId)
+			: 	WorldObject(planetConfig, meta, CLASSID),
+				ID(overrideId>=0 ? overrideId : instanceCounter++),
+				ISSTATIC(isStatic),
+				mPosition(meta.config.position),
+				mSpeed(meta.config.initialSpeed),
+				mAcceleration(meta.config.initialAcceleration),
+				bFlying(false) {
 
 		TAG = "BALL" + std::to_string(ID);
 		setRadiusMultiplier(1.0);
-
-		// set initial height
-		if (mPosition.y == 0) {
-			glm::vec3 chk = {mPosition.x, 0, mPosition.z + radius()};
-			mPosition.y = world->getHeight(chk);
-		}
-
 	}
 
 	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed)
-			: WorldObject(planetConfig, "FAKE"),
-			  ID(FAKE_BALL_ID),
-			  RADIUS(radi),
-			  MASS(mass),
-			  ISSTATIC(false),
-			  mPosition(position),
-			  mSpeed(speed),
-			  bFlying(false) {
-
-		TAG = "BALL" + std::to_string(ID);
-		setRadiusMultiplier(1.0);
+	: Ball(planetConfig, ObjectFeatures_t { "FAKE", { position, {0,0,0}, radi, mass}}, false, FAKE_BALL_ID) {
+		TAG = "FAKEBALL";
 	}
 
 	Ball *Ball::makeCollisionBall(float radi, glm::vec3 position) {
-		return new Ball(PLANET, radi, MASS * 0.8f, position, {-mSpeed.x, 0, -mSpeed.z});
+		return new Ball(WORLD, radi, CONFIG.mass * 0.8f, position, {-mSpeed.x, 0, -mSpeed.z});
 	}
 
 	void Ball::disable(bool disabled) {
@@ -159,7 +143,7 @@ namespace Pix {
 			origPos = mPosition;                                // Store original position this epochoverla
 		}
 
-		fMetronome += fTime;
+		WorldObject::process(world, fTime);
 
 		mAcceleration.z *= 0.8;
 		mAcceleration.x *= 0.8;
@@ -176,6 +160,46 @@ namespace Pix {
 		if (fabs(mSpeed.x * mSpeed.x + mSpeed.z * mSpeed.z) < STABLE) {
 			mSpeed.x = 0;
 			mSpeed.z = 0;
+		}
+		
+	}
+
+	void Ball::processGravity(World *world, float fTime) {
+
+	//		float ACCELERATION_EARTH = 9.8 / 10 ; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
+
+
+		if (fAccelerationZ != 0 || mPosition.y != fHeightTarget) {
+
+			const float EARTH = ACCELERATION_EARTH;
+			const float totalAcceleration = fAccelerationZ + EARTH;
+			float vz = totalAcceleration * fTime * 10000;
+			float sz = vz * fTime;
+
+			mPosition.y += sz;
+
+			if (totalAcceleration > 0) {
+
+				// upwards
+				// if (DBG) std::cerr << "fly up  "<<fHeight<<" vz "<<vz<<" az "<<fAccelerationZ <<std::endl;
+				bFlying = true;
+
+			} else {
+
+				// falling
+				// if (DBG) std::cerr << "fall down "<<position.y<<" vz "<<vz<<" az " << fAccelerationZ << std::endl;
+
+				if (mPosition.y < fHeightTarget) {
+					mPosition.y = fHeightTarget;
+					bFlying = false;
+				}
+			}
+
+			fAccelerationZ *= 0.9;
+
+			if (fAccelerationZ < STABLE)
+				fAccelerationZ = 0;
+
 		}
 	}
 
@@ -240,9 +264,11 @@ namespace Pix {
 		if (mPosition.y > cheight) {
 
 			// downhill
+			
 			if (mPosition.y - cheight < FEATURES_FALL_LIMIT) {
 				// gong down
 				fHeightTarget = cheight;
+			
 			} else {
 				// fell from high
 				// std::cerr << "GOING DOWN !!" << std::endl;
@@ -315,45 +341,9 @@ namespace Pix {
 			}
 #endif
 		}
-
-//		float ACCELERATION_EARTH = 9.8 / 10 ; // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
-
-
-		if (fAccelerationZ != 0 || mPosition.y != fHeightTarget) {
-
-			const float EARTH = ACCELERATION_EARTH;
-			const float totalAcceleration = fAccelerationZ + EARTH;
-			float vz = totalAcceleration * fTime * 10000;
-			float sz = vz * fTime;
-
-			mPosition.y += sz;
-
-			if (totalAcceleration > 0) {
-
-				// upwards
-				// if (DBG) std::cerr << "fly up  "<<fHeight<<" vz "<<vz<<" az "<<fAccelerationZ <<std::endl;
-				bFlying = true;
-
-			} else {
-
-				// falling
-				// if (DBG) std::cerr << "fall down "<<position.y<<" vz "<<vz<<" az " << fAccelerationZ << std::endl;
-
-				if (mPosition.y < fHeightTarget) {
-					mPosition.y = fHeightTarget;
-					bFlying = false;
-				}
-			}
-
-			fAccelerationZ *= 0.9;
-
-			if (fAccelerationZ < STABLE)
-				fAccelerationZ = 0;
-
-		}
-
+		
+		processGravity(world, fTime);
 		return nullptr;
-
 	}
 
 	float LinearDelayer::tick(float fElapsedTime) {

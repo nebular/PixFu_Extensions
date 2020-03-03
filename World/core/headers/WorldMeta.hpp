@@ -32,7 +32,9 @@ namespace Pix {
 		const float C_PITCH = 0;
 	} Perspective_t;
 
-	/**
+	static constexpr Perspective_t PERSP_FOV90 = {90, 0.005, 1000.0, 0.25};
+	static constexpr Perspective_t PERSP_FOV70 = {70, 0.005, 1000.0, 0.25};
+/**
 	 * defines an initiali transforation for the world and objects
 	 */
 
@@ -74,6 +76,9 @@ namespace Pix {
 		/** light color */
 		const glm::vec3 lightColor = {0.8, 0.8, 0.93};
 
+		/** Perspective */
+		const Perspective_t perspective = PERSP_FOV70;
+		
 		/** the global world objects transform to flip their axis, etc */
 		const Transformation_t worldTransform;
 
@@ -91,12 +96,25 @@ namespace Pix {
 
 	} WorldConfig_t;
 
+	/** A simple intrinsic object animation that will rotate the object around axis over time */
+	typedef struct sObjectAnimation {
+		/** animation is enabled */
+		bool enabled = false;
+		// delta animations on every axis
+		float deltaRotationX=0, deltaRotationY=0, deltaRotationZ=0;
+		// sin() animation on scale (0.1 = 10% size variation)
+		float scalePulse = 0;
+	} ObjectAnimation_t;
+
 	/** Initial object properties */
 	typedef struct sObjectConfig {
 		glm::vec3 position = {0, 0, 0};
 		glm::vec3 rotation = {0, 0, 0};
 		float radius = 1.0;
 		float mass = 1.0;
+		ObjectAnimation_t animation={};
+		glm::vec3 initialSpeed = {0,0,0};
+		glm::vec3 initialAcceleration = {0,0,0};
 	} ObjectConfig_t;
 
 	/**
@@ -108,7 +126,7 @@ namespace Pix {
 		std::string className;
 
 		/** Initial properties */
-		sObjectConfig config;
+		ObjectConfig_t config;
 
 		/** Whether object is static */
 		bool isStatic = true;
@@ -143,34 +161,38 @@ namespace Pix {
 	 Base class for any object in the world. This is an abstract class.
 	 You will extend this class to provide physics to your objects.
 	 */
-
-	class WorldObject {
+	
+	class World;
+	class WorldObjectBase {
 
 	protected:
 
 		/** World Configuration */
-		const WorldConfig_t &PLANET;
-
+		const WorldConfig_t &WORLD;
+		
 	public:
+
+		const unsigned CLASSID;
 
 		/** Object Classname (maps to resources) */
 		const std::string CLASS;
 
-		inline WorldObject(const WorldConfig_t &worldConfig, std::string objectClass) : PLANET(worldConfig), CLASS(objectClass) {}
+		inline WorldObjectBase(const WorldConfig_t &worldConfig, std::string objectClass, unsigned classId)
+		: WORLD(worldConfig), CLASS(objectClass), CLASSID(classId) {}
 
-		inline virtual ~WorldObject() = default;
+		inline virtual ~WorldObjectBase() = default;
 
 		/**
-		 * Return object NORMALIZED position (warning)
-		 * @return The object normalized position
+		 * Return object position
+		 * @return The object position
 		 */
-		virtual glm::vec3 pos() = 0;
+		virtual glm::vec3 &pos() = 0;
 
 		/**
 		 * Return object rotation around xyz axis
 		 * @return The rotation vector in radians
 		 */
-		virtual glm::vec3 rot() = 0;
+		virtual glm::vec3 &rot() = 0;
 
 		/**
 		 * Return object radius
@@ -182,26 +204,34 @@ namespace Pix {
 
 	/**
 	 * Convenience class for a static world object without any physics. Will just get rendered
-	 * in a static location that cannot be changed.
+	 * in a static location.
 	 */
 
-	class WorldStaticObject : public WorldObject {
+	class WorldObject : public WorldObjectBase {
 
-		const ObjectFeatures_t CONFIG;
+		static constexpr unsigned CLASSID_CODE = 1;
+		const ObjectFeatures_t META;
 
+	protected:
+
+		float fRadiusAnimator = 0;
+		
+		// copy initial configuration
+		ObjectConfig_t CONFIG = META.config;
+		
 	public:
 
-		inline WorldStaticObject(const WorldConfig_t &worldConfig, const ObjectFeatures_t objectConfig)
-				: WorldObject(worldConfig, objectConfig.className), CONFIG(std::move(objectConfig)) {
+		inline WorldObject(const WorldConfig_t &worldConfig, const ObjectFeatures_t objectMeta, unsigned classid = CLASSID_CODE)
+				: WorldObjectBase(worldConfig, objectMeta.className, classid),
+				  META(std::move(objectMeta)) {}
 
-		}
+		inline virtual glm::vec3 &pos() override { return CONFIG.position; }
 
-		inline glm::vec3 pos() override { return CONFIG.config.position / 1000.0f; }
+		inline virtual glm::vec3 &rot() override { return CONFIG.rotation; }
 
-		inline glm::vec3 rot() override { return CONFIG.config.rotation; }
+		inline float radius() override { return CONFIG.radius; }
 
-		inline float radius() override { return CONFIG.config.radius; }
+		/** process animations */
+		virtual void process(World *world, float fElapsedTime);
 	};
-
-
 }

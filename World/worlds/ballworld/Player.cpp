@@ -13,12 +13,8 @@
 
 namespace Pix {
 
-	Player::Player(World *world, PlayerFeatures_t features)
-			: Ball(world, features.className, features.config.position,
-				   features.config.radius,
-				   features.config.mass,
-				   false),
-			  FEATURES(new PlayerFeatures(features)) {
+	Player::Player(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features)
+	: Ball(world->CONFIG, objectMeta), FEATURES(new PlayerFeatures(objectMeta, features)) {
 	}
 
 	// process ball iteration
