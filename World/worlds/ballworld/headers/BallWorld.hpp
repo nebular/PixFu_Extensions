@@ -39,6 +39,27 @@ namespace Pix {
 		WorldObject *add(ObjectMeta_t features, ObjectLocation_t location, bool setHeight) override;
 
 		/**
+		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
+		 * with that OID. Object is added to the world at the supplied location.
+		 * @param oid Object OID as inserted into the ObjecctDb
+		 * @param location Object location info
+		 * @param setHeight whether to set ground height
+		 * @return The object
+		 */
+
+		WorldObject *add(int oid, ObjectLocation_t location, bool setHeight = true);
+		
+		/**
+		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
+		 * with that OID. Initial location from the DB is used.
+		 * @param oid Object OID as inserted into the ObjecctDb
+		 * @param setHeight whether to set ground height
+		 * @return The object
+		 */
+
+		WorldObject *add(int oid, bool setHeight = true);
+		
+		/**
 		 * Processes ball updates and collisions.
 		 */
 
@@ -58,6 +79,15 @@ namespace Pix {
 
 		void load(std::string levelName);
 	};
+
+	inline WorldObject *BallWorld::add(int oid, ObjectLocation_t location, bool setHeight) {
+		return World::add(oid, location, setHeight);
+	}
+
+	inline WorldObject *BallWorld::add(int oid, bool setHeight) {
+		return World::add(oid, setHeight);
+	}
+
 }
 
 #pragma clang diagnostic pop
