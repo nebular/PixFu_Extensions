@@ -196,7 +196,7 @@ namespace Pix {
 			if (mPosition.y < fHeightTerrain)
 				mPosition.y = fHeightTerrain;
 
-			bFlying = overTerrainAfter;
+			bFlying = mPosition.y - fHeightTerrain > 0.1; // verTerrainAfter;
 
 			mAcceleration.y *= 0.9;
 

@@ -56,6 +56,9 @@ namespace Pix {
 		void process(World *world, float fTime);
 	};
 
+	inline BallPlayer4wheels::BallPlayer4wheels(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features)
+	: BallPlayer (world, objectMeta, features) {}
+
 
 	class GameObject : public Ball {
 	public:

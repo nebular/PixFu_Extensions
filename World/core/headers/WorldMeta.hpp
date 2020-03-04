@@ -108,8 +108,10 @@ namespace Pix {
 
 	/** Initial object properties */
 	typedef struct sObjectConfig {
+
 		glm::vec3 position = {0, 0, 0};
 		glm::vec3 rotation = {0, 0, 0};
+
 		float radius = 1.0;
 		float mass = 1.0;
 		float elasticity = 0.8;
