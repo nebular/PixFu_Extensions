@@ -26,9 +26,9 @@ namespace Pix {
 	float Ball::stfBaseScale = 1.0;
 	float Ball::stfHeightScale = 1.0;
 
-	Ball::Ball(const WorldConfig_t &planetConfig, ObjectMeta_t meta, ObjectLocation_t location, bool isStatic, int overrideId)
+	Ball::Ball(const WorldConfig_t &planetConfig, ObjectMeta_t meta, ObjectLocation_t location, int overrideId)
 			: WorldObject(planetConfig, meta, Pix::ObjectLocation_t(), CLASSID, overrideId),
-			  ISSTATIC(isStatic),
+			  ISSTATIC(meta.ISSTATIC),
 			  mPosition(location.position),
 			  mRotation(location.rotation),
 			  mSpeed(meta.PROPERTIES.initialSpeed),
@@ -42,9 +42,8 @@ namespace Pix {
 	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed) :
 			Ball(
 					planetConfig,
-					ObjectMeta_t{"FAKE", {radi, mass, 0.8, speed}},
+					ObjectMeta_t{ "FAKE", {radi, mass, 0.8, speed}},
 					ObjectLocation_t{position, {0, 0, 0}},
-					false,
 					FAKE_BALL_ID
 			) {
 		TAG = "FAKEBALL";
@@ -108,7 +107,7 @@ namespace Pix {
 
 // subclasses MUST call this
 	void Ball::onCollision(Ball *otherBall, glm::vec3 newSpeedVector, float fElapsedTime) {
-		LogV(TAG, SF("I crashed"));
+		if (DBG) LogV(TAG, SF("I crashed"));
 		mSpeed = newSpeedVector;
 	}
 
@@ -150,6 +149,8 @@ namespace Pix {
 		}
 
 		WorldObject::process(world, fTime);
+		
+		if (ISSTATIC) return;
 
 		mAcceleration.z *= 0.8F;
 		mAcceleration.x *= 0.8F;

@@ -86,7 +86,7 @@ namespace Pix {
 			glm::vec3 rot = object->rot();
 			glm::vec3 pos = object->pos() / 1000.0f;
 
-			float radius = object->radius() / 1000;
+			float radius = object->drawRadius();
 
 			// our shader has a Frustum class initialized already initialized with the
 			// projection & view matrix, so we can now trivially check if an object will be

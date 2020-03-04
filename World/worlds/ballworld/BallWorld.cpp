@@ -95,16 +95,21 @@ namespace Pix {
 	void BallWorld::processStaticCollision(Ball *ball, Ball *target) {
 
 		glm::vec3 displacement = ball->calculateOverlapDisplacement(target);
+		
+		if (!ball->ISSTATIC) {
+			// Displace Current Ball away from collision
+			ball->mPosition.x -= displacement.x;
+			ball->mPosition.y -= displacement.y;
+			ball->mPosition.z -= displacement.z;
+		}
 
-		// Displace Current Ball away from collision
-		ball->mPosition.x -= displacement.x;
-		ball->mPosition.y -= displacement.y;
-		ball->mPosition.z -= displacement.z;
+		if (!target->ISSTATIC) {
+			// Displace Target Ball away from collision
+			target->mPosition.x += displacement.x;
+			target->mPosition.y += displacement.y;
+			target->mPosition.z += displacement.z;
+		}
 
-		// Displace Target Ball away from collision
-		target->mPosition.x += displacement.x;
-		target->mPosition.y += displacement.y;
-		target->mPosition.z += displacement.z;
 	}
 
 	void BallWorld::processDynamicCollision(Ball *b1, Ball *b2, float fElapsedTime) {
@@ -142,8 +147,8 @@ namespace Pix {
 				   (b1->mass() + b2->mass());
 
 		// Update ball velocities
-		glm::vec3 newSpeed1 = {tx * dpTan1 + nx * m1, b1->mSpeed.y, tz * dpTan1 + nz * m1};
-		glm::vec3 newSpeed2 = {tx * dpTan2 + nx * m2, b2->mSpeed.y, tz * dpTan2 + nz * m2};
+		glm::vec3 newSpeed1 = b1->ISSTATIC ? glm::vec3 {0.0F,0.0F,0.0F} : glm::vec3 {tx * dpTan1 + nx * m1, b1->mSpeed.y, tz * dpTan1 + nz * m1};
+		glm::vec3 newSpeed2 = b2->ISSTATIC ? glm::vec3 {0.0F,0.0F,0.0F} : glm::vec3 {tx * dpTan2 + nx * m2, b2->mSpeed.y, tz * dpTan2 + nz * m2};
 
 		b1->onCollision(b2, newSpeed1, fElapsedTime);
 		b2->onCollision(b1, newSpeed2, fElapsedTime);
@@ -151,7 +156,7 @@ namespace Pix {
 	}
 
 	WorldObject *BallWorld::add(ObjectMeta_t features, ObjectLocation_t location, bool setHeight) {
-		Ball *ball = new Ball(CONFIG, features, location, Ball::CLASSID);
+		Ball *ball = new Ball(CONFIG, features, location);
 		World::add(ball, setHeight);
 		return ball;
 	}
@@ -190,7 +195,7 @@ namespace Pix {
 
 					Ball *ball = (Ball *) w;
 
-					if (!ball->ISSTATIC && !ball->bDisabled) {
+					if (!ball->bDisabled) {
 						if (ball->fSimTimeRemaining > 0.0f) {
 
 							// process ball physics

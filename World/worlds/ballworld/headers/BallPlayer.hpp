@@ -62,6 +62,6 @@ inline BallPlayer4wheels::BallPlayer4wheels(World *world, ObjectMeta_t objectMet
 	class GameObject : public Ball {
 	public:
 		GameObject(World *world, ObjectMeta_t features, ObjectLocation_t loc)
-		: Ball(world->CONFIG, features, loc, false, 0) {}
+		: Ball(world->CONFIG, features, loc, 0) {}
 	};
 }
