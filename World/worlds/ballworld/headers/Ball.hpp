@@ -50,9 +50,6 @@ namespace Pix {
 
 		std::string TAG;
 
-		static int instanceCounter;
-
-
 		// Multiple simulation updates with small time steps permit more accurate physics
 		// and realistic results at the expense of CPU time of course
 		// TODO: research which values to use as jdavidx example uses hundreds of balls but
@@ -68,9 +65,6 @@ namespace Pix {
 		static constexpr int MAXSIMULATIONSTEPS = 3; // 15
 
 	public:
-
-		/** Ball ID */
-		const int ID;
 
 		/** whether this is a static object (so wont collide with another static object) */
 		const bool ISSTATIC;
@@ -118,8 +112,6 @@ namespace Pix {
 		// simulation time remaining for current iteration
 		float fSimTimeRemaining;
 
-		Ball(const WorldConfig_t &planetConfig, ObjectFeatures_t meta, ObjectLocation_t location, bool isStatic = false, int overrideId = -1);
-
 		Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed);
 
 		// internal loop function to commit simulation steps
@@ -133,6 +125,8 @@ namespace Pix {
 		static void setBaseScale(float scale);
 
 		static void setHeightScale(float scale);
+
+		Ball(const WorldConfig_t &planetConfig, ObjectMeta_t meta, ObjectLocation_t location, bool isStatic = false, int overrideId = -1);
 
 		/**
 		 * ball normalized position is used by the camera

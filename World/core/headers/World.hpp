@@ -54,22 +54,46 @@ namespace Pix {
 		 * Adds a terrain to the world
 		 * @param terrainConfig The therrain configuration object
 		 */
+
 		Terrain *add(TerrainConfig_t terrainConfig);
 
 		/**
-		 * Adds an object to the world
+		 * Adds a pre-created object to the world
 		 * @param object The object to add
 		 */
+		
 		void add(WorldObject *object, bool setHeight = true);
 
 		/**
-		 * Adds an static object to the world.
+		 * Creates an object from its metadata and Adds it to the world
 		 * @param object The object to add
 		 * @param setHeight whether to set object height to terrain height
+		 * @return The added object
 		 */
 
-		void add(ObjectFeatures_t object, bool setHeight = true);
+		virtual WorldObject *add(ObjectMeta_t object, ObjectLocation_t location, bool setHeight = true);
 
+		/**
+		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
+		 * with that OID. Object is added to the world at the supplied location.
+		 * @param oid Object OID as inserted into the ObjecctDb
+		 * @param location Object location info
+		 * @param setHeight whether to set ground height
+		 * @return The object
+		 */
+
+		WorldObject *add(int oid, ObjectLocation_t location, bool setHeight = true);
+		
+		/**
+		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
+		 * with that OID. Initial location from the DB is used.
+		 * @param oid Object OID as inserted into the ObjecctDb
+		 * @param setHeight whether to set ground height
+		 * @return The object
+		 */
+
+		WorldObject *add(int oid, bool setHeight = true);
+		
 		template<typename Func>
 		void iterateObjects(Func callback) {
 			for (ObjectCluster *cluster:vObjects) {
@@ -183,6 +207,16 @@ namespace Pix {
 
 	inline Canvas2D *World::canvas() {
 		return vTerrains[0]->canvas();
+	}
+
+	inline WorldObject *World::add(int oid, ObjectLocation_t location, bool setHeight) {
+		const ObjectDbEntry_t *entry = ObjectDb::get(oid);
+		return add(entry->first, location, setHeight);
+	}
+
+	inline WorldObject *World::add(int oid, bool setHeight) {
+		const ObjectDbEntry_t *entry = ObjectDb::get(oid);
+		return add(entry->first, entry->second, setHeight);
 	}
 
 }

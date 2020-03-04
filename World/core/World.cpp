@@ -23,6 +23,7 @@ namespace Pix {
 
 	std::string World::TAG = "World";
 	float World::METRONOME = 0;
+	int WorldObjectBase::instanceCounter = 0;
 
 	World::World(WorldConfig_t config)
 			: CONFIG(config) {
@@ -43,8 +44,10 @@ namespace Pix {
 		return world;
 	}
 
-	void World::add(ObjectFeatures_t features, bool setHeight) {
-		add(new WorldObject(CONFIG, features, Pix::ObjectLocation_t(), 0), setHeight);
+	WorldObject *World::add(ObjectMeta_t features, ObjectLocation_t location, bool setHeight) {
+		WorldObject *object = new WorldObject(CONFIG, features, location, WorldObject::CLASSID_CODE );
+		add(object, setHeight);
+		return object;
 	}
 
 	void WorldObject::process(World *world, float fElapsedTime) {

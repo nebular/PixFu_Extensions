@@ -1,7 +1,8 @@
 //
 //  WorldMeta.hpp
+//
 //  The structs that hold world metadata
-//  PixEngine
+//  PixFu Engine
 //
 //  Created by rodo on 25/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
@@ -10,6 +11,7 @@
 #pragma once
 
 #include <string>
+#include <map>
 #include "StaticObject.hpp"
 #include "Font.hpp"
 #include "glm/mat4x4.hpp"
@@ -17,6 +19,7 @@
 
 namespace Pix {
 
+	// convenience to create a transformation matrix
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
 										 float scale, bool flipX, bool flipY, bool flipZ);
 
@@ -34,6 +37,7 @@ namespace Pix {
 
 	static constexpr Perspective_t PERSP_FOV90 = {90, 0.005, 1000.0, 0.25};
 	static constexpr Perspective_t PERSP_FOV70 = {70, 0.005, 1000.0, 0.25};
+
 /**
 	 * defines an initiali transforation for the world and objects
 	 */
@@ -63,8 +67,10 @@ namespace Pix {
 	} Transformation_t;
 
 	/**
-	 * World configuration object
+	 * World configuration object. It is used to instantiate the world class and
+	 * contains the root parameters: lighting, background ...
 	 */
+
 	typedef struct sWorldConfig {
 
 		/** global background color */
@@ -96,7 +102,14 @@ namespace Pix {
 
 	} WorldConfig_t;
 
-	/** A simple intrinsic object animation that will rotate the object around axis over time */
+	//
+	// Metadata for objects
+	//
+
+	/**
+	 * A simple intrinsic object animation that will rotate the object around
+	 * all axis over time
+	 */
 	typedef struct sObjectAnimation {
 		/** animation is enabled */
 		bool enabled = false;
@@ -106,39 +119,82 @@ namespace Pix {
 		float scalePulse = 0;
 	} ObjectAnimation_t;
 
-	/** Object Location */
+	/**
+	 * Used to provide initial positions when adding objets to the world
+	 */
 	typedef struct sObjectLocation {
 		glm::vec3 position = {0, 0, 0};
 		glm::vec3 rotation = {0, 0, 0};
 	} ObjectLocation_t;
 
-	/** Object properties */
-	typedef struct sObjectConfig {
-		float radius = 1.0;
-		float mass = 1.0;
-		float elasticity = 0.8;
-		glm::vec3 initialSpeed = {0, 0, 0};
-		glm::vec3 initialAcceleration = {0, 0, 0};
-		ObjectAnimation_t animation = {};
-	} ObjectConfig_t;
+	/**
+	 * The static Object properties. This is used to insert an object into the world.
+	 * The class ObjectDB can store these structs ("all game objects") then you can also
+	 * insert the objects just using the OID (this struct will be retrieved from the DB)
+	 */
+
+	typedef const struct sObjectProperties {
+		const float radius = 1.0;
+		const float mass = 1.0;
+		const float elasticity = 0.8;
+		const glm::vec3 initialSpeed = {0, 0, 0};
+		const glm::vec3 initialAcceleration = {0, 0, 0};
+		const ObjectAnimation_t animation = {};
+	} ObjectProperties_t;
 
 	/**
-	 * Object definition + initial properties
+	 * Object Metadata - Main Umbrella object.
 	 */
-	typedef struct sObjectFeatures {
+
+	typedef const struct sObjectMeta {
 
 		/** Object class name */
-		std::string className;
+		const std::string CLASSNAME;
 
 		/** Initial properties */
-		ObjectConfig_t config;
+		const ObjectProperties_t PROPERTIES;
 
 		/** Whether object is static */
-		bool isStatic = true;
+		const bool ISSTATIC = true;
 
-	} ObjectFeatures_t;
+	} ObjectMeta_t;
 
-	/** Terrain Definition */
+
+	/**
+	 * The ObjectDB maps an OID to a pair <Properties,InitialLocation>
+	 */
+	typedef std::pair<ObjectMeta_t, ObjectLocation_t> ObjectDbEntry_t;
+
+	/**
+	 * A database of objects, maps an OID to a to a pair <Properties,InitialLocation>
+	 */
+
+	class ObjectDb {
+
+		static std::map<int, ObjectDbEntry_t> Database;
+
+	public:
+
+		/*
+		//		static const std::map<int, int> MapCircuitSprites;                    // 1000kg mass of the player car
+		//		static ObjectFeatures_t  const *getCircuitGroundSprite(int circuitObjectOid);
+		*/
+
+		inline static void insert(int code, ObjectMeta_t objectMeta, ObjectLocation_t initialPosition = {}) {
+			Database.insert({code, { objectMeta, initialPosition }});
+		}
+		
+		
+		inline static ObjectDbEntry_t const *get(int oid) {
+			return &Database.at(oid);
+		}
+
+	};
+
+	/**
+	 * Terrain definition. Used to add terrains to the world.
+	 */
+
 	typedef struct sTerrainConfig {
 
 		/** determines also where the resources are */
@@ -171,6 +227,8 @@ namespace Pix {
 
 	class WorldObjectBase {
 
+		static int instanceCounter;
+		
 	protected:
 
 		/** World Configuration */
@@ -179,14 +237,18 @@ namespace Pix {
 	public:
 
 		const unsigned CLASSID;
+		
+		/** Object ID */
+		const int ID;
 
 		/** Object Classname (maps to resources) */
 		const std::string CLASS;
 
-		inline WorldObjectBase(const WorldConfig_t &worldConfig, std::string objectClass, unsigned classId) :
+		inline WorldObjectBase(const WorldConfig_t &worldConfig, std::string objectClass, unsigned classId, int overrideId = -1) :
 				WORLD(worldConfig),
 				CLASSID(classId),
-				CLASS(objectClass) {}
+				CLASS(objectClass),
+				ID(overrideId >= 0 ? overrideId : instanceCounter++) {}
 
 		inline virtual ~WorldObjectBase() = default;
 
@@ -217,25 +279,28 @@ namespace Pix {
 
 	class WorldObject : public WorldObjectBase {
 
-		static constexpr unsigned CLASSID_CODE = 1;
-		const ObjectFeatures_t META;
+
+		const ObjectMeta_t META;
 
 	protected:
 
 		float fRadiusAnimator = 0;
 
 		// copy initial configuration
-		ObjectConfig_t CONFIG = META.config;
+		ObjectProperties_t CONFIG = META.PROPERTIES;
 
 		// Object Location
 		ObjectLocation_t LOCATION;
 
 	public:
 
-		inline WorldObject(const WorldConfig_t &worldConfig, const ObjectFeatures_t objectMeta, ObjectLocation_t location,
-						   unsigned int classid = CLASSID_CODE)
-				: WorldObjectBase(worldConfig, objectMeta.className, classid),
-				  META(std::move(objectMeta)), LOCATION(std::move(location)) {}
+		static constexpr unsigned CLASSID_CODE = 1;
+
+		inline WorldObject(const WorldConfig_t &worldConfig, const ObjectMeta_t objectMeta, ObjectLocation_t location,
+						   unsigned int classid = CLASSID_CODE, int overrideId = -1) :
+				WorldObjectBase(worldConfig, objectMeta.CLASSNAME, classid, overrideId),
+				META(std::move(objectMeta)),
+				LOCATION(std::move(location)) {}
 
 		inline virtual glm::vec3 &pos() override { return LOCATION.position; }
 

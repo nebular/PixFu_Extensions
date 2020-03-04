@@ -25,16 +25,14 @@ namespace Pix {
 	// global scale for ball radius
 	float Ball::stfBaseScale = 1.0;
 	float Ball::stfHeightScale = 1.0;
-	int Ball::instanceCounter = 0;
 
-	Ball::Ball(const WorldConfig_t &planetConfig, ObjectFeatures_t meta, ObjectLocation_t location, bool isStatic, int overrideId)
-			: WorldObject(planetConfig, meta, Pix::ObjectLocation_t(), CLASSID),
-			  ID(overrideId >= 0 ? overrideId : instanceCounter++),
+	Ball::Ball(const WorldConfig_t &planetConfig, ObjectMeta_t meta, ObjectLocation_t location, bool isStatic, int overrideId)
+			: WorldObject(planetConfig, meta, Pix::ObjectLocation_t(), CLASSID, overrideId),
 			  ISSTATIC(isStatic),
 			  mPosition(location.position),
 			  mRotation(location.rotation),
-			  mSpeed(meta.config.initialSpeed),
-			  mAcceleration(meta.config.initialAcceleration),
+			  mSpeed(meta.PROPERTIES.initialSpeed),
+			  mAcceleration(meta.PROPERTIES.initialAcceleration),
 			  bFlying(false) {
 
 		TAG = "BALL" + std::to_string(ID);
@@ -44,7 +42,7 @@ namespace Pix {
 	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed) :
 			Ball(
 					planetConfig,
-					ObjectFeatures_t{"FAKE", {radi, mass, 0.8, speed}},
+					ObjectMeta_t{"FAKE", {radi, mass, 0.8, speed}},
 					ObjectLocation_t{position, {0, 0, 0}},
 					false,
 					FAKE_BALL_ID

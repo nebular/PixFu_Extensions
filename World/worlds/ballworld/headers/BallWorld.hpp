@@ -33,6 +33,12 @@ namespace Pix {
 		std::vector<std::pair<Ball *, Ball *>> vFutureColliders;
 
 		/**
+		 * Add Balls to the world
+		 */
+
+		WorldObject *add(ObjectMeta_t features, ObjectLocation_t location, bool setHeight) override;
+
+		/**
 		 * Processes ball updates and collisions.
 		 */
 

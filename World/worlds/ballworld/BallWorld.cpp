@@ -60,7 +60,7 @@ namespace Pix {
 		// in that case the coordinates should be adjacent (there are no voids between worlds). This
 		// might be allowed in the future.
 		
-		add({
+		World::add({
 			
 			// Terrain Name. Maps to the assets folder /levels/<name>/ and determines
 			// the terrain texture (PNG), the terraim mesh (Wavefront OBJ) and heightmap (PNG)
@@ -148,6 +148,12 @@ namespace Pix {
 		b1->onCollision(b2, newSpeed1, fElapsedTime);
 		b2->onCollision(b1, newSpeed2, fElapsedTime);
 
+	}
+
+	WorldObject *BallWorld::add(ObjectMeta_t features, ObjectLocation_t location, bool setHeight) {
+		Ball *ball = new Ball(CONFIG, features, location, Ball::CLASSID);
+		World::add(ball, setHeight);
+		return ball;
 	}
 
 	long BallWorld::processCollisions(const std::vector<LineSegment_t> &edges, float fElapsedTime) {

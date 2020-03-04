@@ -5,8 +5,7 @@
 #pragma once
 
 #include "Ball.hpp"
-#include "Meta.hpp"
-#include "PlayerFeatures.hpp"
+#include "BallPlayerFeatures.hpp"
 
 namespace Pix {
 
@@ -19,7 +18,7 @@ namespace Pix {
 
 	protected:
 		
-		const PlayerFeatures *FEATURES;
+		const BallPlayerFeatures *FEATURES;
 		float fAcceleration = 0;
 		float fCalcDirection = 0;
 //		float fSteerAngle = 0;
@@ -28,7 +27,7 @@ namespace Pix {
 
 		float fSteerAngle = 0;
 
-		BallPlayer(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features, ObjectLocation_t location);
+		BallPlayer(World *world, ObjectMeta_t objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location);
 
 		virtual void process(World *world, float fTime);
 
@@ -52,17 +51,17 @@ namespace Pix {
 
 	class BallPlayer4wheels : public BallPlayer {
 	public:
-		BallPlayer4wheels(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features = {});
+		BallPlayer4wheels(World *world, ObjectMeta_t objectMeta, BallPlayerFeatures_t features = {}, ObjectLocation_t location={});
 		void process(World *world, float fTime);
 	};
 
-	inline BallPlayer4wheels::BallPlayer4wheels(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features)
-	: BallPlayer(world, objectMeta, features, Pix::ObjectLocation_t()) {}
+inline BallPlayer4wheels::BallPlayer4wheels(World *world, ObjectMeta_t objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location)
+	: BallPlayer(world, objectMeta, features, location) {}
 
 
 	class GameObject : public Ball {
 	public:
-		GameObject(World *world, ObjectFeatures_t features)
-		: Ball(world->CONFIG, features, Pix::ObjectLocation_t(), false, 0) {}
+		GameObject(World *world, ObjectMeta_t features, ObjectLocation_t loc)
+		: Ball(world->CONFIG, features, loc, false, 0) {}
 	};
 }

@@ -12,9 +12,9 @@
 
 namespace Pix {
 
-	BallPlayer::BallPlayer(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features, ObjectLocation_t location)
+	BallPlayer::BallPlayer(World *world, ObjectMeta_t objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location)
 			: Ball(world->CONFIG, std::move(objectMeta), location),
-			  FEATURES(new PlayerFeatures(objectMeta, features)) {
+			  FEATURES(new BallPlayerFeatures(objectMeta, features)) {
 	}
 
 	/**
