@@ -34,7 +34,7 @@ namespace Pix {
 	class PlayerFeatures {
 
 		const ObjectFeatures_t OBJECT;
-		const PlayerFeatures_t tFeatures;
+		const PlayerFeatures_t FEATURES;
 		//	const Weapon_t *pActiveWeapon = nullptr;	// player active weapon
 		//	const Weapon_t *pPassiveWeapon = nullptr;	// other player's weapon side effects
 
@@ -50,7 +50,7 @@ namespace Pix {
 		float wheelBase() const;
 
 		float speedPercent(float speed) const;
-		
+
 		float maxSpeed() const;
 
 		float maxSpeedBack() const;
@@ -81,7 +81,9 @@ namespace Pix {
 
 // PLAYER FEATURES
 
-	inline PlayerFeatures::PlayerFeatures(ObjectFeatures_t objectMeta, PlayerFeatures_t features) : tFeatures(std::move(features)), OBJECT(std::move(objectMeta)) {}
+	inline PlayerFeatures::PlayerFeatures(ObjectFeatures_t objectMeta, PlayerFeatures_t features) :
+			OBJECT(std::move(objectMeta)),
+			FEATURES(std::move(features)) {}
 
 /*
 inline void PlayerFeatures::setActiveWeapon(const Weapon_t *weapon, Ball *player)  {
@@ -110,32 +112,32 @@ inline void PlayerFeatures::setPassiveWeapon(const Weapon_t *weapon, Ball *playe
 	} // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 
 	inline float
-	PlayerFeatures::maxSpeed() const { return tFeatures.MAXSPEED; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
-	
+	PlayerFeatures::maxSpeed() const { return FEATURES.MAXSPEED; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
+
 	inline float PlayerFeatures::speedPercent(float speed) const {
-		return fmin(fabs(speed) / tFeatures.MAXSPEED, 1); 
+		return fmin(fabs(speed) / FEATURES.MAXSPEED, 1);
 	}
 
 	inline float
-	PlayerFeatures::maxSpeedBack() const { return tFeatures.MAXSPEEDBACK; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
+	PlayerFeatures::maxSpeedBack() const { return FEATURES.MAXSPEEDBACK; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 
-	inline float PlayerFeatures::maxAcceleration() const { return tFeatures.ACCELERATION; } // todo
-	inline float PlayerFeatures::friction() const { return tFeatures.FRICTION; } // todo
-	inline float PlayerFeatures::handling() const { return tFeatures.HANDLING; } // todo
-	inline float PlayerFeatures::traction(float multiplier) const { return tFeatures.TRACTION * multiplier; }
+	inline float PlayerFeatures::maxAcceleration() const { return FEATURES.ACCELERATION; } // todo
+	inline float PlayerFeatures::friction() const { return FEATURES.FRICTION; } // todo
+	inline float PlayerFeatures::handling() const { return FEATURES.HANDLING; } // todo
+	inline float PlayerFeatures::traction(float multiplier) const { return FEATURES.TRACTION * multiplier; }
 
-	inline float PlayerFeatures::turnPerformance(float multiplier) const { return tFeatures.TURNPERFORMANCE * multiplier; }
+	inline float PlayerFeatures::turnPerformance(float multiplier) const { return FEATURES.TURNPERFORMANCE * multiplier; }
 
-	inline float PlayerFeatures::fallLimit() const { return tFeatures.FALL_LIMIT; }
+	inline float PlayerFeatures::fallLimit() const { return FEATURES.FALL_LIMIT; }
 
-	inline float PlayerFeatures::climbLimit() const { return tFeatures.CLIMB_LIMIT; }
+	inline float PlayerFeatures::climbLimit() const { return FEATURES.CLIMB_LIMIT; }
 
-	inline float PlayerFeatures::climbEasy() const { return tFeatures.CLIMB_EASY; }
+	inline float PlayerFeatures::climbEasy() const { return FEATURES.CLIMB_EASY; }
 
-	inline float PlayerFeatures::scratching() const { return tFeatures.SCRATCHING; }
+	inline float PlayerFeatures::scratching() const { return FEATURES.SCRATCHING; }
 
 	inline float
-	PlayerFeatures::mass() const { return tFeatures.MASS; } //  * (pActiveWeapon!=nullptr?pActiveWeapon->massMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->massMultiplier: 1.0); }
+	PlayerFeatures::mass() const { return FEATURES.MASS; } //  * (pActiveWeapon!=nullptr?pActiveWeapon->massMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->massMultiplier: 1.0); }
 	inline float
-	PlayerFeatures::scale() const { return tFeatures.SCALE; } // * (pActiveWeapon!=nullptr?pActiveWeapon->scaleMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->scaleMultiplier: 1.0); }
+	PlayerFeatures::scale() const { return FEATURES.SCALE; } // * (pActiveWeapon!=nullptr?pActiveWeapon->scaleMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->scaleMultiplier: 1.0); }
 }

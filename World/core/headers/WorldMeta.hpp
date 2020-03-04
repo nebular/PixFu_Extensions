@@ -78,7 +78,7 @@ namespace Pix {
 
 		/** Perspective */
 		const Perspective_t perspective = PERSP_FOV70;
-		
+
 		/** the global world objects transform to flip their axis, etc */
 		const Transformation_t worldTransform;
 
@@ -101,23 +101,25 @@ namespace Pix {
 		/** animation is enabled */
 		bool enabled = false;
 		// delta animations on every axis
-		float deltaRotationX=0, deltaRotationY=0, deltaRotationZ=0;
+		float deltaRotationX = 0, deltaRotationY = 0, deltaRotationZ = 0;
 		// sin() animation on scale (0.1 = 10% size variation)
 		float scalePulse = 0;
 	} ObjectAnimation_t;
 
-	/** Initial object properties */
-	typedef struct sObjectConfig {
-
+	/** Object Location */
+	typedef struct sObjectLocation {
 		glm::vec3 position = {0, 0, 0};
 		glm::vec3 rotation = {0, 0, 0};
+	} ObjectLocation_t;
 
+	/** Object properties */
+	typedef struct sObjectConfig {
 		float radius = 1.0;
 		float mass = 1.0;
 		float elasticity = 0.8;
-		ObjectAnimation_t animation={};
-		glm::vec3 initialSpeed = {0,0,0};
-		glm::vec3 initialAcceleration = {0,0,0};
+		glm::vec3 initialSpeed = {0, 0, 0};
+		glm::vec3 initialAcceleration = {0, 0, 0};
+		ObjectAnimation_t animation = {};
 	} ObjectConfig_t;
 
 	/**
@@ -164,15 +166,16 @@ namespace Pix {
 	 Base class for any object in the world. This is an abstract class.
 	 You will extend this class to provide physics to your objects.
 	 */
-	
+
 	class World;
+
 	class WorldObjectBase {
 
 	protected:
 
 		/** World Configuration */
 		const WorldConfig_t &WORLD;
-		
+
 	public:
 
 		const unsigned CLASSID;
@@ -180,8 +183,10 @@ namespace Pix {
 		/** Object Classname (maps to resources) */
 		const std::string CLASS;
 
-		inline WorldObjectBase(const WorldConfig_t &worldConfig, std::string objectClass, unsigned classId)
-		: WORLD(worldConfig), CLASS(objectClass), CLASSID(classId) {}
+		inline WorldObjectBase(const WorldConfig_t &worldConfig, std::string objectClass, unsigned classId) :
+				WORLD(worldConfig),
+				CLASSID(classId),
+				CLASS(objectClass) {}
 
 		inline virtual ~WorldObjectBase() = default;
 
@@ -218,19 +223,23 @@ namespace Pix {
 	protected:
 
 		float fRadiusAnimator = 0;
-		
+
 		// copy initial configuration
 		ObjectConfig_t CONFIG = META.config;
-		
+
+		// Object Location
+		ObjectLocation_t LOCATION;
+
 	public:
 
-		inline WorldObject(const WorldConfig_t &worldConfig, const ObjectFeatures_t objectMeta, unsigned classid = CLASSID_CODE)
+		inline WorldObject(const WorldConfig_t &worldConfig, const ObjectFeatures_t objectMeta, ObjectLocation_t location,
+						   unsigned int classid = CLASSID_CODE)
 				: WorldObjectBase(worldConfig, objectMeta.className, classid),
-				  META(std::move(objectMeta)) {}
+				  META(std::move(objectMeta)), LOCATION(std::move(location)) {}
 
-		inline virtual glm::vec3 &pos() override { return CONFIG.position; }
+		inline virtual glm::vec3 &pos() override { return LOCATION.position; }
 
-		inline virtual glm::vec3 &rot() override { return CONFIG.rotation; }
+		inline virtual glm::vec3 &rot() override { return LOCATION.rotation; }
 
 		inline float radius() override { return CONFIG.radius; }
 

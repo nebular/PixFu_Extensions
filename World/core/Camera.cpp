@@ -44,8 +44,8 @@ namespace Pix {
 	) :
 			UPVECTOR(upVector),
 			mFrontVector(DEF_FRONTVECTOR),
-			SMOOTHLERP(smoothLerp),
 			bSmooth(smooth),
+			SMOOTHLERP(smoothLerp),
 			mMouseSensitivity(DEF_MOUSE_SENS),
 			mMouseZoom(DEF_ZOOM),
 			DISTANCELERP(distanceLerp) {

@@ -46,7 +46,8 @@ add_library(pixFu_ext SHARED
         World/core/World.cpp
         World/worlds/ballworld/Ball.cpp
         World/worlds/ballworld/BallWorld.cpp
-        World/worlds/ballworld/Player.cpp
+        World/worlds/ballworld/BallWorldMap.cpp
+        World/worlds/ballworld/BallPlayer.cpp
         Sprites/SpriteSheets.cpp
         Sprites/SpriteSheet.cpp
         )

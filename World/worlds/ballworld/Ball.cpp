@@ -16,6 +16,7 @@
 #include "glm/gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCSimplifyInspection"
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 
@@ -26,26 +27,33 @@ namespace Pix {
 	float Ball::stfHeightScale = 1.0;
 	int Ball::instanceCounter = 0;
 
-	Ball::Ball(const WorldConfig_t &planetConfig, ObjectFeatures_t meta, bool isStatic, int overrideId)
-			: 	WorldObject(planetConfig, meta, CLASSID),
-				ID(overrideId>=0 ? overrideId : instanceCounter++),
-				ISSTATIC(isStatic),
-				mPosition(meta.config.position),
-				mSpeed(meta.config.initialSpeed),
-				mAcceleration(meta.config.initialAcceleration),
-				bFlying(false) {
+	Ball::Ball(const WorldConfig_t &planetConfig, ObjectFeatures_t meta, ObjectLocation_t location, bool isStatic, int overrideId)
+			: WorldObject(planetConfig, meta, Pix::ObjectLocation_t(), CLASSID),
+			  ID(overrideId >= 0 ? overrideId : instanceCounter++),
+			  ISSTATIC(isStatic),
+			  mPosition(location.position),
+			  mRotation(location.rotation),
+			  mSpeed(meta.config.initialSpeed),
+			  mAcceleration(meta.config.initialAcceleration),
+			  bFlying(false) {
 
 		TAG = "BALL" + std::to_string(ID);
 		setRadiusMultiplier(1.0);
 	}
 
-	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed)
-	: Ball(planetConfig, ObjectFeatures_t { "FAKE", { position, {0,0,0}, radi, mass}}, false, FAKE_BALL_ID) {
+	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed) :
+			Ball(
+					planetConfig,
+					ObjectFeatures_t{"FAKE", {radi, mass, 0.8, speed}},
+					ObjectLocation_t{position, {0, 0, 0}},
+					false,
+					FAKE_BALL_ID
+			) {
 		TAG = "FAKEBALL";
 	}
 
 	Ball *Ball::makeCollisionBall(float radi, glm::vec3 position) {
-		return new Ball(WORLD, radi, CONFIG.mass * 0.8f, position, {-mSpeed.x, 0, -mSpeed.z});
+		return new Ball(WORLD, radi, CONFIG.mass * 0.8F, position, {-mSpeed.x, 0, -mSpeed.z});
 	}
 
 	void Ball::disable(bool disabled) {
@@ -59,7 +67,7 @@ namespace Pix {
 		float fDistance = distance(target);
 
 		// Calculate displacement required
-		float fOverlap = 0.5f * (fDistance - (outer ? outerRadius() : radius()) - target->radius());
+		float fOverlap = 0.5F * (fDistance - (outer ? outerRadius() : radius()) - target->radius());
 
 		return {
 				fOverlap * (fDistance != 0 ? (mPosition.x - target->mPosition.x) / fDistance : 1),
@@ -85,8 +93,8 @@ namespace Pix {
 
 		float distance = ((p->x - mPosition.x) * (p->x - mPosition.x) +
 						  (p->y - mPosition.y) * (p->y - mPosition.y) +
-						  (p->z - mPosition.z) * (p->z - mPosition.z)),
-				sumRadius = (outer ? outerRadi : radius()) + point->radius();
+						  (p->z - mPosition.z) * (p->z - mPosition.z));
+		float sumRadius = (outer ? outerRadi : radius()) + point->radius();
 
 		return (outer && outerRadi == 0) ? false : (fabs(distance) < sumRadius * sumRadius);
 
@@ -145,8 +153,8 @@ namespace Pix {
 
 		WorldObject::process(world, fTime);
 
-		mAcceleration.z *= 0.8;
-		mAcceleration.x *= 0.8;
+		mAcceleration.z *= 0.8F;
+		mAcceleration.x *= 0.8F;
 
 		// Update Velocity
 		mSpeed.x += mAcceleration.x * fTime;
@@ -161,7 +169,7 @@ namespace Pix {
 			mSpeed.x = 0;
 			mSpeed.z = 0;
 		}
-		
+
 	}
 
 	void Ball::processGravity(World *world, float fTime) {
@@ -175,9 +183,9 @@ namespace Pix {
 
 			// update vertical speed
 			mSpeed.y += totalAcceleration * fTime;
-			
+
 			// update position
-			mPosition.y +=  mSpeed.y * fTime;
+			mPosition.y += mSpeed.y * fTime;
 
 			const bool overTerrainAfter = mPosition.y > fHeightTerrain;
 
@@ -186,19 +194,17 @@ namespace Pix {
 				// terrain crash or land
 				// rebound ?
 
-				const float STABLEHEIGHT = 1;
-				
 				mSpeed.y = -mSpeed.y * CONFIG.elasticity;
 				mPosition.y = fHeightTerrain + (fHeightTerrain - mPosition.y);
-	
+
 			}
 
 			if (mPosition.y < fHeightTerrain)
 				mPosition.y = fHeightTerrain;
 
-			bFlying = mPosition.y - fHeightTerrain > 0.1; // verTerrainAfter;
+			bFlying = mPosition.y - fHeightTerrain > 0.1F; // verTerrainAfter;
 
-			mAcceleration.y *= 0.9;
+			mAcceleration.y *= 0.9F;
 
 			if (mAcceleration.y < STABLE)
 				mAcceleration.y = 0;
@@ -216,7 +222,7 @@ namespace Pix {
 			fTime = fSimTimeRemaining;
 		}
 
-		float collisionRadius = radius() * 1.2f; // TODO there are constants like this one here and there, unify them !
+		float collisionRadius = radius() * 1.2F; // TODO there are constants like this one here and there, unify them !
 
 		// get height at left, center and right
 		// to calculate terrain angle
@@ -246,7 +252,7 @@ namespace Pix {
 
 		// terrain angle, x and z
 		// todo properly
-		
+
 		fAngleTerrain = {
 				atan2((heightr - heightl), 2 * collisionRadius),
 				atan2((heightd - heightt), 2 * collisionRadius)
@@ -270,11 +276,11 @@ namespace Pix {
 		if (mPosition.y > cheight) {
 
 			// downhill
-			
+
 			if (mPosition.y - cheight < FEATURES_FALL_LIMIT) {
 				// gong down
 				fHeightTerrain = cheight;
-			
+
 			} else {
 				// fell from high
 				// std::cerr << "GOING DOWN !!" << std::endl;
@@ -347,7 +353,7 @@ namespace Pix {
 			}
 #endif
 		}
-		
+
 		processGravity(world, fTime);
 		return nullptr;
 	}

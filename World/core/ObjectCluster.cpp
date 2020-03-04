@@ -30,8 +30,8 @@ namespace Pix {
 
 	ObjectCluster::ObjectCluster(World *planet, std::string name, Transformation_t initialTransform)
 			: PLANET(planet->CONFIG),
-			  NAME(std::move(name)),
 			  PLACER(std::move(initialTransform)),
+			  NAME(std::move(name)),
 			  WORLD(planet) {
 
 		if (DBG) LogV(TAG, "New Object Cluster " + NAME);

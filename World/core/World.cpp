@@ -44,7 +44,7 @@ namespace Pix {
 	}
 
 	void World::add(ObjectFeatures_t features, bool setHeight) {
-		add(new WorldObject(CONFIG, features), setHeight);
+		add(new WorldObject(CONFIG, features, Pix::ObjectLocation_t(), 0), setHeight);
 	}
 
 	void WorldObject::process(World *world, float fElapsedTime) {

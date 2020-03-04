@@ -83,7 +83,7 @@ namespace Pix {
 		static constexpr float FEATURES_SCRATCHING_NEW = 0.6;
 		static constexpr float FEATURES_CLIMB_LIMIT = 0.3;        // TODO
 		static constexpr float FEATURES_FALL_LIMIT = 0.3;         // TODO move to features
-		static constexpr float ACCELERATION_EARTH = -9.8 * 100;  // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
+		static constexpr float ACCELERATION_EARTH = -9.8f * 100;  // i found a 9.8 - ish value that makes sense so let´s keep it like this :)
 
 		// Threshold indicating stability of object
 		static constexpr float STABLE = 0.001;
@@ -102,7 +102,6 @@ namespace Pix {
 		float fRadiusMultiplier = 1.0;            // multiply ball radius (game powerups)
 
 		float fHeightTerrain = 0.0;                // target height (gravity effect)
-		float fAccelerationZ = 0.0;            // upwards acceleration TODO move to acceleration
 
 		glm::vec2 fAngleTerrain = {0, 0};         // terrain angle at corners
 
@@ -119,7 +118,7 @@ namespace Pix {
 		// simulation time remaining for current iteration
 		float fSimTimeRemaining;
 
-		Ball(const WorldConfig_t &planetConfig, ObjectFeatures_t meta, bool isStatic = false, int overrideId = -1);
+		Ball(const WorldConfig_t &planetConfig, ObjectFeatures_t meta, ObjectLocation_t location, bool isStatic = false, int overrideId = -1);
 
 		Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed);
 

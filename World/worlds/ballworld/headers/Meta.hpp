@@ -31,7 +31,7 @@ namespace Pix {
 
 	};
 
-
+/*
 const std::map<int, ObjectInfo_t> GameObjectsDb::MapGroundSprites = {
 	// Name			oid    sprInfo    anlen  ansp, mass   ang  accl  height selfScale
 	{TortugaVerde,	{1000, {1, 0,}, 	  8, 10.0, 500.0, 	0, 0.08, NOHEIGHT}},
@@ -45,5 +45,5 @@ const std::map<int, ObjectInfo_t> GameObjectsDb::MapGroundSprites = {
 	{Tree2, 		{501,  {3, 28, 1, 2}, 1, 10.0, 900000}},
 	{Tree3, 		{502,  {3, 29, 1, 2}, 1, 10.0, 900000}}
 };
-
+*/
 }

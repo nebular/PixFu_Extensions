@@ -28,7 +28,7 @@ namespace Pix {
 
 		float fSteerAngle = 0;
 
-		BallPlayer(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features = {});
+		BallPlayer(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features, ObjectLocation_t location);
 
 		virtual void process(World *world, float fTime);
 
@@ -57,12 +57,12 @@ namespace Pix {
 	};
 
 	inline BallPlayer4wheels::BallPlayer4wheels(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features)
-	: BallPlayer (world, objectMeta, features) {}
+	: BallPlayer(world, objectMeta, features, Pix::ObjectLocation_t()) {}
 
 
 	class GameObject : public Ball {
 	public:
 		GameObject(World *world, ObjectFeatures_t features)
-		: Ball(world->CONFIG, features) {}
+		: Ball(world->CONFIG, features, Pix::ObjectLocation_t(), false, 0) {}
 	};
 }

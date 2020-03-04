@@ -12,9 +12,9 @@
 
 namespace Pix {
 
-	BallPlayer::BallPlayer(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features)
-	: Ball(world->CONFIG, objectMeta),
-	  FEATURES(new PlayerFeatures(objectMeta, features)) {
+	BallPlayer::BallPlayer(World *world, ObjectFeatures_t objectMeta, PlayerFeatures_t features, ObjectLocation_t location)
+			: Ball(world->CONFIG, std::move(objectMeta), location),
+			  FEATURES(new PlayerFeatures(objectMeta, features)) {
 	}
 
 	/**
@@ -53,7 +53,7 @@ namespace Pix {
 
 		// process the ball parameters
 		Ball::process(world, fElapsedTime);
-		
+
 	}
 
 	/**
@@ -62,7 +62,7 @@ namespace Pix {
 	 */
 
 	void BallPlayer4wheels::process(class World *world, float fElapsedTime) {
-	
+
 		if (fElapsedTime == NOTIME) {
 			// this belongs to the base class but we are avoiding its call, so we have
 			// to take care of it.
@@ -71,11 +71,11 @@ namespace Pix {
 		}
 
 		// process intrinsic animation
-		WorldObject::process(world, fElapsedTime);
+		WorldObject::process(world, fElapsedTime); // NOLINT(bugprone-parent-virtual-call)
 
-		#ifdef DEBUG_CARPHYSICS
+#ifdef DEBUG_CARPHYSICS
 		Canvas2D *canvas = world->canvas(mPosition);
-		#endif
+#endif
 
 		// following is a simulation based on that website that models back and front axis
 		// so steering is applied to the front wheels
@@ -107,11 +107,11 @@ namespace Pix {
 		glm::vec3 frontWheel = mPosition + offset;
 		glm::vec3 backWheel = mPosition - offset;
 
-		#ifdef DEBUG_CARPHYSICS
+#ifdef DEBUG_CARPHYSICS
 		canvas->blank();
 		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::RED);
 		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREEN);
-		#endif
+#endif
 
 		/**
 		 Each wheel should move forward by a certain amount in the direction it is pointing.
@@ -126,19 +126,19 @@ namespace Pix {
 		backWheel += modSpeed * fElapsedTime * headingBack;
 		frontWheel += modSpeed * fElapsedTime * headingFront;
 
-		#ifdef DEBUG_CARPHYSICS
+#ifdef DEBUG_CARPHYSICS
 		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::BLACK);
 		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREY);
-		#endif
+#endif
 		/*
 		The new car position can be calculated by averaging the two new wheel positions.
 		*/
 
-		mPosition = (frontWheel + backWheel) / 2.0f;
+		mPosition = (frontWheel + backWheel) / 2.0F;
 
-		#ifdef DEBUG_CARPHYSICS
+#ifdef DEBUG_CARPHYSICS
 		canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, Pix::Colors::BLUE);
-		#endif
+#endif
 
 		/*
 		 The new car heading can be found by calculating the angle of the line between the
@@ -159,7 +159,7 @@ namespace Pix {
 
 		// Now, acceleration, we have the modulus, and we set the new heading
 		const glm::vec3 head = {cosf(newAngle), 0, sinf(newAngle)};
-		const float accAmount = fAcceleration * (1.0f - FEATURES->speedPercent(modSpeed));
+		const float accAmount = fAcceleration * (1.0F - FEATURES->speedPercent(modSpeed));
 		mAcceleration = accAmount * head;
 
 		if (accAmount != 0) {
@@ -180,7 +180,7 @@ namespace Pix {
 		// MAXSPEED == speed -> 0;
 		// MINSPEED -> KACCEL
 
-		float KACCEL = 100;
+		float KACCEL = 100.0F;
 
 		bReverse = false;
 		bForward = true;
@@ -190,7 +190,7 @@ namespace Pix {
 
 	void BallPlayer::brake(float percentage, float fElapsedTime) {
 
-		float KDECCEL = 200 * (1 - speedPercent());
+		float KDECCEL = 200.0F * (1 - speedPercent());
 		fAcceleration = -KDECCEL * percentage;
 
 	}
