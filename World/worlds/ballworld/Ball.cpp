@@ -26,7 +26,7 @@ namespace Pix {
 	float Ball::stfBaseScale = 1.0;
 	float Ball::stfHeightScale = 1.0;
 
-	Ball::Ball(const WorldConfig_t &planetConfig, ObjectMeta_t meta, ObjectLocation_t location, int overrideId)
+	Ball::Ball(const WorldConfig_t &planetConfig, ObjectProperties_t meta, ObjectLocation_t location, int overrideId)
 			: WorldObject(planetConfig, meta, Pix::ObjectLocation_t(), CLASSID, overrideId),
 			  ISSTATIC(meta.ISSTATIC),
 			  mPosition(location.position),
@@ -42,8 +42,8 @@ namespace Pix {
 	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed) :
 			Ball(
 					planetConfig,
-					ObjectMeta_t{ "FAKE", {radi, mass, 0.8}},
-					ObjectLocation_t {position, {0, 0, 0}, speed},
+					ObjectProperties_t{"FAKE", radi, mass, 0.8},
+					ObjectLocation_t{position, {0, 0, 0}, speed},
 					FAKE_BALL_ID
 			) {
 		TAG = "FAKEBALL";
@@ -149,7 +149,7 @@ namespace Pix {
 		}
 
 		WorldObject::process(world, fTime);
-		
+
 		if (ISSTATIC) return;
 
 		mAcceleration.z *= 0.8F;

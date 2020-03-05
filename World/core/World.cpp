@@ -8,25 +8,33 @@
 //
 
 #include "World.hpp"
-#include "WorldMeta.hpp"
+ #include <utility> #include "WorldMeta.hpp"
 #include "Fu.hpp"
 #include "OpenGL.h"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "err_typecheck_invalid_operands"
+#pragma ide diagnostic ignored "err_typecheck_subscript_value"
+#pragma ide diagnostic ignored "OCSimplifyInspection"
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 namespace Pix {
 
-
-	constexpr Transformation_t World::TRANSFORM_FLIPX, World::TRANSFORM_FLIPY, World::TRANSFORM_FLIPZ;
-
 	std::string World::TAG = "World";
+
+	/** metronome (animaations) */
 	float World::METRONOME = 0;
+
+	/** pbject counter */
 	int WorldObjectBase::instanceCounter = 0;
 
+	/** Object database */
+	std::map<int, ObjectDbEntry_t> ObjectDb::Database;
+
+
 	World::World(WorldConfig_t config)
-			: CONFIG(config) {
+			: CONFIG(std::move(config)) {
 	};
 
 	World::~World() {
@@ -39,12 +47,12 @@ namespace Pix {
 	}
 
 	Terrain *World::add(TerrainConfig_t terrainConfig) {
-		Terrain *world = new Terrain(CONFIG, terrainConfig);
+		Terrain *world = new Terrain(CONFIG, std::move(terrainConfig));
 		vTerrains.push_back(world);
 		return world;
 	}
 
-	WorldObject *World::add(ObjectMeta_t features, ObjectLocation_t location, bool setHeight) {
+	WorldObject *World::add(ObjectProperties_t features, ObjectLocation_t location, bool setHeight) {
 		WorldObject *object = new WorldObject(CONFIG, features, location, WorldObject::CLASSID_CODE );
 		add(object, setHeight);
 		return object;
@@ -66,7 +74,7 @@ namespace Pix {
 
 		}
 	
-		world->canvas()->drawCircle(pos().x, pos().z, radius(), Pix::Colors::RED);
+		world->canvas()->drawCircle(static_cast<int32_t>(pos().x), static_cast<int32_t>(pos().z), static_cast<int32_t>(radius()), Pix::Colors::RED);
 		
 	}
 
@@ -95,7 +103,7 @@ namespace Pix {
 
 	bool World::init(Fu *engine) {
 
-		auto toRad = [](float degs) { return degs * M_PI / 180; };
+		auto toRad = [](float degs) { return degs * M_PI / 180.0F; };
 
 		pShader = new TerrainShader(CONFIG.shaderName);
 		pShaderObjects = new ObjectShader(CONFIG.shaderName + "_objects");
@@ -165,7 +173,7 @@ namespace Pix {
 
 		pShader->stop();
 
-		if (vObjects.size() == 0) return;
+		if (vObjects.empty()) return;
 
 		pShaderObjects->use();
 		pShaderObjects->loadViewMatrix(pCamera);
@@ -187,7 +195,7 @@ namespace Pix {
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
 										 float scale, bool flipX = true, bool flipY = false, bool flipZ = false) {
 
-		glm::mat4 flipMatrix = glm::identity<glm::mat4>();
+		auto flipMatrix = glm::identity<glm::mat4>();
 
 		/*
 		  create transformation matrix. can flip space.
@@ -199,17 +207,17 @@ namespace Pix {
 
 		 */
 
-		if (flipX) flipMatrix[0][0] = -1.0f;
-		if (flipY) flipMatrix[1][1] = -1.0f;
-		if (flipZ) flipMatrix[2][2] = -1.0f;
+		if (flipX) flipMatrix[0][0] = -1.0F;
+		if (flipY) flipMatrix[1][1] = -1.0F;
+		if (flipZ) flipMatrix[2][2] = -1.0F;
 
 
 		glm::mat4 matrix = glm::identity<glm::mat4>();
 
 		matrix = glm::translate(matrix, translation);
-		matrix = glm::rotate(matrix, rxrads, {1.0f, 0.0f, 0.0f});
-		matrix = glm::rotate(matrix, ryrads, {0.0f, 1.0f, 0.0f});
-		matrix = glm::rotate(matrix, rzrads, {0.0f, 0.0f, 1.0f});
+		matrix = glm::rotate(matrix, rxrads, {1.0F, 0.0F, 0.0F});
+		matrix = glm::rotate(matrix, ryrads, {0.0F, 1.0F, 0.0F});
+		matrix = glm::rotate(matrix, rzrads, {0.0F, 0.0F, 1.0F});
 		matrix = glm::scale(matrix, {scale, scale, scale});
 		return matrix * flipMatrix;
 	}

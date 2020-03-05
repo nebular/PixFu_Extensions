@@ -35,14 +35,14 @@ namespace Pix {
 
 	class BallPlayerFeatures {
 
-		const ObjectMeta_t OBJECT;
+		const ObjectProperties_t OBJECT;
 		const BallPlayerFeatures_t FEATURES;
 		//	const Weapon_t *pActiveWeapon = nullptr;	// player active weapon
 		//	const Weapon_t *pPassiveWeapon = nullptr;	// other player's weapon side effects
 
 	public:
 
-		BallPlayerFeatures(ObjectMeta_t objectMeta, BallPlayerFeatures_t features);
+		BallPlayerFeatures(ObjectProperties_t objectMeta, BallPlayerFeatures_t features);
 
 //		void setActiveWeapon(const Weapon_t *weapon, Ball *player);
 //		void setPassiveWeapon(const Weapon_t *weapon, Ball *player, bool enable = true);
@@ -83,7 +83,7 @@ namespace Pix {
 
 // PLAYER FEATURES
 
-	inline BallPlayerFeatures::BallPlayerFeatures(ObjectMeta_t objectMeta, BallPlayerFeatures_t features) :
+	inline BallPlayerFeatures::BallPlayerFeatures(ObjectProperties_t objectMeta, BallPlayerFeatures_t features) :
 			OBJECT(std::move(objectMeta)),
 			FEATURES(std::move(features)) {}
 
@@ -110,14 +110,14 @@ inline void PlayerFeatures::setPassiveWeapon(const Weapon_t *weapon, Ball *playe
 }
 */
 	inline float BallPlayerFeatures::wheelBase() const {
-		return OBJECT.PROPERTIES.radius * 1.7;
+		return OBJECT.radius * 1.7F;
 	} // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 
 	inline float
 	BallPlayerFeatures::maxSpeed() const { return FEATURES.MAXSPEED; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 
 	inline float BallPlayerFeatures::speedPercent(float speed) const {
-		return fmin(fabs(speed) / FEATURES.MAXSPEED, 1);
+		return (float) fmin(fabs(speed) / FEATURES.MAXSPEED, 1);
 	}
 
 	inline float

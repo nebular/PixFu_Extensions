@@ -17,6 +17,7 @@
 #include "glm/vec3.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCSimplifyInspection"
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 
@@ -30,7 +31,7 @@ namespace Pix {
 
 	ObjectCluster::ObjectCluster(World *planet, std::string name, Transformation_t initialTransform)
 			: PLANET(planet->CONFIG),
-			  PLACER(std::move(initialTransform)),
+			  PLACER(initialTransform),
 			  NAME(std::move(name)),
 			  WORLD(planet) {
 
@@ -75,7 +76,7 @@ namespace Pix {
 
 		if (oneMesh) {
 			shader->textureUnit("modelTexture", vTextures[0]);
-			shader->loadShineVariables(1, 0.7);
+			shader->loadShineVariables(1, 0.7F);
 			vTextures[0]->bind();
 			bind(0);
 		}
@@ -84,7 +85,7 @@ namespace Pix {
 
 			// cache object properties
 			glm::vec3 rot = object->rot();
-			glm::vec3 pos = object->pos() / 1000.0f;
+			glm::vec3 pos = object->pos() / 1000.0F;
 
 			float radius = object->drawRadius();
 
@@ -138,7 +139,7 @@ namespace Pix {
 		for (int i = 0; i < vMeshes.size(); i++) {
 
 			shader->textureUnit("modelTexture", vTextures[i]);
-			shader->loadShineVariables(1, 0.7);
+			shader->loadShineVariables(1, 0.7F);
 			vTextures[i]->bind();
 			bind(i);
 

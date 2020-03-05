@@ -9,15 +9,10 @@
 
 namespace Pix {
 
-	typedef struct sWorldMeta {
-		std::string name;
-		int xMas, yMax;
-	} WorldMeta_t;
-
 	class BallPlayer : public Ball {
 
 	protected:
-		
+
 		const BallPlayerFeatures *FEATURES;
 		float fAcceleration = 0;
 		float fCalcDirection = 0;
@@ -27,7 +22,7 @@ namespace Pix {
 
 		float fSteerAngle = 0;
 
-		BallPlayer(World *world, ObjectMeta_t objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location);
+		BallPlayer(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location);
 
 		virtual void process(World *world, float fTime);
 
@@ -51,17 +46,19 @@ namespace Pix {
 
 	class BallPlayer4wheels : public BallPlayer {
 	public:
-		BallPlayer4wheels(World *world, ObjectMeta_t objectMeta, BallPlayerFeatures_t features = {}, ObjectLocation_t location={});
+		BallPlayer4wheels(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features = {}, ObjectLocation_t location = {});
+
 		void process(World *world, float fTime);
 	};
 
-inline BallPlayer4wheels::BallPlayer4wheels(World *world, ObjectMeta_t objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location)
-	: BallPlayer(world, objectMeta, features, location) {}
+	inline BallPlayer4wheels::BallPlayer4wheels(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features,
+												ObjectLocation_t location)
+			: BallPlayer(world, objectMeta, features, location) {}
 
 
 	class GameObject : public Ball {
 	public:
-		GameObject(World *world, ObjectMeta_t features, ObjectLocation_t loc)
-		: Ball(world->CONFIG, features, loc, 0) {}
+		GameObject(World *world, ObjectProperties_t features, ObjectLocation_t loc)
+				: Ball(world->CONFIG, features, loc, 0) {}
 	};
 }

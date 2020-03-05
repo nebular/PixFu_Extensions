@@ -26,13 +26,14 @@
 //
 
 #include "BallWorld.hpp"
-#include "Ball.hpp"
+ #include <utility> #include "Ball.hpp"
 #include "BallPlayer.hpp"
 #include "Splines.hpp"
 #include "LineSegment.hpp"
 #include "glm/gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCSimplifyInspection"
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
@@ -44,15 +45,15 @@ namespace Pix {
 	constexpr int HEIGHT_EDGE_FLYOVER = 100;
 
 	BallWorld::BallWorld(std::string levelName, WorldConfig_t config)
-			: World(config) {
+			: World(std::move(config)) {
 				vObjects.clear();
-				load(levelName);
+				load(std::move(levelName));
 			}
 
-	void BallWorld::load(std::string levelName) {
+	void BallWorld::load(const std::string& levelName) {
 
 		if (pMap != nullptr)
-			throw new std::runtime_error("The map was already loaded.");
+			throw std::runtime_error("The map was already loaded.");
 
 		pMap = new BallWorldMap_t(levelName);
 		
@@ -115,7 +116,8 @@ namespace Pix {
 	void BallWorld::processDynamicCollision(Ball *b1, Ball *b2, float fElapsedTime) {
 
 		//	auto grados = [](float rads) { return std::to_string(rads*180/PI); };
-		glm::vec3 pos1 = b1->mPosition, pos2 = b2->mPosition;
+		glm::vec3 pos1 = b1->mPosition;
+		glm::vec3 pos2 = b2->mPosition;
 
 		// Distance between balls TODO
 		float fDistance = glm::fastSqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
@@ -139,11 +141,11 @@ namespace Pix {
 
 		// Conservation of momentum in 1D
 		float m1 = EFFICIENCY *
-				   (dpNorm1 * (b1->mass() - b2->mass()) + 2.0f * b2->mass() * dpNorm2) /
+				   (dpNorm1 * (b1->mass() - b2->mass()) + 2.0F * b2->mass() * dpNorm2) /
 				   (b1->mass() + b2->mass());
 
 		float m2 = EFFICIENCY *
-				   (dpNorm2 * (b2->mass() - b1->mass()) + 2.0f * b1->mass() * dpNorm1) /
+				   (dpNorm2 * (b2->mass() - b1->mass()) + 2.0F * b1->mass() * dpNorm1) /
 				   (b1->mass() + b2->mass());
 
 		// Update ball velocities
@@ -155,7 +157,7 @@ namespace Pix {
 
 	}
 
-	WorldObject *BallWorld::add(ObjectMeta_t features, ObjectLocation_t location, bool setHeight) {
+	WorldObject *BallWorld::add(ObjectProperties_t features, ObjectLocation_t location, bool setHeight) {
 		Ball *ball = new Ball(CONFIG, features, location);
 		World::add(ball, setHeight);
 		return ball;
@@ -196,13 +198,13 @@ namespace Pix {
 					Ball *ball = (Ball *) w;
 
 					if (!ball->bDisabled) {
-						if (ball->fSimTimeRemaining > 0.0f) {
+						if (ball->fSimTimeRemaining > 0.0F) {
 
 							// process ball physics
-							ball->process(this);
+							ball->process(this, NOTIME);
 
 							// process heightmap collisions & ball height
-							Ball *obstacle = ball->processHeights(this);
+							Ball *obstacle = ball->processHeights(this, NOTIME);
 
 #ifndef DBG_NOHEIGHTMAPCOLLISIONS
 
@@ -290,10 +292,10 @@ namespace Pix {
 									// jumpable unless their height in the heightmap is 1
 									// Add collision to vector of collisions for dynamic resolution
 
-									vCollidingPairs.push_back({ball, fakeball});
+									vCollidingPairs.emplace_back(ball, fakeball);
 
 									// Calculate displacement required
-									const float fOverlap = 1.00f * (fDistance - ball->radius() - fakeball->radius());
+									const float fOverlap = 1.00F * (fDistance - ball->radius() - fakeball->radius());
 
 									// Displace Current Ball away from collision
 									ball->mPosition.x -= fOverlap * (ball->mPosition.x - fakeball->mPosition.x) / fDistance;
@@ -335,7 +337,7 @@ namespace Pix {
 
 								case OVERLAPS:
 									// Collision has occured
-									vCollidingPairs.push_back({ball, target});
+									vCollidingPairs.emplace_back(ball, target);
 									processStaticCollision(ball, target);
 									break;
 
@@ -343,7 +345,7 @@ namespace Pix {
 
 									// the outer radius reports a collision
 									// desdendent classes may use this to feed AI
-									vFutureColliders.push_back({ball, target});
+									vFutureColliders.emplace_back(ball, target);
 									break;
 
 								default:
