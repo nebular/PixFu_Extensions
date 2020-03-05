@@ -73,9 +73,9 @@ namespace Pix {
 		// process intrinsic animation
 		WorldObject::process(world, fElapsedTime); // NOLINT(bugprone-parent-virtual-call)
 
-#ifdef DEBUG_CARPHYSICS
-		Canvas2D *canvas = world->canvas(mPosition);
-#endif
+		const bool debug = world->CONFIG.debugMode == DEBUG_COLLISIONS;
+		Canvas2D *canvas = debug ? world->canvas(mPosition) : nullptr;
+
 
 		// following is a simulation based on that website that models back and front axis
 		// so steering is applied to the front wheels
@@ -83,13 +83,27 @@ namespace Pix {
 
 		const float modSpeed = speed();
 		const float steerAngle = fSteerAngle;
-
+		
 		// when speed = 0 we dont know the car heading so use last one
-		fCalcDirection = modSpeed > STABLE ? atan2(mSpeed.z, mSpeed.x) : fCalcDirection;
+//		fCalcDirection = modSpeed > STABLE ? atan2(mSpeed.z, mSpeed.x) : fCalcDirection;
+		fCalcDirection = modSpeed > 0 ? atan2(mSpeed.z, mSpeed.x) : fCalcDirection;
 
 		// the current car direction, calculated from the velocity vector
 		float ang = fCalcDirection;
+//		Pix::LogV("ang", Pix::SF("ang %f", steerAngle));
+		if (debug) {
+			glm::vec2 r = glm::rotate(glm::vec2(40,0), ang-steerAngle);
+			canvas->drawLine(mPosition.x, mPosition.z, mPosition.x+r.x, mPosition.z+r.y,
+							 Pix::Colors::RED);
+			r = glm::rotate(glm::vec2(40,0), ang);
+			canvas->drawLine(mPosition.x, mPosition.z, mPosition.x+r.x, mPosition.z+r.y,
+							 Pix::Colors::GREEN);
+		}
 
+
+		
+		
+		
 		// the direction vector of the back wheels
 		glm::vec3 headingBack = glm::vec3(cosf(ang), 0, sinf(ang));
 
@@ -107,12 +121,11 @@ namespace Pix {
 		glm::vec3 frontWheel = mPosition + offset;
 		glm::vec3 backWheel = mPosition - offset;
 
-#ifdef DEBUG_CARPHYSICS
-		canvas->blank();
-		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::RED);
-		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREEN);
-#endif
-
+		if (debug) {
+			canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::RED);
+			canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREEN);
+		}
+			
 		/**
 		 Each wheel should move forward by a certain amount in the direction it is pointing.
 		 The distance it needs to move depends on the car speed, and the time between frames
@@ -125,20 +138,19 @@ namespace Pix {
 
 		backWheel += modSpeed * fElapsedTime * headingBack;
 		frontWheel += modSpeed * fElapsedTime * headingFront;
-
-#ifdef DEBUG_CARPHYSICS
-		canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::BLACK);
-		canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREY);
-#endif
+		if (debug) {
+			canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::BLACK);
+			canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREY);
+		}
 		/*
 		The new car position can be calculated by averaging the two new wheel positions.
 		*/
 
 		mPosition = (frontWheel + backWheel) / 2.0F;
-
-#ifdef DEBUG_CARPHYSICS
-		canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, Pix::Colors::BLUE);
-#endif
+		
+		if (debug) {
+			canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, Pix::Colors::BLUE);
+		}
 
 		/*
 		 The new car heading can be found by calculating the angle of the line between the

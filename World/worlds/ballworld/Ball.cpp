@@ -13,7 +13,6 @@
 #include "World.hpp"
 #include "WorldMeta.hpp"
 #include "Config.hpp"
-#include "glm/gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCSimplifyInspection"
@@ -61,17 +60,17 @@ namespace Pix {
 	glm::vec3 Ball::calculateOverlapDisplacement(Ball *target, bool outer) {
 
 		// Distance between ball centers
-			float fDistance = distance(target);
+		float fDistance = distance(target);
 
 		// Calculate displacement required
-//		float fOverlap = 0.5F * (fDistance - (outer ? outerRadius() : radius()) - target->radius());
-		float fOverlap =  (fDistance - (outer ? outerRadius() : radius()) - target->radius());
+		//	float fOverlap = 0.5F * (fDistance - (outer ? outerRadius() : radius()) - target->radius());
 
-		return {
-				fOverlap * (fDistance != 0 ? (mPosition.x - target->mPosition.x) / fDistance : 1),
-				fOverlap * (fDistance != 0 ? (mPosition.y - target->mPosition.y) / fDistance : 1),
-				fOverlap * (fDistance != 0 ? (mPosition.z - target->mPosition.z) / fDistance : 1)
-		};
+		float fOverlap =  (fDistance - (outer ? outerRadius() : radius()) - target->radius());
+		if (fDistance == 0) return { fOverlap, fOverlap, fOverlap};
+		
+		fOverlap/=fDistance;
+		return fOverlap * (mPosition - target->mPosition);
+		
 	}
 
 	bool Ball::isPointInBall(glm::vec3 point) {
@@ -94,7 +93,34 @@ namespace Pix {
 						  (p->z - mPosition.z) * (p->z - mPosition.z));
 		float sumRadius = (outer ? outerRadi : radius()) + point->radius();
 
+//		if (DBG) {
+			float dst = fabs(distance) - sumRadius * sumRadius;
+			if (dst < 0)
+				LogV(TAG, SF("Overlaps by %f", dst));
+//		}
+
 		return (outer && outerRadi == 0) ? false : (fabs(distance) < sumRadius * sumRadius);
+
+	}
+	float Ball::intersectsAmount(Pix::Ball *point, bool outer) {
+		// we are using multiplications because is faster than calling Math.pow
+
+		glm::vec3 *p = &point->mPosition;
+
+		float outerRadi = outer ? outerRadius() : 0;
+
+		float distance = ((p->x - mPosition.x) * (p->x - mPosition.x) +
+						  (p->y - mPosition.y) * (p->y - mPosition.y) +
+						  (p->z - mPosition.z) * (p->z - mPosition.z));
+		float sumRadius = (outer ? outerRadi : radius()) + point->radius();
+
+//		if (DBG) {
+			float dst = fabs(distance) - sumRadius * sumRadius;
+			if (dst < 0)
+				LogV(TAG, SF("Overlaps by %f", dst));
+//		}
+
+		return fabs(distance) - sumRadius * sumRadius;
 
 	}
 
@@ -123,7 +149,7 @@ namespace Pix {
 
 		float fIntendedSpeed = speed();
 
-		float fActualDistance = glm::fastSqrt(
+		float fActualDistance = sqrtf(
 				(mPosition.x - origPos.x) * (mPosition.x - origPos.x)
 				+ (mPosition.z - origPos.z) * (mPosition.z - origPos.z));
 

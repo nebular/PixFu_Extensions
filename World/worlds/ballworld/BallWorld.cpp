@@ -100,11 +100,17 @@ namespace Pix {
 		// Displace balls according to their mass
 		float K = target->mass() / ( ball->mass() + target->mass() );
 
+		if (DBG)
+			LogV(TAG, SF("bevor displacement %f", ball->intersectsAmount(target, false)));
+
 		// Displace Current Ball away from collision
 		ball->mPosition -= K * displacement;
 
 		// Displace Target Ball away from collision
 		target->mPosition += (1-K) * displacement;
+		
+		if (DBG)
+			LogV(TAG, SF("after displacement %f", ball->intersectsAmount(target, false)));
 
 	}
 
