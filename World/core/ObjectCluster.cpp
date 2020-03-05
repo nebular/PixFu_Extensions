@@ -38,7 +38,7 @@ namespace Pix {
 		if (DBG) LogV(TAG, "New Object Cluster " + NAME);
 
 		// load object model
-		pLoader = new ObjLoader(std::string(PATH_OBJECTS)+"/" + NAME + "/" + NAME + ".obj");
+		pLoader = new ObjLoader(std::string(PATH_OBJECTS) + "/" + NAME + "/" + NAME + ".obj");
 
 		// load mesh texxtures TODO parse materials properly
 		for (int i = 0; i < pLoader->meshCount(); i++) {
@@ -47,7 +47,7 @@ namespace Pix {
 		}
 
 		mPlacer = PLACER.toMatrix();
-				  vInstances.clear();
+		vInstances.clear();
 
 		if (DBG) LogV(TAG, SF("Created ObjectCluster %s", NAME.c_str()));
 
@@ -119,7 +119,7 @@ namespace Pix {
 
 					Visible_t v = {object, tmatrix * mPlacer};
 					// save the transform matrix as we will use it several times to draw he individual meshes
-					vVisibles.push_back(v);
+					vVisibles.emplace_back(v);
 				}
 			} else {
 				// we saved drawing this object

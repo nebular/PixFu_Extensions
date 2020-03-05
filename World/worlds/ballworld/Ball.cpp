@@ -65,12 +65,12 @@ namespace Pix {
 		// Calculate displacement required
 		//	float fOverlap = 0.5F * (fDistance - (outer ? outerRadius() : radius()) - target->radius());
 
-		float fOverlap =  (fDistance - (outer ? outerRadius() : radius()) - target->radius());
-		if (fDistance == 0) return { fOverlap, fOverlap, fOverlap};
-		
-		fOverlap/=fDistance;
+		float fOverlap = (fDistance - (outer ? outerRadius() : radius()) - target->radius());
+		if (fDistance == 0) return {fOverlap, fOverlap, fOverlap};
+
+		fOverlap /= fDistance;
 		return fOverlap * (mPosition - target->mPosition);
-		
+
 	}
 
 	bool Ball::isPointInBall(glm::vec3 point) {
@@ -94,14 +94,15 @@ namespace Pix {
 		float sumRadius = (outer ? outerRadi : radius()) + point->radius();
 
 //		if (DBG) {
-			float dst = fabs(distance) - sumRadius * sumRadius;
-			if (dst < 0)
-				LogV(TAG, SF("Overlaps by %f", dst));
+		float dst = fabs(distance) - sumRadius * sumRadius;
+		if (dst < 0)
+			LogV(TAG, SF("Overlaps by %f", dst));
 //		}
 
 		return (outer && outerRadi == 0) ? false : (fabs(distance) < sumRadius * sumRadius);
 
 	}
+
 	float Ball::intersectsAmount(Pix::Ball *point, bool outer) {
 		// we are using multiplications because is faster than calling Math.pow
 
@@ -115,9 +116,9 @@ namespace Pix {
 		float sumRadius = (outer ? outerRadi : radius()) + point->radius();
 
 //		if (DBG) {
-			float dst = fabs(distance) - sumRadius * sumRadius;
-			if (dst < 0)
-				LogV(TAG, SF("Overlaps by %f", dst));
+		float dst = fabs(distance) - sumRadius * sumRadius;
+		if (dst < 0)
+			LogV(TAG, SF("Overlaps by %f", dst));
 //		}
 
 		return fabs(distance) - sumRadius * sumRadius;
@@ -179,7 +180,7 @@ namespace Pix {
 
 		if (ISSTATIC) return;
 
-		const float factor = bFlying ? CONFIG.aero.air:CONFIG.aero.terrain;
+		const float factor = bFlying ? CONFIG.aero.air : CONFIG.aero.terrain;
 		mAcceleration.z *= factor;
 		mAcceleration.x *= factor;
 
@@ -341,7 +342,7 @@ namespace Pix {
 
 				mSpeed *= fPenalty;    // this only affects human player as CPU uses acceleration to drive
 				// TODO acceleration?
-				
+
 				// but that's why we keep the calculated penalty so it can be
 				// added in the CPU car drive routines where it makes sense
 

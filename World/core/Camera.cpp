@@ -41,13 +41,13 @@ namespace Pix {
 			bool smooth,
 			float smoothLerp,
 			float distanceLerp) :
-				UPVECTOR(upVector),
-				mFrontVector(DEF_FRONTVECTOR),
-				bSmooth(smooth),
-				SMOOTHLERP(smoothLerp),
-				mMouseSensitivity(DEF_MOUSE_SENS),
-				mMouseZoom(DEF_ZOOM),
-				DISTANCELERP(distanceLerp) {
+			UPVECTOR(upVector),
+			mFrontVector(DEF_FRONTVECTOR),
+			bSmooth(smooth),
+			SMOOTHLERP(smoothLerp),
+			mMouseSensitivity(DEF_MOUSE_SENS),
+			mMouseZoom(DEF_ZOOM),
+			DISTANCELERP(distanceLerp) {
 
 		mPosition = mInterpolatedPosition = initialPosition;
 		fYaw = initialYaw;
@@ -67,7 +67,7 @@ namespace Pix {
 	void Camera::inputMovement(CameraMovement_t direction, float speed, float fElapsedTime) {
 
 		GLfloat velocity = speed * fElapsedTime;
-		
+
 		switch (direction) {
 			case CM_FORWARD:
 				mPosition += mFrontVector * velocity;
@@ -149,12 +149,12 @@ namespace Pix {
 			case MOVE:
 				if (up) inputMovement(CM_FORWARD, VSTEP * percent, fElapsedTime);
 				if (down) inputMovement(CM_BACKWARD, VSTEP * percent, fElapsedTime);
-				if (left) stepYaw(STEP * percent);		// understand why it is negated
+				if (left) stepYaw(STEP * percent);        // understand why it is negated
 				if (right) stepYaw(-STEP * percent);
 				break;
 
 			case ADJUST_ANGLES:
-				if (left) stepYaw(STEP * percent);		// understand why it is negated
+				if (left) stepYaw(STEP * percent);        // understand why it is negated
 				if (right) stepYaw(-STEP * percent);
 				if (up) stepPitch(-STEP * percent);
 				if (down) stepPitch(STEP * percent);
@@ -217,20 +217,20 @@ namespace Pix {
 	 */
 
 	void Camera::inputMouseWheel(float yoffset) {
-		
+
 		if (mMouseZoom >= 1.0f && mMouseZoom <= 45.0f)
 			mMouseZoom -= yoffset;
 		if (mMouseZoom <= 1.0f)
 			mMouseZoom = 1.0f;
 		if (mMouseZoom >= 45.0f)
 			mMouseZoom = 45.0f;
-	
+
 	}
 
 	void Camera::updateCameraVectors() {
-		
+
 		// Calculate the new Front vector
-		
+
 		glm::vec3 front = {
 				cosf(fYaw) * cosf(fPitch),
 				sinf(fPitch),

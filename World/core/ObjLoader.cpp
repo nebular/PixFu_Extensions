@@ -22,9 +22,11 @@ namespace Pix {
 
 	// Load a static mesh
 	ObjLoader::ObjLoader(const Static3DObject_t *staticObject) : pLoader(new objl::Loader()) {
-		std::vector<unsigned> *Indices = new std::vector<unsigned>(staticObject->indices, staticObject->indices + staticObject->indicesCount);
+		std::vector<unsigned> *Indices = new std::vector<unsigned>(staticObject->indices,
+																   staticObject->indices + staticObject->indicesCount);
 		std::vector<objl::Vertex> *Vertices = new std::vector<objl::Vertex>((objl::Vertex *) staticObject->vertices,
-															  (objl::Vertex *) (staticObject->vertices + staticObject->verticesCount));
+																			(objl::Vertex *) (staticObject->vertices +
+																							  staticObject->verticesCount));
 		pLoader->LoadObject(*Vertices, *Indices);
 	}
 

@@ -8,8 +8,6 @@
 #pragma ide diagnostic ignored "err_ovl_no_viable_member_function_in_call"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 
-#define NO_DEBUG_CARPHYSICS
-
 namespace Pix {
 
 	BallPlayer::BallPlayer(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location)
@@ -18,12 +16,16 @@ namespace Pix {
 	}
 
 	/**
-	 The base class accepts a steering angle and acceleration and does simple rotations
-	 on the speed vector. The movement is ok for balls but not very realistic for cars.
+	 *
+	 * The base class accepts a steering angle and acceleration and does simple rotations
+	 * on the speed vector. The movement is ok for balls but not very realistic for cars.
+	 *
 	 */
+
 	void BallPlayer::process(World *world, float fElapsedTime) {
 
 		//	auto toDeg = [] (float rad) { return (int)(rad*180/M_PI); };
+
 		if (fElapsedTime == NOTIME) {
 			fElapsedTime = fSimTimeRemaining;
 			origPos = mPosition;                                // Store original position this epochoverla
@@ -76,34 +78,35 @@ namespace Pix {
 		const bool debug = world->CONFIG.debugMode == DEBUG_COLLISIONS;
 		Canvas2D *canvas = debug ? world->canvas(mPosition) : nullptr;
 
-
 		// following is a simulation based on that website that models back and front axis
 		// so steering is applied to the front wheels
 		// http://engineeringdotnet.blogspot.com/2010/04/simple-2d-car-physics-in-games.html
 
 		const float modSpeed = speed();
 		const float steerAngle = fSteerAngle;
-		
+
 		// when speed = 0 we dont know the car heading so use last one
 //		fCalcDirection = modSpeed > STABLE ? atan2(mSpeed.z, mSpeed.x) : fCalcDirection;
 		fCalcDirection = modSpeed > 0 ? atan2(mSpeed.z, mSpeed.x) : fCalcDirection;
 
 		// the current car direction, calculated from the velocity vector
 		float ang = fCalcDirection;
-//		Pix::LogV("ang", Pix::SF("ang %f", steerAngle));
+
 		if (debug) {
-			glm::vec2 r = glm::rotate(glm::vec2(40,0), ang-steerAngle);
-			canvas->drawLine(mPosition.x, mPosition.z, mPosition.x+r.x, mPosition.z+r.y,
+			glm::vec2 r = glm::rotate(glm::vec2(40, 0), ang - steerAngle);
+			canvas->drawLine(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), static_cast<int32_t>(mPosition.x + r.x),
+							 static_cast<int32_t>(mPosition.z + r.y),
 							 Pix::Colors::RED);
-			r = glm::rotate(glm::vec2(40,0), ang);
-			canvas->drawLine(mPosition.x, mPosition.z, mPosition.x+r.x, mPosition.z+r.y,
+			r = glm::rotate(glm::vec2(40.0F, 0), ang);
+			canvas->drawLine(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), static_cast<int32_t>(mPosition.x + r.x),
+							 static_cast<int32_t>(mPosition.z + r.y),
 							 Pix::Colors::GREEN);
 		}
 
 
-		
-		
-		
+
+
+
 		// the direction vector of the back wheels
 		glm::vec3 headingBack = glm::vec3(cosf(ang), 0, sinf(ang));
 
@@ -125,7 +128,7 @@ namespace Pix {
 			canvas->fillCircle(static_cast<int32_t>(frontWheel.x), static_cast<int32_t>(frontWheel.z), 2, Pix::Colors::RED);
 			canvas->fillCircle(static_cast<int32_t>(backWheel.x), static_cast<int32_t>(backWheel.z), 2, Pix::Colors::GREEN);
 		}
-			
+
 		/**
 		 Each wheel should move forward by a certain amount in the direction it is pointing.
 		 The distance it needs to move depends on the car speed, and the time between frames
@@ -147,7 +150,7 @@ namespace Pix {
 		*/
 
 		mPosition = (frontWheel + backWheel) / 2.0F;
-		
+
 		if (debug) {
 			canvas->fillCircle(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), 2, Pix::Colors::BLUE);
 		}

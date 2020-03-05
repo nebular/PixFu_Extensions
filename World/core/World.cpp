@@ -37,13 +37,13 @@ namespace Pix {
 
 	World::World(WorldConfig_t config)
 			: CONFIG(std::move(config)) {
-				if (config.debugMode==DEBUG_WIREFRAME)
-					LayerVao::DRAWMODE=GL_LINES;
+		if (config.debugMode == DEBUG_WIREFRAME)
+			LayerVao::DRAWMODE = GL_LINES;
 	};
 
 	World::~World() {
 
-		if (DBG) LogE(TAG, "Destroying planet");
+		if (DBG) LogV(TAG, "Destroying planet");
 		for (Terrain *terrain : vTerrains) {
 			delete terrain;
 		}
@@ -52,12 +52,12 @@ namespace Pix {
 
 	Terrain *World::add(TerrainConfig_t terrainConfig) {
 		Terrain *world = new Terrain(CONFIG, std::move(terrainConfig));
-		vTerrains.push_back(world);
+		vTerrains.emplace_back(world);
 		return world;
 	}
 
 	WorldObject *World::add(ObjectProperties_t features, ObjectLocation_t location, bool setHeight) {
-		WorldObject *object = new WorldObject(CONFIG, features, location, WorldObject::CLASSID_CODE );
+		WorldObject *object = new WorldObject(CONFIG, features, location, WorldObject::CLASSID_CODE);
 		add(object, setHeight);
 		return object;
 	}
@@ -74,13 +74,14 @@ namespace Pix {
 
 			// apply scale pulse
 			if (CONFIG.animation.scalePulse > 0)
-				fRadiusAnimator=sinf(World::METRONOME) * CONFIG.animation.scalePulse;
+				fRadiusAnimator = sinf(World::METRONOME) * CONFIG.animation.scalePulse;
 
 		}
-	
-		if (world->CONFIG.debugMode==DEBUG_COLLISIONS)
-			world->canvas()->drawCircle(static_cast<int32_t>(pos().x), static_cast<int32_t>(pos().z), static_cast<int32_t>(radius()), Pix::Colors::RED);
-		
+
+		if (world->CONFIG.debugMode == DEBUG_COLLISIONS)
+			world->canvas()->drawCircle(static_cast<int32_t>(pos().x), static_cast<int32_t>(pos().z), static_cast<int32_t>(radius()),
+										Pix::Colors::RED);
+
 	}
 
 
@@ -91,14 +92,14 @@ namespace Pix {
 			object->pos().y = height;
 		}
 
-		auto clusterItem = mCluesters.find(object->CLASS);
+		auto clusterItem = mClusters.find(object->CLASS);
 		ObjectCluster *cluster;
 
-		if (clusterItem == mCluesters.end()) {
+		if (clusterItem == mClusters.end()) {
 			// create object cluster
 			cluster = new ObjectCluster(this, object->CLASS, CONFIG.worldTransform);
-			vObjects.push_back(cluster);
-			mCluesters[object->CLASS] = cluster;
+			vObjects.emplace_back(cluster);
+			mClusters[object->CLASS] = cluster;
 		} else {
 			cluster = clusterItem->second;
 		}
@@ -126,11 +127,11 @@ namespace Pix {
 		float aspectRatio = (float) engine->screenWidth() / (float) engine->screenHeight();
 
 		projectionMatrix = glm::perspective(
-											(float) toRad(CONFIG.perspective.FOV),
-											aspectRatio,
-											CONFIG.perspective.NEAR_PLANE,
-											CONFIG.perspective.FAR_PLANE
-											);
+				(float) toRad(CONFIG.perspective.FOV),
+				aspectRatio,
+				CONFIG.perspective.NEAR_PLANE,
+				CONFIG.perspective.FAR_PLANE
+		);
 
 		pShader->loadProjectionMatrix(projectionMatrix);
 		//		pShader->loadLight(pLight);
@@ -146,11 +147,10 @@ namespace Pix {
 			pShaderObjects->use();
 			pShaderObjects->bindAttributes();
 			pShaderObjects->loadProjectionMatrix(projectionMatrix);
-			//			pShaderObjects->loadLight(pLight);
+			// light is updated every frame
+			// pShaderObjects->loadLight(pLight);
 			pShaderObjects->stop();
 		}
-
-//	pGrid->build();
 
 		if (DBG)
 			LogV(TAG, SF("Init World, FOV %f, aspectRatio %f",
@@ -178,23 +178,24 @@ namespace Pix {
 
 		pShader->stop();
 
-		if (vObjects.empty()) return;
+		if (!vObjects.empty()) {
 
-		pShaderObjects->use();
-		pShaderObjects->loadViewMatrix(pCamera);
-		pShaderObjects->loadLight(pLight);
+			pShaderObjects->use();
+			pShaderObjects->loadViewMatrix(pCamera);
+			pShaderObjects->loadLight(pLight);
 
-		for (ObjectCluster *object:vObjects) {
-			object->render(pShaderObjects);
+			for (ObjectCluster *object:vObjects) {
+				object->render(pShaderObjects);
+			}
+
+
+			pShaderObjects->stop();
+			if (DBG) OpenGlUtils::glError("terrain tick");
 		}
 
-
-		pShaderObjects->stop();
-		if (DBG) OpenGlUtils::glError("terrain tick");
-
 		glDisable(GL_DEPTH_TEST);
-		
-		if (CONFIG.debugMode==DEBUG_COLLISIONS)
+
+		if (CONFIG.debugMode == DEBUG_COLLISIONS)
 			canvas()->blank();
 
 	}

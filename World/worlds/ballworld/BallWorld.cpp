@@ -47,46 +47,45 @@ namespace Pix {
 	constexpr int HEIGHT_EDGE_FLYOVER = 100;
 
 	BallWorld::BallWorld(std::string levelName, WorldConfig_t config) :
-		World(std::move(config))
-	{
-			vObjects.clear();
-			load(std::move(levelName));
+			World(std::move(config)) {
+		vObjects.clear();
+		load(std::move(levelName));
 	}
 
-	void BallWorld::load(const std::string& levelName) {
+	void BallWorld::load(const std::string &levelName) {
 
 		if (pMap != nullptr)
 			throw std::runtime_error("The map was already loaded.");
 
 		pMap = new BallWorldMap_t(levelName);
-		
+
 		// our terrain configuration object. You can add several terrains at different coordinates
 		// in that case the coordinates should be adjacent (there are no voids between worlds). This
 		// might be allowed in the future.
-		
-		World::add({
-			
-			// Terrain Name. Maps to the assets folder /levels/<name>/ and determines
-			// the terrain texture (PNG), the terraim mesh (Wavefront OBJ) and heightmap (PNG)
-			// inside that folder
 
-			levelName,
-			
-			// terrain placement in world coordinated (mainly for multi-terrain).
-			// REMEMBER YOUR TERRAIN MODEL MUST HAVE THE ORIGIN AT THE TOP LEFT (0,0) - no negative vertexes !
-			// This is required to ease queries to the heightmap (coordinates will exactly match)
-			{0, 0},
-			
-			// height (Y) model scale. As our Heightmap texture is normalized, we need to know the maximum height (+Y)
-			// on the loaded model, so we can translate the heighmap normalized value into world coordinates.
-			// MIND THAT NO SCALING IS PERFORMED ON THE MODEL, this is the opposite, we learn about the loaded model
-			// height to connect it with our separate heightmap, that we use for example to stick objects to the ground.
-			pMap->fModelScale
-			
-		});
+		World::add({
+
+						   // Terrain Name. Maps to the assets folder /levels/<name>/ and determines
+						   // the terrain texture (PNG), the terraim mesh (Wavefront OBJ) and heightmap (PNG)
+						   // inside that folder
+
+						   levelName,
+
+						   // terrain placement in world coordinated (mainly for multi-terrain).
+						   // REMEMBER YOUR TERRAIN MODEL MUST HAVE THE ORIGIN AT THE TOP LEFT (0,0) - no negative vertexes !
+						   // This is required to ease queries to the heightmap (coordinates will exactly match)
+						   {0, 0},
+
+						   // height (Y) model scale. As our Heightmap texture is normalized, we need to know the maximum height (+Y)
+						   // on the loaded model, so we can translate the heighmap normalized value into world coordinates.
+						   // MIND THAT NO SCALING IS PERFORMED ON THE MODEL, this is the opposite, we learn about the loaded model
+						   // height to connect it with our separate heightmap, that we use for example to stick objects to the ground.
+						   pMap->fModelScale
+
+				   });
 
 	}
-	
+
 	void BallWorld::tick(Pix::Fu *engine, float fElapsedTime) {
 		World::tick(engine, fElapsedTime);
 		processCollisions(fElapsedTime);
@@ -98,7 +97,7 @@ namespace Pix {
 		glm::vec3 displacement = ball->calculateOverlapDisplacement(target);
 
 		// Displace balls according to their mass
-		float K = target->mass() / ( ball->mass() + target->mass() );
+		float K = target->mass() / (ball->mass() + target->mass());
 
 		if (DBG)
 			LogV(TAG, SF("bevor displacement %f", ball->intersectsAmount(target, false)));
@@ -107,8 +106,8 @@ namespace Pix {
 		ball->mPosition -= K * displacement;
 
 		// Displace Target Ball away from collision
-		target->mPosition += (1-K) * displacement;
-		
+		target->mPosition += (1.0F - K) * displacement;
+
 		if (DBG)
 			LogV(TAG, SF("after displacement %f", ball->intersectsAmount(target, false)));
 
@@ -150,8 +149,8 @@ namespace Pix {
 				   (b1->mass() + b2->mass());
 
 		// Update ball velocities
-		glm::vec3 newSpeed1 = glm::vec3 {tx * dpTan1 + nx * m1, b1->mSpeed.y, tz * dpTan1 + nz * m1};
-		glm::vec3 newSpeed2 = glm::vec3 {tx * dpTan2 + nx * m2, b2->mSpeed.y, tz * dpTan2 + nz * m2};
+		glm::vec3 newSpeed1 = glm::vec3{tx * dpTan1 + nx * m1, b1->mSpeed.y, tz * dpTan1 + nz * m1};
+		glm::vec3 newSpeed2 = glm::vec3{tx * dpTan2 + nx * m2, b2->mSpeed.y, tz * dpTan2 + nz * m2};
 
 		b1->onCollision(b2, newSpeed1, fElapsedTime);
 		b2->onCollision(b1, newSpeed2, fElapsedTime);
@@ -182,10 +181,10 @@ namespace Pix {
 
 			// Set all balls time to maximum for this epoch
 
-			iterateObjects([fSimElapsedTime](WorldObject *ball) {
-				if (ball->CLASSID == Ball::CLASSID)
-					static_cast<Ball *>(ball)->fSimTimeRemaining = fSimElapsedTime;
-			});
+//			iterateObjects([fSimElapsedTime](WorldObject *ball) {
+//				if (ball->CLASSID == Ball::CLASSID)
+//					static_cast<Ball *>(ball)->fSimTimeRemaining = fSimElapsedTime;
+//			});
 
 			// Erode simulation time on a per objec tbasis, depending upon what happens
 			// to it during its journey through this epoch
@@ -193,11 +192,15 @@ namespace Pix {
 			for (int j = 0; j < Ball::MAXSIMULATIONSTEPS; j++) {
 
 				// Update Ball Positions
-				iterateObjects([this](WorldObject *w) {
+				iterateObjects([this, j, fSimElapsedTime](WorldObject *w) {
 
 					if (w->CLASSID != Ball::CLASSID) return;
 
 					Ball *ball = (Ball *) w;
+
+					// Set balls time to maximum for this epoch
+					if (j==0)
+						ball->fSimTimeRemaining = fSimElapsedTime;
 
 					if (!ball->bDisabled) {
 						if (ball->fSimTimeRemaining > 0.0F) {
@@ -310,7 +313,7 @@ namespace Pix {
 
 						// discard non-ball objects
 						if (targ->CLASSID != Ball::CLASSID) return;
-							
+
 						Ball *target = (Ball *) targ;
 
 						// isstatic: a tree, a stone. something that will not move
@@ -322,7 +325,7 @@ namespace Pix {
 						// another static object (or else the collision will be allowed).
 						// If you declare all your scenery decoration or obstacles as static
 						// it will be relatively cheap to have lots of them
-						
+
 						if ((!ball->ISSTATIC || !target->ISSTATIC)
 							&& !ball->bDisabled && !target->bDisabled                            // disabled balls
 							&& ball->ID != target->ID) {
