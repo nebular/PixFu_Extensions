@@ -31,8 +31,8 @@ namespace Pix {
 			  ISSTATIC(meta.ISSTATIC),
 			  mPosition(location.position),
 			  mRotation(location.rotation),
-			  mSpeed(meta.PROPERTIES.initialSpeed),
-			  mAcceleration(meta.PROPERTIES.initialAcceleration),
+			  mSpeed(location.initialSpeed),
+			  mAcceleration(location.initialAcceleration),
 			  bFlying(false) {
 
 		TAG = "BALL" + std::to_string(ID);
@@ -42,8 +42,8 @@ namespace Pix {
 	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed) :
 			Ball(
 					planetConfig,
-					ObjectMeta_t{ "FAKE", {radi, mass, 0.8, speed}},
-					ObjectLocation_t{position, {0, 0, 0}},
+					ObjectMeta_t{ "FAKE", {radi, mass, 0.8}},
+					ObjectLocation_t {position, {0, 0, 0}, speed},
 					FAKE_BALL_ID
 			) {
 		TAG = "FAKEBALL";
