@@ -191,6 +191,8 @@ namespace Pix {
 		if (DBG) OpenGlUtils::glError("terrain tick");
 
 		glDisable(GL_DEPTH_TEST);
+		
+		if (DBG_WIRE) canvas()->blank();
 
 	}
 

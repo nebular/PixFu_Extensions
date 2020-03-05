@@ -13,7 +13,7 @@
 #define DBG_NOEDGESCOLLISIONS
 #define DBG_NOHEIGHTMAPCOLLISIONS
 
-constexpr float DBG_WIRE = false;
+constexpr float DBG_WIRE = true;
 
 constexpr int LEVEL_MAXPLAYERS = 8;
 

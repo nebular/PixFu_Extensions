@@ -21,6 +21,8 @@
 //  routine enhanced to 3D (that is heavy math). At the moment the height claculations are
 //  done separately and not really considered for vectors calculation on a collision.
 //
+//  Collision Engine from OneLoneCoder.com masterclass on Balls and Collisions.
+//
 //  Created by rodo on 25/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
 //
@@ -102,14 +104,18 @@ namespace Pix {
 		float K = target->mass() / ( ball->mass() + target->mass() );
 
 		// Displace Current Ball away from collision
-		ball->mPosition.x -= K*displacement.x;
-		ball->mPosition.y -= K*displacement.y;
-		ball->mPosition.z -= K*displacement.z;
+		ball->mPosition -= K * displacement;
+
+		// ball->mPosition.x -= K*displacement.x;
+		// ball->mPosition.y -= K*displacement.y;
+		// ball->mPosition.z -= K*displacement.z;
 
 		// Displace Target Ball away from collision
-		target->mPosition.x += (1-K) * displacement.x;
-		target->mPosition.y += (1-K) * displacement.y;
-		target->mPosition.z += (1-K) * displacement.z;
+		target->mPosition += (1-K) * displacement;
+
+		// target->mPosition.x += (1-K) * displacement.x;
+		// target->mPosition.y += (1-K) * displacement.y;
+		// target->mPosition.z += (1-K) * displacement.z;
 	}
 
 	void BallWorld::processDynamicCollision(Ball *b1, Ball *b2, float fElapsedTime) {
