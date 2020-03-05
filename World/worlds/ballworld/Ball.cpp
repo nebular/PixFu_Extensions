@@ -61,10 +61,11 @@ namespace Pix {
 	glm::vec3 Ball::calculateOverlapDisplacement(Ball *target, bool outer) {
 
 		// Distance between ball centers
-		float fDistance = distance(target);
+			float fDistance = distance(target);
 
 		// Calculate displacement required
-		float fOverlap = 0.5F * (fDistance - (outer ? outerRadius() : radius()) - target->radius());
+//		float fOverlap = 0.5F * (fDistance - (outer ? outerRadius() : radius()) - target->radius());
+		float fOverlap =  (fDistance - (outer ? outerRadius() : radius()) - target->radius());
 
 		return {
 				fOverlap * (fDistance != 0 ? (mPosition.x - target->mPosition.x) / fDistance : 1),
@@ -152,8 +153,9 @@ namespace Pix {
 
 		if (ISSTATIC) return;
 
-		mAcceleration.z *= 0.8F;
-		mAcceleration.x *= 0.8F;
+		const float factor = bFlying ? CONFIG.aero.air:CONFIG.aero.terrain;
+		mAcceleration.z *= factor;
+		mAcceleration.x *= factor;
 
 		// Update Velocity
 		mSpeed.x += mAcceleration.x * fTime;
@@ -312,6 +314,8 @@ namespace Pix {
 						   (1 - fmin(delta, FEATURES_CLIMB_LIMIT) / FEATURES_CLIMB_LIMIT) * (1 - FEATURES_SCRATCHING_NEW);
 
 				mSpeed *= fPenalty;    // this only affects human player as CPU uses acceleration to drive
+				// TODO acceleration?
+				
 				// but that's why we keep the calculated penalty so it can be
 				// added in the CPU car drive routines where it makes sense
 

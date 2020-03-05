@@ -202,3 +202,4 @@ namespace Pix {
 }
 
 #pragma clang diagnostic pop
+

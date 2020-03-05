@@ -23,7 +23,6 @@ namespace Pix {
 	class BallWorld : public World {
 
 		static std::string TAG;
-		static constexpr float EFFICIENCY = 1.00;
 
 	protected:
 
@@ -64,7 +63,7 @@ namespace Pix {
 		 * Processes ball updates and collisions.
 		 */
 
-		long processCollisions(const std::vector<LineSegment_t> &edges, float fElapsedTime);
+		long processCollisions(float fElapsedTime);
 
 		// process static collisions
 		void processStaticCollision(Ball *ball, Ball *target);

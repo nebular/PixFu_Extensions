@@ -13,6 +13,8 @@
 #define DBG_NOEDGESCOLLISIONS
 #define DBG_NOHEIGHTMAPCOLLISIONS
 
+constexpr float DBG_WIRE = false;
+
 constexpr int LEVEL_MAXPLAYERS = 8;
 
 constexpr char PATH_LEVELS[] = "levels";

@@ -17,7 +17,7 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "err_ovl_no_viable_member_function_in_call"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
-// glm warnngs in idea
+// glm warnings in idea TODO 
 
 namespace Pix {
 
@@ -40,15 +40,15 @@ namespace Pix {
 			glm::vec3 upVector,
 			bool smooth,
 			float smoothLerp,
-			float distanceLerp
-	) :
-			UPVECTOR(upVector),
-			mFrontVector(DEF_FRONTVECTOR),
-			bSmooth(smooth),
-			SMOOTHLERP(smoothLerp),
-			mMouseSensitivity(DEF_MOUSE_SENS),
-			mMouseZoom(DEF_ZOOM),
-			DISTANCELERP(distanceLerp) {
+			float distanceLerp) :
+				UPVECTOR(upVector),
+				mFrontVector(DEF_FRONTVECTOR),
+				bSmooth(smooth),
+				SMOOTHLERP(smoothLerp),
+				mMouseSensitivity(DEF_MOUSE_SENS),
+				mMouseZoom(DEF_ZOOM),
+				DISTANCELERP(distanceLerp) {
+
 		mPosition = mInterpolatedPosition = initialPosition;
 		fYaw = initialYaw;
 		fRoll = 0;
@@ -60,13 +60,14 @@ namespace Pix {
 	 * Processes input received from any keyboard-like input system. Accepts input parameter
 	 * in the form of camera defined ENUM (to abstract it from windowing systems)
 	 * @param direction Direction enum
-	 * @param speed speed
-	 * @param fElapsedTime time
+	 * @param speed speed increment
+	 * @param fElapsedTime time frame time
 	 */
 
 	void Camera::inputMovement(CameraMovement_t direction, float speed, float fElapsedTime) {
 
 		GLfloat velocity = speed * fElapsedTime;
+		
 		switch (direction) {
 			case CM_FORWARD:
 				mPosition += mFrontVector * velocity;
@@ -133,38 +134,45 @@ namespace Pix {
 
 	}
 
-// Processes input received from a keyboard-like input system. Expects the pressed status of
-// each direction, plus a mode to set the arrwos meaning: move camera, adjust position,
-// adjust pitch/yaw
+	/**
+	 * Processes input received from a keyboard-like input system. Expects the pressed status of
+	 * each direction, plus a mode to set the arrwos meaning: move camera, adjust position,
+	 * adjust pitch/yaw
+	 */
 
-	void Camera::inputKey(CameraKeyControlMode_t mode, bool up, bool down, bool left, bool right, float fElapsedTime) {
+	void Camera::inputKey(CameraKeyControlMode_t mode, bool up, bool down, bool left, bool right, float percent, float fElapsedTime) {
 
 		mCameraMode = mode;
 
 		switch (mode) {
+
 			case MOVE:
-				if (up) inputMovement(CM_FORWARD, VSTEP, fElapsedTime);
-				if (down) inputMovement(CM_BACKWARD, VSTEP, fElapsedTime);
-				if (left) stepYaw(-STEP * 5);
-				if (right) stepYaw(STEP * 5);
+				if (up) inputMovement(CM_FORWARD, VSTEP * percent, fElapsedTime);
+				if (down) inputMovement(CM_BACKWARD, VSTEP * percent, fElapsedTime);
+				if (left) stepYaw(STEP * percent);		// understand why it is negated
+				if (right) stepYaw(-STEP * percent);
 				break;
+
 			case ADJUST_ANGLES:
-				if (left) stepYaw(-STEP * 5);
-				if (right) stepYaw(STEP * 5);
-				if (up) stepPitch(-STEP * 2);
-				if (down) stepPitch(STEP * 2);
+				if (left) stepYaw(STEP * percent);		// understand why it is negated
+				if (right) stepYaw(-STEP * percent);
+				if (up) stepPitch(-STEP * percent);
+				if (down) stepPitch(STEP * percent);
 				break;
+
 			case ADJUST_POSITION:
-				if (up) inputMovement(CM_UP, VSTEP, fElapsedTime);
-				if (down) inputMovement(CM_DOWN, VSTEP, fElapsedTime);
-				if (left) inputMovement(CM_LEFT, VSTEP, fElapsedTime);
-				if (right) inputMovement(CM_RIGHT, VSTEP, fElapsedTime);
+				if (up) inputMovement(CM_UP, VSTEP * percent, fElapsedTime);
+				if (down) inputMovement(CM_DOWN, VSTEP * percent, fElapsedTime);
+				if (left) inputMovement(CM_LEFT, VSTEP * percent, fElapsedTime);
+				if (right) inputMovement(CM_RIGHT, VSTEP * percent, fElapsedTime);
 				break;
+
 			case ADJUST_PLAYER_ANGLES:
 				if (up) fPlayerPitch -= VSTEP / 100;
 				if (down) fPlayerPitch += VSTEP / 100;
 //				LogV("cam", SF("fPlayerPitch %f", fPlayerPitch));
 				break;
+
 			case ADJUST_PLAYER_POSITION:
 				if (left) fPlayerDistanceFar -= VSTEP / 100;
 				if (right) fPlayerDistanceFar += VSTEP / 100;
@@ -172,15 +180,16 @@ namespace Pix {
 				if (down) fPlayerDistanceUp += VSTEP / 1000;
 				if (fPlayerDistanceUp < 0) fPlayerDistanceUp = 0;
 //				LogV("cam", SF("fPlayerDistanceFar %f fPlayerDistanceUp  %f", fPlayerDistanceFar, fPlayerDistanceUp));
-
 				break;
 
 		}
 
 	};
 
-// Processes input received from a mouse input system. Expects the offset value in both
-// the x and y direction.
+	/**
+	 * Processes input received from a mouse input system. Expects the offset value in both
+	 * the x and y direction.
+	 */
 
 	void Camera::inputMouse(float xoffset, float yoffset, bool constrainPitch) {
 
@@ -202,20 +211,26 @@ namespace Pix {
 		updateCameraVectors();
 	}
 
-// Processes input received from a mouse scroll-wheel event. Only requires input on the
-// vertical wheel-axis
+	/**
+	 * Processes input received from a mouse scroll-wheel event. Only requires input on the
+	 * vertical wheel-axis
+	 */
 
 	void Camera::inputMouseWheel(float yoffset) {
+		
 		if (mMouseZoom >= 1.0f && mMouseZoom <= 45.0f)
 			mMouseZoom -= yoffset;
 		if (mMouseZoom <= 1.0f)
 			mMouseZoom = 1.0f;
 		if (mMouseZoom >= 45.0f)
 			mMouseZoom = 45.0f;
+	
 	}
 
 	void Camera::updateCameraVectors() {
+		
 		// Calculate the new Front vector
+		
 		glm::vec3 front = {
 				cosf(fYaw) * cosf(fPitch),
 				sinf(fPitch),

@@ -26,7 +26,7 @@
 //
 
 #include "BallWorld.hpp"
- #include <utility> #include "Ball.hpp"
+#include "Ball.hpp"
 #include "BallPlayer.hpp"
 #include "Splines.hpp"
 #include "LineSegment.hpp"
@@ -44,11 +44,12 @@ namespace Pix {
 	// heigh over which
 	constexpr int HEIGHT_EDGE_FLYOVER = 100;
 
-	BallWorld::BallWorld(std::string levelName, WorldConfig_t config)
-			: World(std::move(config)) {
-				vObjects.clear();
-				load(std::move(levelName));
-			}
+	BallWorld::BallWorld(std::string levelName, WorldConfig_t config) :
+		World(std::move(config))
+	{
+			vObjects.clear();
+			load(std::move(levelName));
+	}
 
 	void BallWorld::load(const std::string& levelName) {
 
@@ -72,7 +73,7 @@ namespace Pix {
 			// terrain placement in world coordinated (mainly for multi-terrain).
 			// REMEMBER YOUR TERRAIN MODEL MUST HAVE THE ORIGIN AT THE TOP LEFT (0,0) - no negative vertexes !
 			// This is required to ease queries to the heightmap (coordinates will exactly match)
-			{0,0},
+			{0, 0},
 			
 			// height (Y) model scale. As our Heightmap texture is normalized, we need to know the maximum height (+Y)
 			// on the loaded model, so we can translate the heighmap normalized value into world coordinates.
@@ -89,28 +90,26 @@ namespace Pix {
 	
 	void BallWorld::tick(Pix::Fu *engine, float fElapsedTime) {
 		World::tick(engine, fElapsedTime);
-		processCollisions(pMap->vecLines, fElapsedTime);
+		processCollisions(fElapsedTime);
 	}
 
 
 	void BallWorld::processStaticCollision(Ball *ball, Ball *target) {
 
 		glm::vec3 displacement = ball->calculateOverlapDisplacement(target);
-		
-		if (!ball->ISSTATIC) {
-			// Displace Current Ball away from collision
-			ball->mPosition.x -= displacement.x;
-			ball->mPosition.y -= displacement.y;
-			ball->mPosition.z -= displacement.z;
-		}
 
-		if (!target->ISSTATIC) {
-			// Displace Target Ball away from collision
-			target->mPosition.x += displacement.x;
-			target->mPosition.y += displacement.y;
-			target->mPosition.z += displacement.z;
-		}
+		// Displace balls according to their mass
+		float K = target->mass() / ( ball->mass() + target->mass() );
 
+		// Displace Current Ball away from collision
+		ball->mPosition.x -= K*displacement.x;
+		ball->mPosition.y -= K*displacement.y;
+		ball->mPosition.z -= K*displacement.z;
+
+		// Displace Target Ball away from collision
+		target->mPosition.x += (1-K) * displacement.x;
+		target->mPosition.y += (1-K) * displacement.y;
+		target->mPosition.z += (1-K) * displacement.z;
 	}
 
 	void BallWorld::processDynamicCollision(Ball *b1, Ball *b2, float fElapsedTime) {
@@ -140,17 +139,17 @@ namespace Pix {
 		float dpNorm2 = b2->mSpeed.x * nx + b2->mSpeed.z * nz;
 
 		// Conservation of momentum in 1D
-		float m1 = EFFICIENCY *
+		float m1 = b1->CONFIG.crashEfficiency *
 				   (dpNorm1 * (b1->mass() - b2->mass()) + 2.0F * b2->mass() * dpNorm2) /
 				   (b1->mass() + b2->mass());
 
-		float m2 = EFFICIENCY *
+		float m2 = b2->CONFIG.crashEfficiency *
 				   (dpNorm2 * (b2->mass() - b1->mass()) + 2.0F * b1->mass() * dpNorm1) /
 				   (b1->mass() + b2->mass());
 
 		// Update ball velocities
-		glm::vec3 newSpeed1 = b1->ISSTATIC ? glm::vec3 {0.0F,0.0F,0.0F} : glm::vec3 {tx * dpTan1 + nx * m1, b1->mSpeed.y, tz * dpTan1 + nz * m1};
-		glm::vec3 newSpeed2 = b2->ISSTATIC ? glm::vec3 {0.0F,0.0F,0.0F} : glm::vec3 {tx * dpTan2 + nx * m2, b2->mSpeed.y, tz * dpTan2 + nz * m2};
+		glm::vec3 newSpeed1 = glm::vec3 {tx * dpTan1 + nx * m1, b1->mSpeed.y, tz * dpTan1 + nz * m1};
+		glm::vec3 newSpeed2 = glm::vec3 {tx * dpTan2 + nx * m2, b2->mSpeed.y, tz * dpTan2 + nz * m2};
 
 		b1->onCollision(b2, newSpeed1, fElapsedTime);
 		b2->onCollision(b1, newSpeed2, fElapsedTime);
@@ -163,9 +162,10 @@ namespace Pix {
 		return ball;
 	}
 
-	long BallWorld::processCollisions(const std::vector<LineSegment_t> &edges, float fElapsedTime) {
+	long BallWorld::processCollisions(float fElapsedTime) {
 
 		const long crono = nowns();
+		const std::vector<LineSegment_t> &edges = pMap->vecLines;
 
 		vFakeBalls.clear();
 		vCollidingPairs.clear();
@@ -226,18 +226,13 @@ namespace Pix {
 				return pnow()-crono;
 #endif
 
-				long times[4] = {0};
-				times[0] = nowns();
-
 				// Work out static collisions with walls and displace balls so no overlaps
 
-				iterateObjects([this, &edges, &times](WorldObject *b) {
+				iterateObjects([this, &edges](WorldObject *b) {
 
 					if (b->CLASSID != Ball::CLASSID) return;
 
 					Ball *ball = (Ball *) b;
-
-					long t2 = nowns();
 
 					if (!ball->ISSTATIC && !ball->bDisabled)
 						for (auto &edge : edges) {
@@ -308,9 +303,6 @@ namespace Pix {
 							}
 						}
 
-					times[1] = nowns() - t2;
-					t2 = nowns();
-
 					// Against other balls
 					iterateObjects([ball, this](WorldObject *targ) {
 
@@ -354,13 +346,11 @@ namespace Pix {
 						}
 					});
 
-					times[2] = nowns() - t2;
-
 					ball->commitSimulation();
 				});
 
 				if (DBG)
-					LogV(TAG, SF("iterate %ld, edges %ld, balls %ld, collid %d, future %d", nowns() - times[0], times[1], times[2],
+					LogV(TAG, SF("iterate %ld, collid %d, future %d", nowns() - crono,
 								 vCollidingPairs.size(), vFutureColliders.size()));
 
 				// Now work out dynamic collisions
@@ -379,7 +369,6 @@ namespace Pix {
 			}
 
 		}
-		if (DBG) LogV(TAG, SF("total %ld", nowns() - crono));
 		return nowns() - crono;
 	}
 }

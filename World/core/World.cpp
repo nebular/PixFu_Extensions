@@ -11,6 +11,7 @@
 #include "World.hpp"
 #include "WorldMeta.hpp"
 #include "Fu.hpp"
+#include "Config.hpp"
 #include "OpenGL.h"
 
 #pragma clang diagnostic push
@@ -75,7 +76,8 @@ namespace Pix {
 
 		}
 	
-		world->canvas()->drawCircle(static_cast<int32_t>(pos().x), static_cast<int32_t>(pos().z), static_cast<int32_t>(radius()), Pix::Colors::RED);
+		if (DBG_WIRE)
+			world->canvas()->drawCircle(static_cast<int32_t>(pos().x), static_cast<int32_t>(pos().z), static_cast<int32_t>(radius()), Pix::Colors::RED);
 		
 	}
 
