@@ -81,10 +81,7 @@ namespace Pix {
 			// on the loaded model, so we can translate the heighmap normalized value into world coordinates.
 			// MIND THAT NO SCALING IS PERFORMED ON THE MODEL, this is the opposite, we learn about the loaded model
 			// height to connect it with our separate heightmap, that we use for example to stick objects to the ground.
-			pMap->fModelScale,
-
-			// render a wireframe grid over the texture. You can also access that canvas and draw additional stuff.
-			true
+			pMap->fModelScale
 			
 		});
 

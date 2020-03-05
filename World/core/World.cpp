@@ -37,6 +37,8 @@ namespace Pix {
 
 	World::World(WorldConfig_t config)
 			: CONFIG(std::move(config)) {
+				if (config.debugMode==DEBUG_WIREFRAME)
+					LayerVao::DRAWMODE=GL_LINES;
 	};
 
 	World::~World() {
@@ -76,7 +78,7 @@ namespace Pix {
 
 		}
 	
-		if (DBG_WIRE)
+		if (world->CONFIG.debugMode==DEBUG_COLLISIONS)
 			world->canvas()->drawCircle(static_cast<int32_t>(pos().x), static_cast<int32_t>(pos().z), static_cast<int32_t>(radius()), Pix::Colors::RED);
 		
 	}
@@ -192,7 +194,8 @@ namespace Pix {
 
 		glDisable(GL_DEPTH_TEST);
 		
-		if (DBG_WIRE) canvas()->blank();
+		if (CONFIG.debugMode==DEBUG_COLLISIONS)
+			canvas()->blank();
 
 	}
 
