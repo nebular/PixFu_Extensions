@@ -7,8 +7,9 @@
 // Created by rodo on 2020-02-17.
 //
 
+#include <utility>
 #include "World.hpp"
- #include <utility> #include "WorldMeta.hpp"
+#include "WorldMeta.hpp"
 #include "Fu.hpp"
 #include "OpenGL.h"
 
