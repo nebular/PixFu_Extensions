@@ -140,6 +140,7 @@ namespace Pix {
 	 * adjust pitch/yaw
 	 */
 
+
 	void Camera::inputKey(CameraKeyControlMode_t mode, bool up, bool down, bool left, bool right, float percent, float fElapsedTime) {
 
 		mCameraMode = mode;

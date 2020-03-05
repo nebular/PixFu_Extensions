@@ -180,14 +180,15 @@ namespace Pix {
 
 		if (!vObjects.empty()) {
 
+			// configure object shader
 			pShaderObjects->use();
 			pShaderObjects->loadViewMatrix(pCamera);
 			pShaderObjects->loadLight(pLight);
 
+			// draw each cluster
 			for (ObjectCluster *object:vObjects) {
 				object->render(pShaderObjects);
 			}
-
 
 			pShaderObjects->stop();
 			if (DBG) OpenGlUtils::glError("terrain tick");
