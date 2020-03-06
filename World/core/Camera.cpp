@@ -1,6 +1,11 @@
 //
-//  Camera.cpp
-//  PixEngine
+//  Camera.hpp
+//  PixFu World Extensoin
+//
+//  An abstract camera class that processes input and calculates the corresponding Euler Angles,
+//	Vectors and Matrices for use in OpenGL
+//
+//  I learnt everything from https://learnopengl.com/Getting-started/Camera
 //
 //  Created by rodo on 19/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
@@ -27,20 +32,14 @@ namespace Pix {
 	Camera::Camera(CameraConfig_t configuration) :
 		CONFIG(configuration),
 		mPosition(configuration.position),
+		mUpVector(configuration.upVector),
 		mInterpolatedPosition(configuration.position),
 		fYaw(configuration.yaw),
 		fPitch(configuration.pitch),
-		fRoll(0.00F),
+		fRoll(configuration.roll),
 		bSmooth(configuration.smooth),
-		mMouseSensitivity(CameraConfig_t::DEF_MOUSE_SENS),
-		mMouseZoom(CameraConfig_t::DEF_ZOOM) {
-
- 	/*
- 	 * 			bSmooth(configuration.smooth),
-			mMouseSensitivity(CameraC DEF_MOUSE_SENS),
-			mMouseZoom(DEF_ZOOM)
- 	 * */
-
+		mMouseSensitivity(DEF_MOUSE_SENS),
+		mMouseZoom(DEF_ZOOM) {
 		updateCameraVectors();
 	}
 
