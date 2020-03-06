@@ -199,7 +199,7 @@ namespace Pix {
 					Ball *ball = (Ball *) w;
 
 					// Set balls time to maximum for this epoch
-					if (j==0)
+					if (j == 0)
 						ball->fSimTimeRemaining = fSimElapsedTime;
 
 					if (!ball->bDisabled) {

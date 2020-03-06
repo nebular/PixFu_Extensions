@@ -305,15 +305,7 @@ namespace Pix {
 
 			// downhill
 
-			if (mPosition.y - cheight < FEATURES_FALL_LIMIT) {
-				// gong down
-				fHeightTerrain = cheight;
-
-			} else {
-				// fell from high
-				// std::cerr << "GOING DOWN !!" << std::endl;
-				fHeightTerrain = cheight;
-			}
+			fHeightTerrain = cheight;
 
 		} else if (mPosition.y < cheight) {
 
@@ -324,7 +316,7 @@ namespace Pix {
 			// impose penalties on the speed depending on the gradient
 
 			float delta = cheight - mPosition.y;
-			if (delta < RIDEHEIGHT_SEAMLESS) {
+			if (delta < CONFIG.terrain.RIDEHEIGHT_SEAMLESS) {
 
 				// we can ride seamlessly across this irregularity
 
@@ -337,8 +329,8 @@ namespace Pix {
 				// The terrain is pretty irregular, so impose a penalty on the car performance.
 				// fPenalty is the percent of penalty to impose, 0  stops the car, 1 unaffected
 
-				fPenalty = FEATURES_SCRATCHING_NEW +
-						   (1 - fmin(delta, FEATURES_CLIMB_LIMIT) / FEATURES_CLIMB_LIMIT) * (1 - FEATURES_SCRATCHING_NEW);
+				fPenalty = CONFIG.terrain.SCRATCHING_NEW +
+						   (1 - fmin(delta, CONFIG.terrain.CLIMB_LIMIT) / CONFIG.terrain.CLIMB_LIMIT) * (1 - CONFIG.terrain.SCRATCHING_NEW);
 
 				mSpeed *= fPenalty;    // this only affects human player as CPU uses acceleration to drive
 				// TODO acceleration?

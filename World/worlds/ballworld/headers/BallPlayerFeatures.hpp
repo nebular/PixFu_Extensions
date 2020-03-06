@@ -20,22 +20,7 @@ namespace Pix {
 		/** TODO max speed backwards */
 		const float MAXSPEEDBACK = 50;
 		/** Maximum Steer Angle */
-		const float MAXSTEERANGLE = M_PI / 4;
-		
-		const float FRICTION = 0.001;                // speed lose on no gas. change this name, it is not friction.
-		const float ACCELERATION = 0.003;            // max car acceleration
-		const float HANDLING = 18;//12;				// max turn angle (value is not an angle, but related to it), higher = sharper
-		const float TRACTION = 2;                    // turn speed and back to center on no turn input
-		const float TURNPERFORMANCE = 0.01; //0.03;	// speed lose on turns. Beware has to be in the 0.0xx order
-
-		/** (heightmap collisions) height difference to consider a fall rather than just climb down */
-		const float FALL_LIMIT = 0.3;
-		/** (heightmap collisions) height difference to consider a wreck against a wall rather than just climb up */
-		const float CLIMB_LIMIT = 0.3;
-		/**(heightmap collisions) height difference to consider a wreck against a wall rather than just climb up */
-		const float CLIMB_EASY = 0.06;
-		/** heightmap: speed lose on height change (1 = none) */
-		const float SCRATCHING = 0.96;                //
+		const float MAXSTEERANGLE = (float) M_PI / 4;
 
 		const float SCALE = 1.0;                    // player scale
 		const float MASS = 1000;                    // player mass in kg
@@ -47,6 +32,7 @@ namespace Pix {
 
 		const ObjectProperties_t OBJECT;
 		const BallPlayerFeatures_t FEATURES;
+
 		//	const Weapon_t *pActiveWeapon = nullptr;	// player active weapon
 		//	const Weapon_t *pPassiveWeapon = nullptr;	// other player's weapon side effects
 
@@ -56,7 +42,6 @@ namespace Pix {
 
 //		void setActiveWeapon(const Weapon_t *weapon, Ball *player);
 //		void setPassiveWeapon(const Weapon_t *weapon, Ball *player, bool enable = true);
-
 
 		/** Used: The wheel distance as percent of raduis */
 		float wheelBase() const;
@@ -70,26 +55,6 @@ namespace Pix {
 		float maxSpeedBack() const;
 
 		float maxSteerAngle() const;
-		
-		
-		
-		float maxAcceleration() const;
-
-		float friction() const;
-
-		float handling() const;
-
-		float traction(float multiplier = 1.0) const;
-
-		float turnPerformance(float multiplier = 1.0) const;
-
-		float fallLimit() const;
-
-		float climbLimit() const;
-
-		float climbEasy() const;
-
-		float scratching() const;
 
 		float mass() const;
 
@@ -103,60 +68,46 @@ namespace Pix {
 			OBJECT(std::move(objectMeta)),
 			FEATURES(std::move(features)) {}
 
-/*
-inline void PlayerFeatures::setActiveWeapon(const Weapon_t *weapon, Ball *player)  {
-	pActiveWeapon = weapon;
-	player->setMassMultiplier(weapon == nullptr || weapon->massMultiplier == 0 ? 1.0 : weapon->massMultiplier);
-	player->setRadiusMultiplier(weapon == nullptr || weapon->scaleMultiplier == 0 ? 1.0 : weapon->scaleMultiplier);
-}
-
-inline void PlayerFeatures::setPassiveWeapon(const Weapon_t *weapon, Ball *player, bool enable) {
-	if (!enable && weapon != nullptr) {
-		if (weapon != pPassiveWeapon) {
-			// disable passive weapon, but there is other later passive weapon active that replaced
-			// this one
-			return;
-		} else {
-			weapon = nullptr;
-		}
+	/*
+	inline void PlayerFeatures::setActiveWeapon(const Weapon_t *weapon, Ball *player)  {
+		pActiveWeapon = weapon;
+		player->setMassMultiplier(weapon == nullptr || weapon->massMultiplier == 0 ? 1.0 : weapon->massMultiplier);
+		player->setRadiusMultiplier(weapon == nullptr || weapon->scaleMultiplier == 0 ? 1.0 : weapon->scaleMultiplier);
 	}
-	pPassiveWeapon = weapon;
-	player->setMassMultiplier(weapon == nullptr || weapon->massMultiplier == 0 ? 1.0 : weapon->massMultiplier);
-	player->setRadiusMultiplier(weapon == nullptr || weapon->scaleMultiplier == 0 ? 1.0 : weapon->scaleMultiplier);
-}
-*/
-	inline float BallPlayerFeatures::wheelBase() const {
-		return OBJECT.radius * 1.7F;
-	} // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
+
+	inline void PlayerFeatures::setPassiveWeapon(const Weapon_t *weapon, Ball *player, bool enable) {
+		if (!enable && weapon != nullptr) {
+			if (weapon != pPassiveWeapon) {
+				// disable passive weapon, but there is other later passive weapon active that replaced
+				// this one
+				return;
+			} else {
+				weapon = nullptr;
+			}
+		}
+		pPassiveWeapon = weapon;
+		player->setMassMultiplier(weapon == nullptr || weapon->massMultiplier == 0 ? 1.0 : weapon->massMultiplier);
+		player->setRadiusMultiplier(weapon == nullptr || weapon->scaleMultiplier == 0 ? 1.0 : weapon->scaleMultiplier);
+	}
+	*/
+
+	inline float
+	BallPlayerFeatures::wheelBase() const { return OBJECT.radius * 1.7F; }
 
 	inline float
 	BallPlayerFeatures::maxSpeed() const { return FEATURES.MAXSPEED; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
-
-	inline float BallPlayerFeatures::speedPercent(float speed) const {
-		return (float) fmin(fabs(speed) / FEATURES.MAXSPEED, 1);
-	}
+	inline float BallPlayerFeatures::speedPercent(float speed) const { return (float) fmin(fabs(speed) / FEATURES.MAXSPEED, 1); }
 
 	inline float
 	BallPlayerFeatures::maxSpeedBack() const { return FEATURES.MAXSPEEDBACK; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
-	inline float BallPlayerFeatures::maxSteerAngle() const { return FEATURES.MAXSTEERANGLE; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 
-	inline float BallPlayerFeatures::maxAcceleration() const { return FEATURES.ACCELERATION; } // todo
-	inline float BallPlayerFeatures::friction() const { return FEATURES.FRICTION; } // todo
-	inline float BallPlayerFeatures::handling() const { return FEATURES.HANDLING; } // todo
-	inline float BallPlayerFeatures::traction(float multiplier) const { return FEATURES.TRACTION * multiplier; }
-
-	inline float BallPlayerFeatures::turnPerformance(float multiplier) const { return FEATURES.TURNPERFORMANCE * multiplier; }
-
-	inline float BallPlayerFeatures::fallLimit() const { return FEATURES.FALL_LIMIT; }
-
-	inline float BallPlayerFeatures::climbLimit() const { return FEATURES.CLIMB_LIMIT; }
-
-	inline float BallPlayerFeatures::climbEasy() const { return FEATURES.CLIMB_EASY; }
-
-	inline float BallPlayerFeatures::scratching() const { return FEATURES.SCRATCHING; }
+	inline float
+	BallPlayerFeatures::maxSteerAngle() const { return FEATURES.MAXSTEERANGLE; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 
 	inline float
 	BallPlayerFeatures::mass() const { return FEATURES.MASS; } //  * (pActiveWeapon!=nullptr?pActiveWeapon->massMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->massMultiplier: 1.0); }
+
 	inline float
 	BallPlayerFeatures::scale() const { return FEATURES.SCALE; } // * (pActiveWeapon!=nullptr?pActiveWeapon->scaleMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->scaleMultiplier: 1.0); }
+
 }
