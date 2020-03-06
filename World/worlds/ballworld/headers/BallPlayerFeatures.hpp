@@ -15,18 +15,28 @@ namespace Pix {
 	// TODO most are not used, review and remove
 	typedef struct sBallPlayerFeatures {
 
-		const float MAXSPEED = 160;                // max speed in m/h, 0.15 = 150 km/h and kind of makes sense for the map
-		const float MAXSPEEDBACK = 50;            // max speed backwards
-
+		/** Max Speed in km/h */
+		const float MAXSPEED = 160;
+		/** TODO max speed backwards */
+		const float MAXSPEEDBACK = 50;
+		/** Maximum Steer Angle */
+		const float MAXSTEERANGLE = M_PI / 4;
+		
 		const float FRICTION = 0.001;                // speed lose on no gas. change this name, it is not friction.
 		const float ACCELERATION = 0.003;            // max car acceleration
 		const float HANDLING = 18;//12;				// max turn angle (value is not an angle, but related to it), higher = sharper
 		const float TRACTION = 2;                    // turn speed and back to center on no turn input
 		const float TURNPERFORMANCE = 0.01; //0.03;	// speed lose on turns. Beware has to be in the 0.0xx order
-		const float FALL_LIMIT = 0.3;                // (heightmap collisions) height difference to consider a fall rather than just climb down
-		const float CLIMB_LIMIT = 0.3; // 0.2;		// (heightmap collisions) height difference to consider a wreck against a wall rather than just climb up
-		const float CLIMB_EASY = 0.06;                // (heightmap collisions) height difference to consider a wreck against a wall rather than just climb up
-		const float SCRATCHING = 0.96;                // speed lose on height change (1 = none)
+
+		/** (heightmap collisions) height difference to consider a fall rather than just climb down */
+		const float FALL_LIMIT = 0.3;
+		/** (heightmap collisions) height difference to consider a wreck against a wall rather than just climb up */
+		const float CLIMB_LIMIT = 0.3;
+		/**(heightmap collisions) height difference to consider a wreck against a wall rather than just climb up */
+		const float CLIMB_EASY = 0.06;
+		/** heightmap: speed lose on height change (1 = none) */
+		const float SCRATCHING = 0.96;                //
+
 		const float SCALE = 1.0;                    // player scale
 		const float MASS = 1000;                    // player mass in kg
 
@@ -48,15 +58,21 @@ namespace Pix {
 //		void setPassiveWeapon(const Weapon_t *weapon, Ball *player, bool enable = true);
 
 
-
+		/** Used: The wheel distance as percent of raduis */
 		float wheelBase() const;
 
+		/** Used: returns speed percent r/ maximum speed*/
 		float speedPercent(float speed) const;
 
+		/** Used: return max speed */
 		float maxSpeed() const;
 
 		float maxSpeedBack() const;
 
+		float maxSteerAngle() const;
+		
+		
+		
 		float maxAcceleration() const;
 
 		float friction() const;
@@ -122,6 +138,7 @@ inline void PlayerFeatures::setPassiveWeapon(const Weapon_t *weapon, Ball *playe
 
 	inline float
 	BallPlayerFeatures::maxSpeedBack() const { return FEATURES.MAXSPEEDBACK; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
+	inline float BallPlayerFeatures::maxSteerAngle() const { return FEATURES.MAXSTEERANGLE; } // * (pActiveWeapon!=nullptr?pActiveWeapon->maxSpeedMultiplier : pPassiveWeapon != nullptr ? pPassiveWeapon->maxSpeedMultiplier: 1.0); }
 
 	inline float BallPlayerFeatures::maxAcceleration() const { return FEATURES.ACCELERATION; } // todo
 	inline float BallPlayerFeatures::friction() const { return FEATURES.FRICTION; } // todo

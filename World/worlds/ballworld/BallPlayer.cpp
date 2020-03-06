@@ -189,7 +189,7 @@ namespace Pix {
 
 	void BallPlayer::steer(float perc, float fElapsedTime) {
 		//	fSteerAngle = perc * M_PI / 512; // * (- log2(fabs(speedPercent()) + 0.000001));
-		fSteerAngle = static_cast<float>(perc * M_PI / 4 * (1 - 0.85 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
+		fSteerAngle = static_cast<float>(perc * FEATURES->steerAngle() * (1 - 0.85 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
 
 	}
 
