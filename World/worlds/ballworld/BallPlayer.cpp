@@ -10,8 +10,8 @@
 
 namespace Pix {
 
-	BallPlayer::BallPlayer(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location)
-			: Ball(world->CONFIG, std::move(objectMeta), location),
+	BallPlayer::BallPlayer(World *world, ObjectProperties_t& objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location)
+			: Ball(world->CONFIG, objectMeta, location),
 			  FEATURES(new BallPlayerFeatures(objectMeta, features)) {
 	}
 
@@ -93,11 +93,14 @@ namespace Pix {
 		float ang = fCalcDirection;
 
 		if (debug) {
-			glm::vec2 r = glm::rotate(glm::vec2(40, 0), ang - steerAngle);
+
+			const float TAIL = 40.0F;
+
+			glm::vec2 r = glm::rotate(glm::vec2(TAIL, 0), ang - steerAngle);
 			canvas->drawLine(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), static_cast<int32_t>(mPosition.x + r.x),
 							 static_cast<int32_t>(mPosition.z + r.y),
 							 Pix::Colors::RED);
-			r = glm::rotate(glm::vec2(40.0F, 0), ang);
+			r = glm::rotate(glm::vec2(TAIL, 0), ang);
 			canvas->drawLine(static_cast<int32_t>(mPosition.x), static_cast<int32_t>(mPosition.z), static_cast<int32_t>(mPosition.x + r.x),
 							 static_cast<int32_t>(mPosition.z + r.y),
 							 Pix::Colors::GREEN);

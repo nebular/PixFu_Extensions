@@ -22,7 +22,7 @@ namespace Pix {
 
 		float fSteerAngle = 0;
 
-		BallPlayer(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location);
+		BallPlayer(World *world, ObjectProperties_t& objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location);
 
 		virtual void process(World *world, float fTime);
 

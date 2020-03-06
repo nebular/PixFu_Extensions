@@ -12,7 +12,7 @@
 
 namespace Pix {
 
-	ObjectShader::ObjectShader(std::string name) : Shader(std::move(name)) {}
+	ObjectShader::ObjectShader(const std::string& name) : Shader(std::move(name)) {}
 
 	void ObjectShader::bindAttributes() {
 		bindAttribute(0, "position");

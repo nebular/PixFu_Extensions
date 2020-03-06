@@ -14,6 +14,7 @@
 #include "glm/gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "err_ovl_ambiguous_call"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "err_ovl_no_viable_member_function_in_call"
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
@@ -21,38 +22,25 @@
 
 namespace Pix {
 
-	constexpr glm::vec3 Camera::DEF_UPVECTOR;
-	constexpr glm::vec3 Camera::DEF_FRONTVECTOR;
+	// Constructor with vectors
 
-	constexpr float Camera::STEP;
-	constexpr float Camera::DEF_YAW;
-	constexpr float Camera::DEF_PITCH;
-	constexpr float Camera::DEF_HEIGHT;
-	constexpr float Camera::DEF_MOUSE_SENS;
-	constexpr float Camera::DEF_ZOOM;
+	Camera::Camera(CameraConfig_t configuration) :
+		CONFIG(configuration),
+		mPosition(configuration.position),
+		mInterpolatedPosition(configuration.position),
+		fYaw(configuration.yaw),
+		fPitch(configuration.pitch),
+		fRoll(0.00F),
+		bSmooth(configuration.smooth),
+		mMouseSensitivity(CameraConfig_t::DEF_MOUSE_SENS),
+		mMouseZoom(CameraConfig_t::DEF_ZOOM) {
 
-// Constructor with vectors
+ 	/*
+ 	 * 			bSmooth(configuration.smooth),
+			mMouseSensitivity(CameraC DEF_MOUSE_SENS),
+			mMouseZoom(DEF_ZOOM)
+ 	 * */
 
-	Camera::Camera(
-			glm::vec3 initialPosition,
-			float initialYaw,
-			float initialPitch,
-			glm::vec3 upVector,
-			bool smooth,
-			float smoothLerp,
-			float distanceLerp) :
-			UPVECTOR(upVector),
-			mFrontVector(DEF_FRONTVECTOR),
-			bSmooth(smooth),
-			SMOOTHLERP(smoothLerp),
-			mMouseSensitivity(DEF_MOUSE_SENS),
-			mMouseZoom(DEF_ZOOM),
-			DISTANCELERP(distanceLerp) {
-
-		mPosition = mInterpolatedPosition = initialPosition;
-		fYaw = initialYaw;
-		fRoll = 0;
-		fPitch = initialPitch;
 		updateCameraVectors();
 	}
 
@@ -97,16 +85,21 @@ namespace Pix {
 
 	void Camera::update(float fElapsedTime) {
 
-		fPlayerDistanceFar += (fTargetDistance - fPlayerDistanceFar) * DISTANCELERP * fElapsedTime;
+		fPlayerDistanceFar += (fTargetDistance - fPlayerDistanceFar) * CONFIG.lerpDistance * fElapsedTime;
 
 		if (bTargetMode) {
 
-			float lerp = 15; // 0.1;
+			float lerp = CONFIG.lerpAngle; // 0.1;
 			float diff = fabs(fTargetAngle - fYaw);
+
+			// when this is false means 99% we are in the discontinuity
+			// from -PI to PI, so in that case we skip the lerp so it
+			// doesnt do a full circle bac to the negaive or positive angle.
 
 			if (bSmooth && diff < 15 * M_PI / 8) {
 
-				if (diff > M_PI / 16) lerp = 2;
+				// if there is a big delta, make lerp faster
+				if (diff > M_PI / 16) lerp = CONFIG.lerpAngle / 5;
 
 				fYaw += (fTargetAngle - fYaw) * lerp * fElapsedTime;
 
@@ -128,8 +121,8 @@ namespace Pix {
 				mPosition = mTargetPosition;
 			}
 
-			inputMovement(CM_BACKWARD, fPlayerDistanceFar, 0.08);
-			inputMovement(CM_UP, fPlayerDistanceUp, 0.08);
+			inputMovement(CM_BACKWARD, fPlayerDistanceFar, 0.08F);
+			inputMovement(CM_UP, fPlayerDistanceUp, 0.08F);
 		}
 
 	}
@@ -219,12 +212,12 @@ namespace Pix {
 
 	void Camera::inputMouseWheel(float yoffset) {
 
-		if (mMouseZoom >= 1.0f && mMouseZoom <= 45.0f)
+		if (mMouseZoom >= 1.0F && mMouseZoom <= 45.0f)
 			mMouseZoom -= yoffset;
-		if (mMouseZoom <= 1.0f)
-			mMouseZoom = 1.0f;
-		if (mMouseZoom >= 45.0f)
-			mMouseZoom = 45.0f;
+		if (mMouseZoom <= 1.0F)
+			mMouseZoom = 1.0F;
+		if (mMouseZoom >= 45.0F)
+			mMouseZoom = 45.0F;
 
 	}
 
@@ -232,7 +225,7 @@ namespace Pix {
 
 		// Calculate the new Front vector
 
-		glm::vec3 front = {
+		const glm::vec3 front = {
 				cosf(fYaw) * cosf(fPitch),
 				sinf(fPitch),
 				sinf(fYaw) * cosf(fPitch)
@@ -244,7 +237,7 @@ namespace Pix {
 
 		// todo this fancy fastnormalize is supposedly much less accurate but is it enough?
 		mFrontVector = glm::fastNormalize(front);
-		mRightVector = glm::fastNormalize(glm::cross(mFrontVector, UPVECTOR));
+		mRightVector = glm::fastNormalize(glm::cross(mFrontVector, CONFIG.upVector));
 		mUpVector = glm::fastNormalize(glm::cross(mRightVector, mFrontVector));
 
 	}

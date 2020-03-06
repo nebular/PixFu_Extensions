@@ -35,8 +35,8 @@ namespace Pix {
 	std::map<int, ObjectDbEntry_t> ObjectDb::Database;
 
 
-	World::World(WorldConfig_t config)
-			: CONFIG(std::move(config)) {
+	World::World(WorldConfig_t &config)
+			: CONFIG(config) {
 		if (config.debugMode == DEBUG_WIREFRAME)
 			LayerVao::DRAWMODE = GL_LINES;
 	};
@@ -221,8 +221,7 @@ namespace Pix {
 		if (flipY) flipMatrix[1][1] = -1.0F;
 		if (flipZ) flipMatrix[2][2] = -1.0F;
 
-
-		glm::mat4 matrix = glm::identity<glm::mat4>();
+		auto matrix = glm::identity<glm::mat4>();
 
 		matrix = glm::translate(matrix, translation);
 		matrix = glm::rotate(matrix, rxrads, {1.0F, 0.0F, 0.0F});
