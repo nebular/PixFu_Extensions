@@ -33,11 +33,11 @@ namespace Pix {
 		CONFIG(configuration),
 		mPosition(configuration.position),
 		mUpVector(configuration.upVector),
-		mInterpolatedPosition(configuration.position),
 		fYaw(configuration.yaw),
 		fPitch(configuration.pitch),
 		fRoll(configuration.roll),
 		bSmooth(configuration.smooth),
+		mInterpolatedPosition(configuration.position),
 		mMouseSensitivity(DEF_MOUSE_SENS),
 		mMouseZoom(DEF_ZOOM) {
 		updateCameraVectors();

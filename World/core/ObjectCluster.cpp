@@ -43,7 +43,7 @@ namespace Pix {
 		// load mesh texxtures TODO parse materials properly
 		for (int i = 0; i < pLoader->meshCount(); i++) {
 			if (DBG) LogV(TAG, SF("- texture %s, name %d", NAME.c_str(), i));
-			vTextures.push_back(new Texture2D("objects/" + NAME + "/" + NAME + "-" + std::to_string(i) + ".png"));
+			vTextures.emplace_back(new Texture2D("objects/" + NAME + "/" + NAME + "-" + std::to_string(i) + ".png"));
 		}
 
 		mPlacer = PLACER.toMatrix();
@@ -56,7 +56,7 @@ namespace Pix {
 	void ObjectCluster::add(WorldObject *object) {
 //		glm::vec3 pos = object->pos();
 // TODO	if (setHeight) pos.y = WORLD->getHeight(pos);
-		vInstances.push_back(object);
+		vInstances.emplace_back(object);
 		if (DBG) LogV(TAG, SF("Add to cluster %s, total %d", NAME.c_str(), vInstances.size()));
 	}
 

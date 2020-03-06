@@ -25,7 +25,7 @@ namespace Pix {
 	float Ball::stfBaseScale = 1.0;
 	float Ball::stfHeightScale = 1.0;
 
-	Ball::Ball(const WorldConfig_t &planetConfig, ObjectProperties_t meta, ObjectLocation_t location, int overrideId)
+	Ball::Ball(const WorldConfig_t &planetConfig, ObjectProperties_t& meta, ObjectLocation_t location, int overrideId)
 			: WorldObject(planetConfig, meta, Pix::ObjectLocation_t(), CLASSID, overrideId),
 			  ISSTATIC(meta.ISSTATIC),
 			  mPosition(location.position),
@@ -41,7 +41,7 @@ namespace Pix {
 	Ball::Ball(const WorldConfig_t &planetConfig, float radi, float mass, glm::vec3 position, glm::vec3 speed) :
 			Ball(
 					planetConfig,
-					ObjectProperties_t{"FAKE", radi, mass, 0.8},
+					ObjectProperties_t{"FAKE", radi, mass, 0.8F},
 					ObjectLocation_t{position, {0, 0, 0}, speed},
 					FAKE_BALL_ID
 			) {
@@ -200,7 +200,7 @@ namespace Pix {
 
 	}
 
-	void Ball::processGravity(World *world, float fTime) {
+	void Ball::processGravity(float fTime) {
 
 
 		// if there is acceleration (not counting earths) and object is not at terrain level
@@ -232,7 +232,7 @@ namespace Pix {
 
 			bFlying = mPosition.y - fHeightTerrain > 0.1F; // verTerrainAfter;
 
-			mAcceleration.y *= 0.9F;
+			mAcceleration.y *= CONFIG.aero.air_vertical;
 
 			if (mAcceleration.y < STABLE)
 				mAcceleration.y = 0;
@@ -376,7 +376,7 @@ namespace Pix {
 #endif
 		}
 
-		processGravity(world, fTime);
+		processGravity(fTime);
 		return nullptr;
 	}
 

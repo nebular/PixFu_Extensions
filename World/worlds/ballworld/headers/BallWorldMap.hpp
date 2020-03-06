@@ -37,7 +37,7 @@ namespace Pix {
 		float fTrackWidth = 20.0f;
 		float fModelScale = 0.1f;
 
-		bool loadV3(std::string filename, int scaleFactor = 0);
+		bool loadV3(const std::string& filename, int scaleFactor = 0);
 
 		bool saveV3(std::string filename, int scaleFactor = 0);
 
@@ -49,7 +49,7 @@ namespace Pix {
 
 		bool bEmpty = true;
 
-		std::string getPath(std::string filzwename);
+		std::string getPath(const std::string& filzwename);
 
 	public:
 

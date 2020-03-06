@@ -35,21 +35,20 @@
 #include "glm/gtx/fast_square_root.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 #pragma ide diagnostic ignored "OCSimplifyInspection"
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 namespace Pix {
 
-	std::string BallWorld::TAG = "BallWorld";
-
 	// heigh over which
 	constexpr int HEIGHT_EDGE_FLYOVER = 100;
 
-	BallWorld::BallWorld(std::string levelName, WorldConfig_t config) :
-			World(std::move(config)) {
+	BallWorld::BallWorld(const std::string &levelName, WorldConfig_t &config) :
+			World(config) {
 		vObjects.clear();
-		load(std::move(levelName));
+		load(levelName);
 	}
 
 	void BallWorld::load(const std::string &levelName) {
@@ -116,41 +115,41 @@ namespace Pix {
 	void BallWorld::processDynamicCollision(Ball *b1, Ball *b2, float fElapsedTime) {
 
 		//	auto grados = [](float rads) { return std::to_string(rads*180/PI); };
-		glm::vec3 pos1 = b1->mPosition;
-		glm::vec3 pos2 = b2->mPosition;
+		glm::vec3 &pos1 = b1->mPosition;
+		glm::vec3 &pos2 = b2->mPosition;
 
 		// Distance between balls TODO
-		float fDistance = glm::fastSqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
-										+ (pos1.z - pos2.z) * (pos1.z - pos2.z));
+		const float fDistance = glm::fastSqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
+											  + (pos1.z - pos2.z) * (pos1.z - pos2.z));
 
 		// Normal
-		float nx = (pos2.x - pos1.x) / fDistance;
-		float nz = (pos2.z - pos1.z) / fDistance;
+		const float nx = (pos2.x - pos1.x) / fDistance;
+		const float nz = (pos2.z - pos1.z) / fDistance;
 
 		// Tangent
-		float tx = -nz;
-		float tz = nx;
+		const float tx = -nz;
+		const float tz = nx;
 
 		// Dot Product Tangent
-		float dpTan1 = b1->mSpeed.x * tx + b1->mSpeed.z * tz;
-		float dpTan2 = b2->mSpeed.x * tx + b2->mSpeed.z * tz;
+		const float dpTan1 = b1->mSpeed.x * tx + b1->mSpeed.z * tz;
+		const float dpTan2 = b2->mSpeed.x * tx + b2->mSpeed.z * tz;
 
 		// Dot Product Normal
-		float dpNorm1 = b1->mSpeed.x * nx + b1->mSpeed.z * nz;
-		float dpNorm2 = b2->mSpeed.x * nx + b2->mSpeed.z * nz;
+		const float dpNorm1 = b1->mSpeed.x * nx + b1->mSpeed.z * nz;
+		const float dpNorm2 = b2->mSpeed.x * nx + b2->mSpeed.z * nz;
 
 		// Conservation of momentum in 1D
-		float m1 = b1->CONFIG.crashEfficiency *
-				   (dpNorm1 * (b1->mass() - b2->mass()) + 2.0F * b2->mass() * dpNorm2) /
-				   (b1->mass() + b2->mass());
+		const float m1 = b1->CONFIG.crashEfficiency *
+						 (dpNorm1 * (b1->mass() - b2->mass()) + 2.0F * b2->mass() * dpNorm2) /
+						 (b1->mass() + b2->mass());
 
-		float m2 = b2->CONFIG.crashEfficiency *
-				   (dpNorm2 * (b2->mass() - b1->mass()) + 2.0F * b1->mass() * dpNorm1) /
-				   (b1->mass() + b2->mass());
+		const float m2 = b2->CONFIG.crashEfficiency *
+						 (dpNorm2 * (b2->mass() - b1->mass()) + 2.0F * b1->mass() * dpNorm1) /
+						 (b1->mass() + b2->mass());
 
 		// Update ball velocities
-		glm::vec3 newSpeed1 = glm::vec3{tx * dpTan1 + nx * m1, b1->mSpeed.y, tz * dpTan1 + nz * m1};
-		glm::vec3 newSpeed2 = glm::vec3{tx * dpTan2 + nx * m2, b2->mSpeed.y, tz * dpTan2 + nz * m2};
+		const glm::vec3 newSpeed1 = glm::vec3{tx * dpTan1 + nx * m1, b1->mSpeed.y, tz * dpTan1 + nz * m1};
+		const glm::vec3 newSpeed2 = glm::vec3{tx * dpTan2 + nx * m2, b2->mSpeed.y, tz * dpTan2 + nz * m2};
 
 		b1->onCollision(b2, newSpeed1, fElapsedTime);
 		b2->onCollision(b1, newSpeed2, fElapsedTime);
@@ -177,15 +176,6 @@ namespace Pix {
 		// Main simulation loop
 		for (int i = 0; i < Ball::SIMULATIONUPDATES; i++) {
 
-//			long cronoIter=nowns();
-
-			// Set all balls time to maximum for this epoch
-
-//			iterateObjects([fSimElapsedTime](WorldObject *ball) {
-//				if (ball->CLASSID == Ball::CLASSID)
-//					static_cast<Ball *>(ball)->fSimTimeRemaining = fSimElapsedTime;
-//			});
-
 			// Erode simulation time on a per objec tbasis, depending upon what happens
 			// to it during its journey through this epoch
 
@@ -211,8 +201,6 @@ namespace Pix {
 							// process heightmap collisions & ball height
 							Ball *obstacle = ball->processHeights(this, NOTIME);
 
-#ifndef DBG_NOHEIGHTMAPCOLLISIONS
-
 							// these are collisions against height map
 
 							if (obstacle != nullptr) {
@@ -221,7 +209,6 @@ namespace Pix {
 								vCollidingPairs.push_back({ball, obstacle});
 								if (DBG) LogV(TAG, "- Ball collided with wall");
 							}
-#endif
 						}
 					}
 				});

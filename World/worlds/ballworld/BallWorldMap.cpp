@@ -8,6 +8,9 @@
 //
 
 #include <fstream>
+#include <ios>
+#include <iostream>
+#include <filesystem> // C++17
 
 #include "BallWorldMap.hpp"
 #include "Fu.hpp"
@@ -16,12 +19,12 @@
 
 namespace Pix {
 
-	std::string BallWorldMap_t::getPath(std::string filename) {
+	std::string BallWorldMap_t::getPath(const std::string& filename) {
 		return FuPlatform::getPath(std::string(PATH_LEVELS) + "/" + NAME + "/" + filename);
 	}
 
 	// current circuit loader / saver
-	bool BallWorldMap_t::loadV3(std::string circuitName, int scaleFactor) {
+	bool BallWorldMap_t::loadV3(const std::string& circuitName, int scaleFactor) {
 		std::ifstream file(getPath(circuitName), std::ios::in | std::ios::binary);
 		if (!file.is_open()) return false;
 
@@ -42,7 +45,7 @@ namespace Pix {
 
 		vecLines.clear();
 
-		float f = 1 / (1.0 + scaleFactor);
+		float f = static_cast<float>(1 / (1.0 + scaleFactor));
 		for (int x = 0; x < l; x++) {
 			LineSegment_t segment;
 			file.read((char *) &segment, sizeof(LineSegment_t));
@@ -72,7 +75,9 @@ namespace Pix {
 	}
 
 	bool BallWorldMap_t::saveV3(std::string sFilename, int scaleFactor) {
+
 		std::ofstream file(getPath(sFilename), std::ios::out | std::ios::binary);
+
 		if (!file.is_open()) return false;
 
 		// version

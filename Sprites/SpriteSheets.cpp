@@ -10,6 +10,7 @@
 #include "Utils.hpp"
 
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCSimplifyInspection"
 #pragma ide diagnostic ignored "OCDFAInspection"
 namespace Pix {
 
