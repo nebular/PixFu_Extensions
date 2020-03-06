@@ -25,9 +25,6 @@ namespace Pix {
 
 	std::string World::TAG = "World";
 
-	/** metronome (animaations) */
-	float World::METRONOME = 0;
-
 	/** pbject counter */
 	int WorldObjectBase::instanceCounter = 0;
 
@@ -74,7 +71,7 @@ namespace Pix {
 
 			// apply scale pulse
 			if (CONFIG.animation.scalePulse > 0)
-				fRadiusAnimator = sinf(World::METRONOME) * CONFIG.animation.scalePulse;
+				fRadiusAnimator = sinf(Fu::METRONOME) * CONFIG.animation.scalePulse;
 
 		}
 
@@ -160,8 +157,6 @@ namespace Pix {
 	}
 
 	void World::tick(Fu *engine, float fElapsedTime) {
-
-		METRONOME += fElapsedTime;
 
 		pCamera->update(fElapsedTime);
 
