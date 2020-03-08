@@ -112,7 +112,7 @@ namespace Pix {
 		pShaderObjects = new ObjectShader(CONFIG.shaderName + "_objects");
 
 		pLight = new Light(CONFIG.lightPosition, CONFIG.lightColor);
-		pCamera = new Camera(CAM_FOLLOW);
+		pCamera = new Camera();
 
 		pCamera->setHeight(CONFIG.perspective.C_HEIGHT);
 		pCamera->setPitch(CONFIG.perspective.C_PITCH);
