@@ -41,11 +41,13 @@ namespace Pix {
 // todo		std::vector<WorldObject *> vInstances;
 
 	public:
+
 		std::vector<WorldObject *> vInstances;
 
 		const WorldConfig_t PLANET;
 		const Transformation_t PLACER;
 		const std::string NAME;
+
 		World *WORLD;
 
 		ObjectCluster(World *planet, std::string name, Transformation_t initialTransform = Transformation_t());

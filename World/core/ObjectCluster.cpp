@@ -166,7 +166,7 @@ namespace Pix {
 
 	void ObjectCluster::init() {
 
-		for (int i = 0; i < pLoader->meshCount(); i++) {
+		for (int i = 0, l = pLoader->meshCount(); i < l; i++) {
 			LayerVao::add(
 					pLoader->vertices(i), pLoader->verticesCount(i),
 					pLoader->indices(i), pLoader->indicesCount(i)

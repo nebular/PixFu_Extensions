@@ -15,9 +15,9 @@
 namespace Pix {
 
 	class BallObject : public Ball {
-		
+
 		inline const static std::string TAG = "BallObject";
-		
+
 		Spline_t *pSpline = nullptr;
 		sPoint2D mLastPoint;
 		float fPosition = 0;
@@ -25,7 +25,9 @@ namespace Pix {
 		void driveSpline(float fElapsedTime);
 
 	public:
-		BallObject (BallWorld *world, ObjectProperties_t& meta, ObjectLocation_t location);
+
+		BallObject(BallWorld *world, ObjectProperties_t &meta, ObjectLocation_t location);
+
 		void process(World *world, float fTime);
 
 	};

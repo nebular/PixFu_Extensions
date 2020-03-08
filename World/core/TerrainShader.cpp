@@ -13,7 +13,7 @@
 
 namespace Pix {
 
-	TerrainShader::TerrainShader(std::string name) : Shader(name) {}
+	TerrainShader::TerrainShader(const std::string& name) : Shader(name) {}
 
 	void TerrainShader::bindAttributes() {
 		bindAttribute(0, "position");

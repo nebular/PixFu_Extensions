@@ -9,6 +9,8 @@
 #include "WorldObject.hpp"
 #include "World.hpp"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace Pix {
 
 	// Segment (A, B)
@@ -16,14 +18,14 @@ namespace Pix {
 	// return : Point Q, the cloesest point on [AB] from P
 	glm::vec3 ClosestPoint(glm::vec3 A, glm::vec3 B, glm::vec3 P) {
 		glm::vec3 AB    = B - A;
-		float ab2       = glm::dot(AB,AB);
+		auto ab2       = glm::dot(AB,AB);
 		glm::vec3 AP       = P - A;
-		float ap_dot_ab = glm::dot(AP,AB);
+		auto ap_dot_ab = glm::dot(AP,AB);
 		float t         = ap_dot_ab / ab2;
 		// the projection parameter on the line
 		// clamp parameter to segment extremities
-		if (t < 0.0f) t = 0.0f;
-		else if (t > 1.0f) t = 1.0f;
+		if (t < 0.0F) t = 0.0F;
+		else if (t > 1.0F) t = 1.0F;
 		// calculate the closest point
 		glm::vec3 Q = A + AB * t;
 		return Q;
@@ -31,17 +33,16 @@ namespace Pix {
 
 	bool PointInSphere(glm::vec3 P, float r, glm::vec3 Q) {
 		glm::vec3 PQ = Q - P;
-		float pq2 = glm::dot(PQ,PQ);
+		auto pq2 = glm::dot(PQ,PQ);
 		float r2  = r * r;
-		if(pq2 > r2) return false;
-		else return true;
+		return !(pq2 > r2);
 	}
 
 
 	// https://gamedev.stackexchange.com/questions/21552/picking-objects-with-mouse-ray
 	bool WorldObject::checkRayCollision(glm::vec3& origin, glm::vec3& direction) {
 		glm::vec3 center = pos();
-		glm::vec3 closest = ClosestPoint(origin, origin+2000.0f*direction, center);
+		glm::vec3 closest = ClosestPoint(origin, origin+2000.0F*direction, center);
 		return PointInSphere(center, radius(), closest);
 	}
 
@@ -67,3 +68,5 @@ namespace Pix {
 
 	}
 }
+
+#pragma clang diagnostic pop

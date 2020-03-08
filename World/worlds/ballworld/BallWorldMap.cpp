@@ -19,12 +19,12 @@
 
 namespace Pix {
 
-	std::string BallWorldMap_t::getPath(const std::string& filename) {
+	std::string BallWorldMap_t::getPath(const std::string &filename) {
 		return FuPlatform::getPath(std::string(PATH_LEVELS) + "/" + NAME + "/" + filename);
 	}
 
 	// current circuit loader / saver
-	bool BallWorldMap_t::loadV3(const std::string& circuitName, int scaleFactor) {
+	bool BallWorldMap_t::loadV3(const std::string &circuitName, int scaleFactor) {
 		std::ifstream file(getPath(circuitName), std::ios::in | std::ios::binary);
 		if (!file.is_open()) return false;
 

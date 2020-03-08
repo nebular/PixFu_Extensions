@@ -92,46 +92,48 @@ namespace Pix {
 		/** delay for angle follow */
 		const float lerpAngle = 15;
 		/** delay for distant mode follow TODO */
-		const float lerpDistance = 5;
+		const float lerpConfig = 5;
 
 	} CameraConfig_t;
 
-	static constexpr CameraConfig_t CAM_TOPVIEW = { {1,1, 0.700},  M_PI/2, -M_PI/2,0};
-	static constexpr CameraConfig_t CAM_TOPPERS = { {0.9,0.9, 0.13},  M_PI/2, -1.15F, 0};
-	static constexpr CameraConfig_t CAM_FOLLOW = { {0,0,0}, DEF_YAW, DEF_PITCH, 0, DEF_UPVECTOR, true, true };
-	static constexpr CameraConfig_t CAM_INITIAL = { {0,0,0}, DEF_YAW, DEF_PITCH, 0, DEF_UPVECTOR, true, false };
-
 	class Camera {
+
+		// Some fixed camera values
+
+		static constexpr CameraConfig_t CAM_TOPVIEW = {{1, 1, 0.700},(float) M_PI / 2, (float)-M_PI / 2, 0};
+		static constexpr CameraConfig_t CAM_TOPPERS = {{0.9, 0.9, 0.13}, (float)M_PI / 2, -1.15F, 0};
+		static constexpr CameraConfig_t CAM_FOLLOW  = {{0, 0, 0}, DEF_YAW, DEF_PITCH, 0, DEF_UPVECTOR, true, true};
+		static constexpr CameraConfig_t CAM_INITIAL = {{0, 0, 0}, DEF_YAW, DEF_PITCH, 0, DEF_UPVECTOR, true, false};
 
 		static constexpr float STEP = 0.0015f, VSTEP = 0.05;
 
 		/** Default camera values */
-		static constexpr float DEF_HEIGHT = 0.2f;
+		// static constexpr float DEF_HEIGHT = 0.2f;
 
 		const CameraConfig_t *CONFIG;
 
 		// Camera Attributes
 
 		/** Current camera position */
-		glm::vec3 mPosition;
+		glm::vec3 mPosition = {};
 		/** Current camera Front Vector */
-		glm::vec3 mFrontVector;
+		glm::vec3 mFrontVector = {};
 		/** Current camera Up Vector */
-		glm::vec3 mUpVector;
+		glm::vec3 mUpVector = {};
 		/** Current camera Right Vector */
-		glm::vec3 mRightVector;
+		glm::vec3 mRightVector = {};
 		/** Optimizzation: current view matrix */
-		glm::mat4 mCurrentViewMatrix;
+		glm::mat4 mCurrentViewMatrix = {};
 		/** Optimizzation: current inverse view matrix */
-		glm::mat4 mCurrentInvViewMatrix;
+		glm::mat4 mCurrentInvViewMatrix = {};
 		// Euler Angles
 
 		/** Current Yaw */
-		float fYaw;
+		float fYaw = 0;
 		/** Current Pitch */
-		float fPitch;
+		float fPitch = 0;
 		/** Current Roll */
-		float fRoll;
+		float fRoll = 0;
 
 		// target mode / Smooth mode
 
@@ -145,16 +147,18 @@ namespace Pix {
 		long lDistantMode = 0;
 
 		/** Target camera angle (easing) */
-		float fTargetYaw;
+		float fTargetYaw = 0;
 		/** Target position and interpolated position */
-		glm::vec3 mTargetPosition, mInterpolatedPosition;
+		glm::vec3 mTargetPosition = {};
+		/** Interpolated position (target mode) */
+		glm::vec3 mInterpolatedPosition = {};
 
-		// Camera options
-		float mMouseSensitivity;
-		float mMouseZoom;
+		// Mouse parameters
+		float mMouseSensitivity = 1;
+		float mMouseZoom = 1;
 
 		/** Current camera mode (for interaction) */
-		CameraKeyControlMode_t mCameraMode;
+		CameraKeyControlMode_t mCameraMode = MOVE;
 
 		// camera player focus. Adjust the camera position when following a player / object
 
@@ -182,12 +186,18 @@ namespace Pix {
 		void update(float fElapsedTime);
 
 		/**
-		 * Returns the view matrix calculated using Euler Angles and the LookAt Matrix
+		 * Returns current View Matrix
 		 * @return The View Matrix (4x4)
 		 */
 
-		glm::mat4& getViewMatrix();
-		glm::mat4& getInvViewMatrix();
+		glm::mat4 &getViewMatrix();
+
+		/**
+		 * Returns the current inverse view matrix
+		 * @return The View Matrix (4x4)
+		 */
+
+		glm::mat4 &getInvViewMatrix();
 
 		/**
 		 * Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
@@ -201,6 +211,7 @@ namespace Pix {
 		/**
 		 * Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
 		 */
+
 		void inputMouseWheel(float yoffset);
 
 		/**
@@ -246,7 +257,18 @@ namespace Pix {
 
 		// getters & getters
 
+		/**
+		 * Get camera position
+		 * @return Camera position in World coordinates
+		 */
+
 		glm::vec3 getPosition();
+
+		/**
+		 * Gets the camera front vector
+		 * @param size Optional size (1 = normalized)
+		 * @return The vector
+		 */
 
 		glm::vec3 getFrontVector(float size);
 
@@ -305,6 +327,7 @@ namespace Pix {
 		 * Sets camera yaw
 		 * @param rads radians
 		 */
+
 		void setYaw(float rads);
 
 		/**
@@ -324,10 +347,14 @@ namespace Pix {
 		 * Enable or disable target mode
 		 */
 		void toggleTargetMode();
-		
-		void setConfig(const CameraConfig_t &configuration, bool animate);
 
-		glm::vec3 get3dMouse(glm::mat4& matProj, float xnorm, float ynorm);
+		/**
+		 * Set camera configuration
+		 * @param configuration The new configuration
+		 * @param animate Whether to animate change
+		 */
+
+		void setConfig(const CameraConfig_t &configuration, bool animate=true);
 
 	private:
 
@@ -378,11 +405,11 @@ namespace Pix {
 
 	// Returns the view matrix calculated using Euler Angles and the LookAt Matrix
 
-	inline glm::mat4& Camera::getViewMatrix() {
+	inline glm::mat4 &Camera::getViewMatrix() {
 		return mCurrentViewMatrix;
 	}
 
-	inline glm::mat4& Camera::getInvViewMatrix() {
+	inline glm::mat4 &Camera::getInvViewMatrix() {
 		return mCurrentInvViewMatrix;
 	}
 
@@ -397,17 +424,17 @@ namespace Pix {
 		//		fTargetAngle = (float) -M_PI / 2.0f - target->rot().y;
 	}
 
-	inline void Camera::setConfig(const CameraConfig_t &configuration, bool animate = false) {
+	inline void Camera::setConfig(const CameraConfig_t &configuration, bool animate) {
 		CONFIG = &configuration;
 
-		mUpVector=configuration.upVector;
+		mUpVector = configuration.upVector;
 
 		bSmooth = configuration.smooth;
 		bTargetMode = configuration.target;
 		bAnimateConfigChange = !bTargetMode && animate;
 
 		if (!animate) {
-			mPosition=mInterpolatedPosition=configuration.position;
+			mPosition = mInterpolatedPosition = configuration.position;
 			fYaw = configuration.yaw;
 			fPitch = configuration.pitch;
 			fRoll = configuration.roll;
@@ -423,7 +450,7 @@ namespace Pix {
 	 * @param enable  Whether
 	 */
 
-	inline void Camera::setTargetMode(bool enable=true) {
+	inline void Camera::setTargetMode(bool enable = true) {
 		bTargetMode = enable;
 		bAnimateConfigChange = false;
 	}

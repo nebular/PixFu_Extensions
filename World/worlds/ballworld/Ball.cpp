@@ -27,7 +27,7 @@ namespace Pix {
 
 	Ball::Ball(const WorldConfig_t &planetConfig, ObjectProperties_t& meta, ObjectLocation_t location, int overrideId)
 			: WorldObject(planetConfig, meta, Pix::ObjectLocation_t(), CLASSID, overrideId),
-			  TYPE(meta.type),
+			  ISSTATIC(meta.ISSTATIC),
 			  mPosition(location.position),
 			  mRotation(location.rotation),
 			  mSpeed(location.initialSpeed),
@@ -179,7 +179,7 @@ namespace Pix {
 
 		WorldObject::process(world, fTime);
 
-		if (TYPE==OBJT_STATIC) return;
+		if (ISSTATIC) return;
 
 		const float factor = bFlying ? CONFIG.aero.air : CONFIG.aero.terrain;
 		mAcceleration.z *= factor;

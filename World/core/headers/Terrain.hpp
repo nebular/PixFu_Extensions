@@ -40,7 +40,7 @@ namespace Pix {
 		const TerrainConfig_t CONFIG;
 		const WorldConfig_t PLANET;
 
-		Terrain(WorldConfig_t planetConfig, TerrainConfig_t config);
+		Terrain(WorldConfig_t  planetConfig, TerrainConfig_t config);
 
 		virtual ~Terrain();
 

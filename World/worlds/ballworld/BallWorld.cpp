@@ -123,7 +123,7 @@ namespace Pix {
 //		const float fDistance = glm::fastSqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
 //											  + (pos1.z - pos2.z) * (pos1.z - pos2.z));
 		const float fDistance = sqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
-											  + (pos1.z - pos2.z) * (pos1.z - pos2.z));
+									 + (pos1.z - pos2.z) * (pos1.z - pos2.z));
 
 		// Normal
 		const float nx = (pos2.x - pos1.x) / fDistance;
@@ -159,8 +159,8 @@ namespace Pix {
 
 	}
 
-	WorldObject *BallWorld::add(ObjectProperties_t features, ObjectLocation_t location, bool setHeight) {
-		BallObject *ball = new BallObject(this, features, location);
+	WorldObject *BallWorld::add(ObjectProperties_t &features, ObjectLocation_t location, bool setHeight) {
+		auto *ball = new BallObject(this, features, location);
 		World::add(ball, setHeight);
 		return ball;
 	}
@@ -209,7 +209,7 @@ namespace Pix {
 							if (obstacle != nullptr) {
 								vFakeBalls.push_back(obstacle);
 								// Add collision to vector of collisions for dynamic resolution
-								vCollidingPairs.push_back({ball, obstacle});
+								vCollidingPairs.emplace_back(ball, obstacle);
 								if (DBG) LogV(TAG, "- Ball collided with wall");
 							}
 						}
@@ -229,7 +229,7 @@ namespace Pix {
 
 					Ball *ball = (Ball *) b;
 
-					if (!ball->TYPE==OBJT_STATIC && !ball->bDisabled)
+					if (!ball->ISSTATIC && !ball->bDisabled)
 						for (auto &edge : edges) {
 
 							// float fDeltaTime = ball->fSimTimeRemaining;
@@ -316,7 +316,7 @@ namespace Pix {
 						// If you declare all your scenery decoration or obstacles as static
 						// it will be relatively cheap to have lots of them
 
-						if ((ball->TYPE!=OBJT_STATIC || target->TYPE!=OBJT_STATIC)
+						if ((!ball->ISSTATIC || !target->ISSTATIC)
 							&& !ball->bDisabled && !target->bDisabled                            // disabled balls
 							&& ball->ID != target->ID) {
 

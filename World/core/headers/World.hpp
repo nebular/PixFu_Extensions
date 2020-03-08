@@ -29,19 +29,19 @@ namespace Pix {
 	// Base World class
 	class World : public FuExtension {
 
-		static std::string TAG;
+		inline const static std::string TAG = "World";
 
 		/** Shader for terrain */
-		TerrainShader *pShader;
-		
+		TerrainShader *pShader = nullptr;
+
 		/** Shader for objects */
-		ObjectShader *pShaderObjects;
+		ObjectShader *pShaderObjects = nullptr;
 
 		/** World Light */
-		Light *pLight;
+		Light *pLight = nullptr;
 
 		/** World Camera */
-		Camera *pCamera;
+		Camera *pCamera = nullptr;
 
 		/** Object Clusters */
 		std::map<std::string, ObjectCluster *> mClusters;
@@ -53,7 +53,7 @@ namespace Pix {
 
 		/** Object Clusters */
 		std::vector<ObjectCluster *> vObjects;
-		
+
 		/** Terrains */
 		std::vector<Terrain *> vTerrains;
 
@@ -68,7 +68,7 @@ namespace Pix {
 		 * @param engine The FU engine
 		 * @param fElapsedTime The frame time
 		 */
-		
+
 		virtual void tick(Fu *engine, float fElapsedTime);
 
 		/**
@@ -82,17 +82,17 @@ namespace Pix {
 		 * Adds a pre-created object to the world
 		 * @param object The object to add
 		 */
-		
+
 		void add(WorldObject *object, bool setHeight = true);
 
 		/**
 		 * Creates an object from its metadata and Adds it to the world
-		 * @param object The object to add
+		 * @param features The object to add
 		 * @param setHeight whether to set object height to terrain height
 		 * @return The added object
 		 */
 
-		virtual WorldObject *add(ObjectProperties_t object, ObjectLocation_t location, bool setHeight);
+		virtual WorldObject *add(ObjectProperties_t &features, ObjectLocation_t location, bool setHeight);
 
 		/**
 		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
@@ -104,7 +104,7 @@ namespace Pix {
 		 */
 
 		virtual WorldObject *add(int oid, ObjectLocation_t location, bool setHeight);
-		
+
 		/**
 		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
 		 * with that OID. Initial location from the DB is used.
@@ -114,7 +114,7 @@ namespace Pix {
 		 */
 
 		virtual WorldObject *add(int oid, bool setHeight);
-		
+
 		/**
 		 * Iterates all world objects
 		 * @param callback The callback
@@ -175,7 +175,8 @@ namespace Pix {
 		/** Immutable config */
 		const WorldConfig_t CONFIG;
 
-		World(WorldConfig_t& config);
+		World(WorldConfig_t &config);
+
 		virtual ~World();
 
 		/**
@@ -199,15 +200,15 @@ namespace Pix {
 		 * @return height in world coordinates
 		 */
 
-		float getHeight(glm::vec3& posWorld);
-		
+		float getHeight(glm::vec3 &posWorld);
+
 		/**
 		 * Whether there is a terrain at that world coords.
 		 * @param posWorld Position to check
 		 * @return whether
 		 */
 
-		bool hasTerrain(glm::vec3& posWorld);
+		bool hasTerrain(glm::vec3 &posWorld);
 
 		/**
 		 * Selects an object using raytracing (nehavior is object dependent)
@@ -217,13 +218,13 @@ namespace Pix {
 		 * @return The object pointed by the ray, if any.
 		 */
 
-		WorldObject *select(glm::vec3& rayDirection, bool exclusive = true);
+		WorldObject *select(glm::vec3 &rayDirection, bool exclusive = true);
 
 		/**
 		 * selects/unselects all objects.
 		 */
 
-		void selectAll(bool select=true);
+		void selectAll(bool select = true);
 
 		/**
 		 * Gets the 3D canvas. A
@@ -232,7 +233,7 @@ namespace Pix {
 		 * @return The 3D canvas
 		 */
 
-		Canvas2D *canvas(glm::vec3& posWorld);
+		Canvas2D *canvas(glm::vec3 &posWorld);
 
 		/**
 		 * Convenience function to return the 3D canvas of the first terrain.
@@ -267,7 +268,7 @@ namespace Pix {
 
 	inline bool World::hasTerrain(glm::vec3 &posWorld) {
 
-		if (vTerrains.size()==1)
+		if (vTerrains.size() == 1)
 			return vTerrains[0]->contains(posWorld);
 
 		for (Terrain *terrain:vTerrains)

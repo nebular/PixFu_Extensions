@@ -10,10 +10,12 @@
 #include "Frustum.hpp"
 #include "glm/gtc/matrix_inverse.hpp"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace Pix {
 
-	ObjectShader::ObjectShader(const std::string& name)
-	: Shader(std::move(name)) {}
+	ObjectShader::ObjectShader(std::string name)
+	: Shader(name) {}
 
 	void ObjectShader::bindAttributes() {
 		bindAttribute(0, "position");
@@ -59,3 +61,5 @@ namespace Pix {
 	}
 
 }
+
+#pragma clang diagnostic pop

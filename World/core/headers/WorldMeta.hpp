@@ -145,7 +145,7 @@ namespace Pix {
 		const float SCRATCHING_NEW = 0.6;
 		const float CLIMB_LIMIT = 0.3;
 		const float FALL_LIMIT = 0.3;
-		const float RIDEHEIGHT_SEAMLESS = 5;	// ignore this height difference
+		const float RIDEHEIGHT_SEAMLESS = 5;    // ignore this height difference
 	} ObjectTerrainBehavior_t;
 
 	static constexpr int NO_SPLINE = -1;

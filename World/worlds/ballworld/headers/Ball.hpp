@@ -20,7 +20,6 @@
 #include "Drawable.hpp"
 #include "World.hpp"
 #include "BallWorld.hpp"
-#include "WorldObject.hpp"
 
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
@@ -64,8 +63,7 @@ namespace Pix {
 	public:
 
 		/** whether this is a static object (so wont collide with another static object) */
-		const ObjectType_t TYPE;
-
+		const bool ISSTATIC;
 
 	protected:
 
@@ -255,7 +253,7 @@ namespace Pix {
 		 * @param b2 Another ball
 		 * @return Overlap code: No overlap, overlaps, overlaps in outer radius
 		 */
-	
+
 		Overlaps_t overlaps(Ball *b2);
 
 		/**

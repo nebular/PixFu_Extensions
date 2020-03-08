@@ -7,6 +7,7 @@
 //
 
 #pragma once
+
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
 #include "glm/vec4.hpp"
@@ -89,12 +90,12 @@ namespace Pix {
 
 		// Object Location
 		ObjectLocation_t LOCATION;
-		
+
 
 	public:
 
-		inline static constexpr glm::vec4 TINT_NONE = { 0,0,0,0};
-		inline static constexpr glm::vec4 TINT_SELECT = { 2,0,0,1};
+		inline static constexpr glm::vec4 TINT_NONE = {0, 0, 0, 0};
+		inline static constexpr glm::vec4 TINT_SELECT = {2, 0, 0, 1};
 		static constexpr unsigned CLASSID_CODE = 1;
 
 		// Object metadata
@@ -104,8 +105,7 @@ namespace Pix {
 						   unsigned int classid = CLASSID_CODE, int overrideId = -1) :
 				WorldObjectBase(worldConfig, objectMeta.CLASSNAME, classid, overrideId),
 				LOCATION(std::move(location)),
-				CONFIG(std::move(objectMeta))
-				{}
+				CONFIG(std::move(objectMeta)) {}
 
 		inline virtual glm::vec3 &pos() override { return LOCATION.position; }
 
@@ -123,7 +123,7 @@ namespace Pix {
 		/**
 		 * Selects this object
 		 */
-		inline void setSelected(bool selected=true) { bSelected = selected; };
+		inline void setSelected(bool selected = true) { bSelected = selected; };
 
 		/**
 		 * Tints this object
@@ -132,8 +132,8 @@ namespace Pix {
 
 		/** process animations */
 		virtual void process(World *world, float fElapsedTime);
-		
+
 		// https://gamedev.stackexchange.com/questions/21552/picking-objects-with-mouse-ray
-		bool checkRayCollision(glm::vec3& origin, glm::vec3& direction);
+		bool checkRayCollision(glm::vec3 &origin, glm::vec3 &direction);
 	};
 }

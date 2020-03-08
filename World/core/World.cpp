@@ -23,8 +23,6 @@
 
 namespace Pix {
 
-	std::string World::TAG = "World";
-
 	/** pbject counter */
 	int WorldObjectBase::instanceCounter = 0;
 
@@ -32,10 +30,10 @@ namespace Pix {
 	std::map<int, ObjectDbEntry_t> ObjectDb::Database;
 
 	World::World(WorldConfig_t &config)
-			: FuExtension(true),								// require add on constructor
+			: FuExtension(true),                                // require add on constructor
 			  CONFIG(config) {
-					if (config.debugMode == DEBUG_WIREFRAME)
-						LayerVao::DRAWMODE = GL_LINES;
+		if (config.debugMode == DEBUG_WIREFRAME)
+			LayerVao::DRAWMODE = GL_LINES;
 	};
 
 	World::~World() {
@@ -53,7 +51,7 @@ namespace Pix {
 		return world;
 	}
 
-	WorldObject *World::add(ObjectProperties_t features, ObjectLocation_t location, bool setHeight) {
+	WorldObject *World::add(ObjectProperties_t& features, ObjectLocation_t location, bool setHeight) {
 		WorldObject *object = new WorldObject(CONFIG, features, location, WorldObject::CLASSID_CODE);
 		add(object, setHeight);
 		return object;
@@ -173,7 +171,7 @@ namespace Pix {
 
 	}
 
-	WorldObject *World::select(glm::vec3& ray, bool exclusive) {
+	WorldObject *World::select(glm::vec3 &ray, bool exclusive) {
 		WorldObject *selected = nullptr;
 		iterateObjects([this, &ray, &selected, exclusive](WorldObject *obj) {
 			// only select first one (simple behavior)
@@ -188,7 +186,7 @@ namespace Pix {
 				if (sel) obj->setSelected(!obj->isSelected());
 			}
 
-			if (sel && selected==nullptr) selected = obj;
+			if (sel && selected == nullptr) selected = obj;
 		});
 		return selected;
 	}
@@ -226,7 +224,7 @@ namespace Pix {
 		matrix = glm::rotate(matrix, rzrads, {0.0F, 0.0F, 1.0F});
 		matrix = glm::scale(matrix, {scale, scale, scale});
 		return matrix * flipMatrix;
-}
+	}
 
 };
 

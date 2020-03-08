@@ -20,7 +20,7 @@ namespace Pix {
 	std::string Terrain::TAG = "Terrain";
 
 	Terrain::Terrain(WorldConfig_t planetConfig, TerrainConfig_t config)
-			: CONFIG(config), PLANET(planetConfig) {
+			: CONFIG(config), PLANET(std::move(planetConfig)) {
 
 		std::string path = std::string(PATH_LEVELS) + "/" + config.name;
 
@@ -35,7 +35,7 @@ namespace Pix {
 
 			pLoader = new ObjLoader(config.staticMesh);
 			pTexture = new Texture2D(2000, 2000);
-			pTexture->buffer()->clear(Pix::Colors::GREEN.scale(0.3));
+			pTexture->buffer()->clear(Pix::Colors::GREEN.scale(0.3F));
 			pHeightMap = nullptr;
 
 		}
@@ -83,7 +83,7 @@ namespace Pix {
 		if (!bInited) init(shader);
 
 		shader->textureUnit("modelTexture", pTexture);
-		shader->loadShineVariables(1, 0.7);
+		shader->loadShineVariables(1, 0.7F);
 
 		if (pDirtTexture != nullptr) {
 			if (pDirtTexture->buffer()->clearDirty()) pDirtTexture->update();
@@ -97,7 +97,7 @@ namespace Pix {
 	void Terrain::init(TerrainShader *shader) {
 
 		glm::mat4 tmatrix = createTransformationMatrix(
-				{CONFIG.origin.x / 1000, 0, CONFIG.origin.y / 1000},
+				{CONFIG.origin.x / 1000.0F, 0, CONFIG.origin.y / 1000.0F},
 				0, 0, 0, 1, false, false, false) * PLANET.terrainTransform.toMatrix();
 
 		shader->loadTransformationMatrix(tmatrix);

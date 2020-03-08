@@ -36,7 +36,7 @@ namespace Pix {
 		 * Add Balls to the world
 		 */
 
-		WorldObject *add(ObjectProperties_t features, ObjectLocation_t location, bool setHeight) override;
+		WorldObject *add(ObjectProperties_t &features, ObjectLocation_t location, bool setHeight) override;
 
 		/**
 		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
@@ -48,7 +48,7 @@ namespace Pix {
 		 */
 
 		WorldObject *add(int oid, ObjectLocation_t location, bool setHeight = true) override;
-		
+
 		/**
 		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
 		 * with that OID. Initial location from the DB is used.
@@ -58,7 +58,7 @@ namespace Pix {
 		 */
 
 		WorldObject *add(int oid, bool setHeight = true) override;
-		
+
 		/**
 		 * Processes ball updates and collisions.
 		 */
@@ -73,12 +73,12 @@ namespace Pix {
 
 	public:
 
-		BallWorld(const std::string& levelName, WorldConfig_t& config);
+		BallWorld(const std::string &levelName, WorldConfig_t &config);
 
 		virtual void tick(Pix::Fu *engine, float fElapsedTime) override;
 
-		void load(const std::string& levelName);
-		
+		void load(const std::string &levelName);
+
 		BallWorldMap_t *map();
 	};
 

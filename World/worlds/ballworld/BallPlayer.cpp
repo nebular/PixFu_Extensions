@@ -3,6 +3,7 @@
 #include "glm/gtx/rotate_vector.hpp"
 
 #pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
 #pragma ide diagnostic ignored "OCDFAInspection"
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "err_ovl_no_viable_member_function_in_call"
@@ -10,7 +11,7 @@
 
 namespace Pix {
 
-	BallPlayer::BallPlayer(World *world, ObjectProperties_t& objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location)
+	BallPlayer::BallPlayer(World *world, ObjectProperties_t &objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location)
 			: Ball(world->CONFIG, objectMeta, location),
 			  FEATURES(new BallPlayerFeatures(objectMeta, features)) {
 	}
@@ -186,8 +187,13 @@ namespace Pix {
 	}
 
 	void BallPlayer::steer(float perc, float fElapsedTime) {
+
 		//	fSteerAngle = perc * M_PI / 512; // * (- log2(fabs(speedPercent()) + 0.000001));
-		fSteerAngle = static_cast<float>(perc * FEATURES->maxSteerAngle() * (1 - 0.85 * speedPercent())); // * (- log2(fabs(speedPercent()) + 0.000001));
+		fSteerAngle = static_cast<float>(
+				perc
+				* FEATURES->maxSteerAngle()
+				* (1 - 0.85 * speedPercent())
+		); // * (- log2(fabs(speedPercent()) + 0.000001));
 
 	}
 

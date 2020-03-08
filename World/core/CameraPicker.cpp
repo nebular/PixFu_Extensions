@@ -11,6 +11,11 @@
 #include "CameraPicker.hpp"
 #include "glm/gtx/fast_square_root.hpp"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+#pragma ide diagnostic ignored "err_ovl_ambiguous_call"
+#pragma ide diagnostic ignored "err_typecheck_invalid_operands"
 namespace Pix {
 	
 	CameraPicker *CameraPicker::pInstance = nullptr;
@@ -53,7 +58,7 @@ namespace Pix {
 	}
 
 	glm::vec3 CameraPicker::calculateMouseRay(float mouseXndc, float mouseYndc) {
-		glm::vec4 clipCoords = { mouseXndc, mouseYndc, -1.0f, 1.0f };
+		glm::vec4 clipCoords = { mouseXndc, mouseYndc, -1.0F, 1.0F };
 		glm::vec4 eyeCoords = toEyeCoords(clipCoords);
 		glm::vec3 worldRay = toWorldCoords(eyeCoords);
 		return worldRay;
@@ -107,3 +112,5 @@ namespace Pix {
 	}
 };
 
+
+#pragma clang diagnostic pop

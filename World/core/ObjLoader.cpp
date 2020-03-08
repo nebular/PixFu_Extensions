@@ -12,6 +12,7 @@
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "RedundantCast"
+
 namespace Pix {
 
 	// Load an OBJ Model

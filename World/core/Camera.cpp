@@ -29,15 +29,20 @@
 
 namespace Pix {
 
-	// Constructor with vectors
+	/**
+	 * Constructs the camera
+	 * @param configuration The configuration object
+	 */
 
 	Camera::Camera(const CameraConfig_t &configuration) {
-		setConfig(configuration);
+		setConfig(configuration, false);
 	}
 
 	/**
+	 *
 	 * Processes input received from any keyboard-like input system. Accepts input parameter
 	 * in the form of camera defined ENUM (to abstract it from windowing systems)
+	 *
 	 * @param direction Direction enum
 	 * @param speed speed increment
 	 * @param fElapsedTime time frame time
@@ -76,7 +81,7 @@ namespace Pix {
 
 	void Camera::update(float fElapsedTime) {
 
-		fPlayerDistanceFar += (fTargetDistance - fPlayerDistanceFar) * CONFIG->lerpDistance * fElapsedTime;
+		fPlayerDistanceFar += (fTargetDistance - fPlayerDistanceFar) * CONFIG->lerpConfig * fElapsedTime;
 
 		if (bTargetMode) {
 
@@ -87,10 +92,10 @@ namespace Pix {
 			// from -PI to PI, so in that case we skip the lerp so it
 			// doesnt do a full circle bac to the negaive or positive angle.
 
-			if (bSmooth && diff < 15 * M_PI / 8) {
+			if (bSmooth && diff < 15.0 * M_PI / 8.0) {
 
 				// if there is a big delta, make lerp faster
-				if (diff > M_PI / 16) lerp = CONFIG->lerpAngle / 5;
+				if (diff > M_PI / 16.0) lerp = CONFIG->lerpAngle / 5;
 
 				fYaw += (fTargetYaw - fYaw) * lerp * fElapsedTime;
 
@@ -112,10 +117,16 @@ namespace Pix {
 				mPosition = mTargetPosition;
 			}
 
-			inputMovement(CM_BACKWARD, fPlayerDistanceFar, 0.08F);
-			inputMovement(CM_UP, fPlayerDistanceUp, 0.08F);
+			constexpr float KMOVER = 0.08f;
+			inputMovement(CM_BACKWARD, fPlayerDistanceFar, KMOVER);
+			inputMovement(CM_UP, fPlayerDistanceUp, KMOVER);
+
 		} else if (bAnimateConfigChange) {
-			const float factor = CONFIG->lerpDistance * fElapsedTime;
+
+			// animate a config change
+
+			const float factor = CONFIG->lerpConfig * fElapsedTime;
+
 			mPosition.x += (CONFIG->position.x - mPosition.x) * factor;
 			mPosition.y += (CONFIG->position.y - mPosition.y) * factor;
 			mPosition.z += (CONFIG->position.z - mPosition.z) * factor;
@@ -144,9 +155,15 @@ namespace Pix {
 
 		mCameraMode = mode;
 
+		constexpr float KSTEP = 100;
+
 		switch (mode) {
 
 			case MOVE:
+
+				// move the camera using the calculated front and back vectors
+				// yaw left/right
+
 				if (up) inputMovement(CM_FORWARD, VSTEP * percent, fElapsedTime);
 				if (down) inputMovement(CM_BACKWARD, VSTEP * percent, fElapsedTime);
 				if (left) stepYaw(STEP * percent);        // understand why it is negated
@@ -154,6 +171,10 @@ namespace Pix {
 				break;
 
 			case ADJUST_ANGLES:
+
+				// looks up / down (yaw)
+				// left/right also yaw
+
 				if (left) stepYaw(STEP * percent);        // understand why it is negated
 				if (right) stepYaw(-STEP * percent);
 				if (up) stepPitch(-STEP * percent);
@@ -161,6 +182,9 @@ namespace Pix {
 				break;
 
 			case ADJUST_POSITION:
+
+				// adjust camera position
+
 				if (up) inputMovement(CM_UP, VSTEP * percent, fElapsedTime);
 				if (down) inputMovement(CM_DOWN, VSTEP * percent, fElapsedTime);
 				if (left) inputMovement(CM_LEFT, VSTEP * percent, fElapsedTime);
@@ -168,22 +192,26 @@ namespace Pix {
 				break;
 
 			case ADJUST_PLAYER_ANGLES:
-				if (up) fPlayerPitch -= VSTEP / 100;
-				if (down) fPlayerPitch += VSTEP / 100;
-//				LogV("cam", SF("fPlayerPitch %f", fPlayerPitch));
+
+				// UP/DOWN adjust target mode pitch
+
+				if (up) fPlayerPitch -= VSTEP / KSTEP;
+				if (down) fPlayerPitch += VSTEP / KSTEP;
 				break;
 
 			case ADJUST_PLAYER_POSITION:
-				if (left) fPlayerDistanceFar -= VSTEP / 100;
-				if (right) fPlayerDistanceFar += VSTEP / 100;
+
+				// UP/DOWN adjust vertical distance to target
+				// LEFT/RIGHT adjust horizontal distance to target
+
+				if (left) fPlayerDistanceFar -= VSTEP / KSTEP;
+				if (right) fPlayerDistanceFar += VSTEP / KSTEP;
 				if (up) fPlayerDistanceUp -= VSTEP / 1000;
 				if (down) fPlayerDistanceUp += VSTEP / 1000;
 				if (fPlayerDistanceUp < 0) fPlayerDistanceUp = 0;
-//				LogV("cam", SF("fPlayerDistanceFar %f fPlayerDistanceUp  %f", fPlayerDistanceFar, fPlayerDistanceUp));
+
 				break;
-
 		}
-
 	};
 
 	/**
@@ -234,11 +262,11 @@ namespace Pix {
 	void Camera::updateCameraVectors() {
 
 		// Calculate the new Front vector
-
+		const float cosPitch = cosf(fPitch);
 		const glm::vec3 front = {
-				cosf(fYaw) * cosf(fPitch),
+				cosf(fYaw) * cosPitch,
 				sinf(fPitch),
-				sinf(fYaw) * cosf(fPitch)
+				sinf(fYaw) * cosPitch
 		};
 
 		// Re-calculate the Front, Right and Up vector
