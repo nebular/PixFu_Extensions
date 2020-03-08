@@ -29,6 +29,7 @@
 
 #include "BallWorld.hpp"
 #include "Ball.hpp"
+#include "BallObject.hpp"
 #include "BallPlayer.hpp"
 #include "Splines.hpp"
 #include "LineSegment.hpp"
@@ -157,7 +158,7 @@ namespace Pix {
 	}
 
 	WorldObject *BallWorld::add(ObjectProperties_t features, ObjectLocation_t location, bool setHeight) {
-		Ball *ball = new Ball(CONFIG, features, location);
+		BallObject *ball = new BallObject(this, features, location);
 		World::add(ball, setHeight);
 		return ball;
 	}

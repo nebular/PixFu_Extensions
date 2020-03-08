@@ -112,7 +112,7 @@ namespace Pix {
 		pShaderObjects = new ObjectShader(CONFIG.shaderName + "_objects");
 
 		pLight = new Light(CONFIG.lightPosition, CONFIG.lightColor);
-		pCamera = new Camera();
+		pCamera = new Camera(CAM_FOLLOW);
 
 		pCamera->setHeight(CONFIG.perspective.C_HEIGHT);
 		pCamera->setPitch(CONFIG.perspective.C_PITCH);
@@ -196,7 +196,6 @@ namespace Pix {
 
 	}
 
-
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
 										 float scale, bool flipX = true, bool flipY = false, bool flipZ = false) {
 
@@ -225,6 +224,14 @@ namespace Pix {
 		matrix = glm::scale(matrix, {scale, scale, scale});
 		return matrix * flipMatrix;
 	}
+
+	void World::select(glm::vec3& ray) {
+		iterateObjects([this, &ray](WorldObject *obj) {
+			glm::vec3 pos = pCamera->getPosition();
+			obj->setSelected(obj->checkRayCollision(pos, ray));
+		});
+	}
+
 };
 
 #pragma clang diagnostic pop

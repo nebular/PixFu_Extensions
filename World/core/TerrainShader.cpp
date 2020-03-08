@@ -38,11 +38,13 @@ namespace Pix {
 	}
 
 	void TerrainShader::loadViewMatrix(Camera *camera) {
-		glm::mat4 viewMatrix = camera->getViewMatrix();
+		glm::mat4& viewMatrix = camera->getViewMatrix();
 		setMat4("viewMatrix", (float *) &viewMatrix);
-
-		glm::mat4 invViewMatrix = glm::affineInverse(viewMatrix);
+		glm::mat4& invViewMatrix = camera->getInvViewMatrix();
 		setMat4("invViewMatrix", (float *) &invViewMatrix);
+
+//		glm::mat4 invViewMatrix = glm::affineInverse(viewMatrix);
+//		setMat4("invViewMatrix", (float *) &invViewMatrix);
 	}
 
 	void TerrainShader::loadProjectionMatrix(glm::mat4 &projection) {

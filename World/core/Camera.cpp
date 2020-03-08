@@ -17,6 +17,8 @@
 #include "Utils.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/fast_square_root.hpp"
+#include "glm/vec3.hpp"
+#include "glm/vec4.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "err_ovl_ambiguous_call"
@@ -29,18 +31,8 @@ namespace Pix {
 
 	// Constructor with vectors
 
-	Camera::Camera(CameraConfig_t configuration) :
-		CONFIG(configuration),
-		mPosition(configuration.position),
-		mUpVector(configuration.upVector),
-		fYaw(configuration.yaw),
-		fPitch(configuration.pitch),
-		fRoll(configuration.roll),
-		bSmooth(configuration.smooth),
-		mInterpolatedPosition(configuration.position),
-		mMouseSensitivity(DEF_MOUSE_SENS),
-		mMouseZoom(DEF_ZOOM) {
-		updateCameraVectors();
+	Camera::Camera(const CameraConfig_t &configuration) {
+		setConfig(configuration);
 	}
 
 	/**
@@ -84,12 +76,12 @@ namespace Pix {
 
 	void Camera::update(float fElapsedTime) {
 
-		fPlayerDistanceFar += (fTargetDistance - fPlayerDistanceFar) * CONFIG.lerpDistance * fElapsedTime;
+		fPlayerDistanceFar += (fTargetDistance - fPlayerDistanceFar) * CONFIG->lerpDistance * fElapsedTime;
 
 		if (bTargetMode) {
 
-			float lerp = CONFIG.lerpAngle; // 0.1;
-			float diff = fabs(fTargetAngle - fYaw);
+			float lerp = CONFIG->lerpAngle; // 0.1;
+			float diff = fabs(fTargetYaw - fYaw);
 
 			// when this is false means 99% we are in the discontinuity
 			// from -PI to PI, so in that case we skip the lerp so it
@@ -98,12 +90,12 @@ namespace Pix {
 			if (bSmooth && diff < 15 * M_PI / 8) {
 
 				// if there is a big delta, make lerp faster
-				if (diff > M_PI / 16) lerp = CONFIG.lerpAngle / 5;
+				if (diff > M_PI / 16) lerp = CONFIG->lerpAngle / 5;
 
-				fYaw += (fTargetAngle - fYaw) * lerp * fElapsedTime;
+				fYaw += (fTargetYaw - fYaw) * lerp * fElapsedTime;
 
 			} else {
-				setYaw(fTargetAngle);
+				setYaw(fTargetYaw);
 			}
 
 			setPitch(fPlayerPitch);
@@ -122,8 +114,19 @@ namespace Pix {
 
 			inputMovement(CM_BACKWARD, fPlayerDistanceFar, 0.08F);
 			inputMovement(CM_UP, fPlayerDistanceUp, 0.08F);
+		} else if (bAnimateConfigChange) {
+			const float factor = CONFIG->lerpDistance * fElapsedTime;
+			mPosition.x += (CONFIG->position.x - mPosition.x) * factor;
+			mPosition.y += (CONFIG->position.y - mPosition.y) * factor;
+			mPosition.z += (CONFIG->position.z - mPosition.z) * factor;
+			fYaw += (CONFIG->yaw - fYaw) 					  * factor;
+			fPitch += (CONFIG->pitch - fPitch) 				  * factor;
+			fRoll += (CONFIG->roll - fRoll) 				  * factor;
+			updateCameraVectors();
 		}
-
+		
+		mCurrentViewMatrix = glm::lookAt(mPosition, mPosition + mFrontVector, mUpVector);
+		mCurrentInvViewMatrix = glm::inverse(mCurrentViewMatrix);
 	}
 
 	/**
@@ -134,6 +137,10 @@ namespace Pix {
 
 
 	void Camera::inputKey(CameraKeyControlMode_t mode, bool up, bool down, bool left, bool right, float percent, float fElapsedTime) {
+
+		// if we are animating, keep animating unless any direction key is pressed
+		if (bAnimateConfigChange)
+			bAnimateConfigChange = !(up||down||left||right);
 
 		mCameraMode = mode;
 
@@ -186,6 +193,8 @@ namespace Pix {
 
 	void Camera::inputMouse(float xoffset, float yoffset, bool constrainPitch) {
 
+		bAnimateConfigChange = false;
+		
 		xoffset *= mMouseSensitivity;
 		yoffset *= mMouseSensitivity;
 
@@ -210,6 +219,8 @@ namespace Pix {
 	 */
 
 	void Camera::inputMouseWheel(float yoffset) {
+
+		bAnimateConfigChange = false;
 
 		if (mMouseZoom >= 1.0F && mMouseZoom <= 45.0f)
 			mMouseZoom -= yoffset;
@@ -236,12 +247,10 @@ namespace Pix {
 
 		// todo this fancy fastnormalize is supposedly much less accurate but is it enough?
 		mFrontVector = glm::fastNormalize(front);
-		mRightVector = glm::fastNormalize(glm::cross(mFrontVector, CONFIG.upVector));
+		mRightVector = glm::fastNormalize(glm::cross(mFrontVector, CONFIG->upVector));
 		mUpVector = glm::fastNormalize(glm::cross(mRightVector, mFrontVector));
 
 	}
-
-
 }
 
 #pragma clang diagnostic pop
