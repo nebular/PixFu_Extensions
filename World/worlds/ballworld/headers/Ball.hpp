@@ -63,7 +63,8 @@ namespace Pix {
 	public:
 
 		/** whether this is a static object (so wont collide with another static object) */
-		const bool ISSTATIC;
+		const ObjectType_t TYPE;
+
 
 	protected:
 

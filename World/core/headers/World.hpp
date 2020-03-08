@@ -102,6 +102,7 @@ namespace Pix {
 		}
 
 
+
 	public:
 
 		const WorldConfig_t CONFIG;

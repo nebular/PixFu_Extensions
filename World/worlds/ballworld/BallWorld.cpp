@@ -226,7 +226,7 @@ namespace Pix {
 
 					Ball *ball = (Ball *) b;
 
-					if (!ball->ISSTATIC && !ball->bDisabled)
+					if (!ball->TYPE==OBJT_STATIC && !ball->bDisabled)
 						for (auto &edge : edges) {
 
 							// float fDeltaTime = ball->fSimTimeRemaining;
@@ -313,7 +313,7 @@ namespace Pix {
 						// If you declare all your scenery decoration or obstacles as static
 						// it will be relatively cheap to have lots of them
 
-						if ((!ball->ISSTATIC || !target->ISSTATIC)
+						if ((ball->TYPE!=OBJT_STATIC || target->TYPE!=OBJT_STATIC)
 							&& !ball->bDisabled && !target->bDisabled                            // disabled balls
 							&& ball->ID != target->ID) {
 
