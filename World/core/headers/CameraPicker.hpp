@@ -16,12 +16,16 @@
 #include "Camera.hpp"
 #include "Mouse.hpp"
 #include "World.hpp"
+#include "FuExtension.hpp"
 
 namespace Pix {
-	class MousePicker {
+
+	class CameraPicker:public FuExtension {
 
 		static constexpr int 	RECURSION_COUNT = 200;
 		static constexpr float 	RAY_RANGE = 3000;
+
+		float fLastMouseX, fLastMouseY;
 
 		glm::vec3 currentRay;
 		glm::vec3 currentTerrainPoint;
@@ -45,9 +49,10 @@ namespace Pix {
 		bool isUnderGround(glm::vec3& testPoint);
 
 		public:
-			MousePicker(World *world, glm::mat4& projection);
+			CameraPicker(World *world);
 			glm::vec3 *getCurrentTerrainPoint();
 			glm::vec3& getCurrentRay();
-			void update();
+			bool init(Fu *engine) override;
+			void tick(Fu *engine, float fElapsedTime) override;
 	};
 }

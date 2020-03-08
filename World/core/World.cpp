@@ -59,28 +59,6 @@ namespace Pix {
 		return object;
 	}
 
-	void WorldObject::process(World *world, float fElapsedTime) {
-
-		// process intrinsic animation
-		if (CONFIG.animation.enabled) {
-
-			// apply rotation
-			rot().x += CONFIG.animation.deltaRotationX * fElapsedTime;
-			rot().y += CONFIG.animation.deltaRotationY * fElapsedTime;
-			rot().z += CONFIG.animation.deltaRotationZ * fElapsedTime;
-
-			// apply scale pulse
-			if (CONFIG.animation.scalePulse > 0)
-				fRadiusAnimator = sinf(Fu::METRONOME) * CONFIG.animation.scalePulse;
-
-		}
-
-		if (world->CONFIG.debugMode == DEBUG_COLLISIONS)
-			world->canvas()->drawCircle(static_cast<int32_t>(pos().x), static_cast<int32_t>(pos().z), static_cast<int32_t>(radius()),
-										Pix::Colors::RED);
-
-	}
-
 
 	void World::add(WorldObject *object, bool setHeight) {
 
@@ -225,10 +203,29 @@ namespace Pix {
 		return matrix * flipMatrix;
 	}
 
-	void World::select(glm::vec3& ray) {
-		iterateObjects([this, &ray](WorldObject *obj) {
+	WorldObject *World::select(glm::vec3& ray, bool exclusive) {
+		WorldObject *selected = nullptr;
+		iterateObjects([this, &ray, &selected, exclusive](WorldObject *obj) {
+			// only select first one (simple behavior)
+			// future might return a vector
 			glm::vec3 pos = pCamera->getPosition();
-			obj->setSelected(obj->checkRayCollision(pos, ray));
+			bool sel = obj->checkRayCollision(pos, ray);
+
+			if (exclusive) {
+				obj->setSelected(sel);
+			} else {
+				// on multiselect, toggle on reclick selected
+				if (sel) obj->setSelected(!obj->isSelected());
+			}
+
+			if (sel && selected==nullptr) selected = obj;
+		});
+		return selected;
+	}
+
+	void World::selectAll(bool stat) {
+		iterateObjects([stat](WorldObject *obj) {
+			obj->setSelected(stat);
 		});
 	}
 

@@ -106,8 +106,6 @@ namespace Pix {
 
 	public:
 
-		const WorldConfig_t CONFIG;
-
 		static constexpr Transformation_t TRANSFORM_NONE = {};
 		static constexpr Transformation_t TRANSFORM_FLIPX = {
 				{0, 0, 0},                // global translation
@@ -127,14 +125,12 @@ namespace Pix {
 				1.0,                    // global scale
 				false, true, false        // global xyz flip
 		};
-
 		static constexpr Transformation_t TRANSFORM_FLIPZ = {
 				{0, 0, 0},                // global translation
 				{0, 0, 0},                // global rotation
 				1.0,                    // global scale
 				false, false, true        // global xyz flip
 		};
-
 		static constexpr Transformation_t TRANSFORM_FLIPZ_ROT = {
 				{0, 0, 0},                // global translation
 				{0, M_PI / 2, 0},            // global rotation
@@ -142,15 +138,24 @@ namespace Pix {
 				false, false, 0        // global xyz flip
 		};
 
-		World(WorldConfig_t& config);
+		const WorldConfig_t CONFIG;
 
+		World(WorldConfig_t& config);
 		virtual ~World();
 
 		/**
 		 Gets camera
-		 @return camera
+		 @return The world camera
 		 */
+
 		Camera *camera();
+
+		/**
+		 * Gets the projection matrix in use
+		 * @return The projection atix in use
+		 */
+
+		glm::mat4 getProjectionMatrix();
 
 		/**
 		 * Looks up the terrain height (+Y) for a world position. Height will be adjusted using the height scale
@@ -159,10 +164,8 @@ namespace Pix {
 		 * @return height in world coordinates
 		 */
 
-		float getHeight(glm::vec3 &posWorld);
-
+		float getHeight(glm::vec3& posWorld);
 		
-		void select(glm::vec3& rayDirection);
 		/**
 		 * Whether there is a terrain at that world coords.
 		 * @param posWorld Position to check
@@ -170,6 +173,22 @@ namespace Pix {
 		 */
 
 		bool hasTerrain(glm::vec3& posWorld);
+
+		/**
+		 * Selects an object using raytracing (nehavior is object dependent)
+		 *
+		 * @param rayDirection Normalized Ray from the camera
+		 * @param exclusive Whether to select all objects
+		 * @return The object pointed by the ray, if any.
+		 */
+
+		WorldObject *select(glm::vec3& rayDirection, bool exclusive = true);
+
+		/**
+		 * selects/unselects all objects.
+		 */
+
+		void selectAll(bool select=true);
 
 		/**
 		 * Gets the 3D canvas. A
@@ -185,6 +204,7 @@ namespace Pix {
 		 * @return The 3D canvas
 		 */
 		Canvas2D *canvas();
+		
 
 	};
 
@@ -201,6 +221,10 @@ namespace Pix {
 		}
 
 		return 0;
+	}
+
+	inline glm::mat4 World::getProjectionMatrix() {
+		return projectionMatrix;
 	}
 
 	inline bool World::hasTerrain(glm::vec3 &posWorld) {
