@@ -16,10 +16,8 @@ namespace Pix {
 	}
 
 	/**
-	 *
 	 * The base class accepts a steering angle and acceleration and does simple rotations
 	 * on the speed vector. The movement is ok for balls but not very realistic for cars.
-	 *
 	 */
 
 	void BallPlayer::process(World *world, float fElapsedTime) {
