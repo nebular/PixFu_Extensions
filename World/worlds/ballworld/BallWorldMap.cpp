@@ -1,5 +1,5 @@
 //
-//  GameCircuit
+//  BAllWorldMap
 //
 //  Saves and loads a circuit definition (.cir)
 //
