@@ -29,6 +29,7 @@
 
 #include "BallWorld.hpp"
 #include "Ball.hpp"
+#include "BallObject.hpp"
 #include "BallPlayer.hpp"
 #include "Splines.hpp"
 #include "LineSegment.hpp"
@@ -119,7 +120,9 @@ namespace Pix {
 		glm::vec3 &pos2 = b2->mPosition;
 
 		// Distance between balls TODO
-		const float fDistance = glm::fastSqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
+//		const float fDistance = glm::fastSqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
+//											  + (pos1.z - pos2.z) * (pos1.z - pos2.z));
+		const float fDistance = sqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
 											  + (pos1.z - pos2.z) * (pos1.z - pos2.z));
 
 		// Normal
@@ -157,7 +160,7 @@ namespace Pix {
 	}
 
 	WorldObject *BallWorld::add(ObjectProperties_t features, ObjectLocation_t location, bool setHeight) {
-		Ball *ball = new Ball(CONFIG, features, location);
+		BallObject *ball = new BallObject(this, features, location);
 		World::add(ball, setHeight);
 		return ball;
 	}

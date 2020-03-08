@@ -1,44 +1,33 @@
 //
-// Created by rodo on 2020-03-06.
+//  BallObject.hpp
+//  PixFu
+//
+//  Created by rodo on 06/03/2020.
+//  Copyright © 2020 rodo. All rights reserved.
 //
 
-#ifndef PIXFU_ANDROID_LIB_BALLOBJECT_HPP
-#define PIXFU_ANDROID_LIB_BALLOBJECT_HPP
+#pragma once
 
-#include "../../../geom/Splines.hpp"
+#include "WorldMeta.hpp"
 #include "Ball.hpp"
-#include "../../../core/headers/WorldMeta.hpp"
+#include "Splines.hpp"
 
 namespace Pix {
 
-	class BallObject:public Ball {
+	class BallObject : public Ball {
+		
+		inline const static std::string TAG = "BallObject";
+		
+		Spline_t *pSpline = nullptr;
+		sPoint2D mLastPoint;
+		float fPosition = 0;
 
-		Spline_t *pSpline;
-		float fPos;
+		void driveSpline(float fElapsedTime);
 
 	public:
-		BallObject(const WorldConfig_t &planetConfig, ObjectProperties_t &meta, const ObjectLocation_t &location, int overrideId)
-		:Ball(planetConfig, meta, location, overrideId) {}
+		BallObject (BallWorld *world, ObjectProperties_t& meta, ObjectLocation_t location);
+		void process(World *world, float fTime);
 
-	private:
-		void driveSpline(float fElapsedTime);
 	};
-
-	void BallObject::driveSpline(float fElapsedTime) {
-
-		if (fPos > pSpline->fTotalSplineLength) fPos = 0;
-
-		fPos += fElapsedTime;
-
-		Pix::sPoint2D splPoint = pSpline->GetSplinePoint(fPos);
-
-		glm::vec3 &pos = pHumanPlayer->pos();
-		pos.x = splPoint.x; //1000;
-		pos.z = splPoint.y; //1000;
-
-		pHumanPlayer->rot().y = -spl.GetSplineAngle(fPos);
-
-	}
-BallObject::BallObject(const WorldConfig_t & planetConfig, ObjectProperties_t & meta, const ObjectLocation_t & location, int overrideId):Ball(planetConfig,meta,location,overrideId){}
 
 }

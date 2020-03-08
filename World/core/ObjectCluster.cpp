@@ -112,6 +112,9 @@ namespace Pix {
 					// load the transformation matrix
 					shader->loadTransformationMatrix(result);
 
+					// Set object tint
+					shader->setTint(object->isSelected() ? WorldObject::TINT_SELECT:object->tintCode());
+
 					// VAO thunder
 					draw(0, false);
 
@@ -147,6 +150,9 @@ namespace Pix {
 
 				// load the transformation matrix
 				shader->loadTransformationMatrix(visible.transformMatrix);
+
+				// Set object tint
+				shader->setTint(visible.object->isSelected() ? WorldObject::TINT_SELECT:visible.object->tintCode());
 
 				// VAO thunder
 				draw(i, false);

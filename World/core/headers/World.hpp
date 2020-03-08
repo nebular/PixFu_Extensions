@@ -31,23 +31,44 @@ namespace Pix {
 
 		static std::string TAG;
 
+		/** Shader for terrain */
 		TerrainShader *pShader;
+		
+		/** Shader for objects */
 		ObjectShader *pShaderObjects;
 
-		glm::mat4 projectionMatrix;
-
+		/** World Light */
 		Light *pLight;
+
+		/** World Camera */
 		Camera *pCamera;
 
+		/** Object Clusters */
 		std::map<std::string, ObjectCluster *> mClusters;
 
 	protected:
 
+		/** The current projection matrix */
+		glm::mat4 projectionMatrix;
+
+		/** Object Clusters */
 		std::vector<ObjectCluster *> vObjects;
-		std::vector<Terrain *> vTerrains;
 		
+		/** Terrains */
+		std::vector<Terrain *> vTerrains;
+
+		/**
+		 * Intits the extension
+		 * @param engine The FU engine
+		 */
 		virtual bool init(Fu *engine);
 
+		/**
+		 * Ticks the extension
+		 * @param engine The FU engine
+		 * @param fElapsedTime The frame time
+		 */
+		
 		virtual void tick(Fu *engine, float fElapsedTime);
 
 		/**
@@ -94,6 +115,11 @@ namespace Pix {
 
 		virtual WorldObject *add(int oid, bool setHeight);
 		
+		/**
+		 * Iterates all world objects
+		 * @param callback The callback
+		 */
+
 		template<typename Func>
 		void iterateObjects(Func callback) {
 			for (ObjectCluster *cluster:vObjects) {
@@ -101,25 +127,28 @@ namespace Pix {
 			}
 		}
 
-
-
 	public:
 
-		const WorldConfig_t CONFIG;
-
+		/** Do not transform, use vertex data as-is */
 		static constexpr Transformation_t TRANSFORM_NONE = {};
+
+		/** Flip X axis */
 		static constexpr Transformation_t TRANSFORM_FLIPX = {
 				{0, 0, 0},                // global translation
 				{0, 0, 0},                // global rotation
 				1.0,                    // global scale
 				true, false, false        // global xyz flip
 		};
+
+		/** Flip X and Y axis */
 		static constexpr Transformation_t TRANSFORM_FLIPXY = {
 				{0, 0, 0},                // global translation
 				{0, 0, 0},                // global rotation
 				1.0,                    // global scale
 				true, true, false        // global xyz flip
 		};
+
+		/** Flip Y axis */
 		static constexpr Transformation_t TRANSFORM_FLIPY = {
 				{0, 0, 0},                // global translation
 				{0, 0, 0},                // global rotation
@@ -127,6 +156,7 @@ namespace Pix {
 				false, true, false        // global xyz flip
 		};
 
+		/** Flip Z axis */
 		static constexpr Transformation_t TRANSFORM_FLIPZ = {
 				{0, 0, 0},                // global translation
 				{0, 0, 0},                // global rotation
@@ -134,6 +164,7 @@ namespace Pix {
 				false, false, true        // global xyz flip
 		};
 
+		/** Flip Z axis and rotates PI/2 */
 		static constexpr Transformation_t TRANSFORM_FLIPZ_ROT = {
 				{0, 0, 0},                // global translation
 				{0, M_PI / 2, 0},            // global rotation
@@ -141,15 +172,25 @@ namespace Pix {
 				false, false, 0        // global xyz flip
 		};
 
-		World(WorldConfig_t& config);
+		/** Immutable config */
+		const WorldConfig_t CONFIG;
 
+		World(WorldConfig_t& config);
 		virtual ~World();
 
 		/**
 		 Gets camera
-		 @return camera
+		 @return The world camera
 		 */
+
 		Camera *camera();
+
+		/**
+		 * Gets the projection matrix in use
+		 * @return The projection atix in use
+		 */
+
+		glm::mat4 getProjectionMatrix();
 
 		/**
 		 * Looks up the terrain height (+Y) for a world position. Height will be adjusted using the height scale
@@ -158,7 +199,31 @@ namespace Pix {
 		 * @return height in world coordinates
 		 */
 
-		float getHeight(glm::vec3 &posWorld);
+		float getHeight(glm::vec3& posWorld);
+		
+		/**
+		 * Whether there is a terrain at that world coords.
+		 * @param posWorld Position to check
+		 * @return whether
+		 */
+
+		bool hasTerrain(glm::vec3& posWorld);
+
+		/**
+		 * Selects an object using raytracing (nehavior is object dependent)
+		 *
+		 * @param rayDirection Normalized Ray from the camera
+		 * @param exclusive Whether to select all objects
+		 * @return The object pointed by the ray, if any.
+		 */
+
+		WorldObject *select(glm::vec3& rayDirection, bool exclusive = true);
+
+		/**
+		 * selects/unselects all objects.
+		 */
+
+		void selectAll(bool select=true);
 
 		/**
 		 * Gets the 3D canvas. A
@@ -167,7 +232,7 @@ namespace Pix {
 		 * @return The 3D canvas
 		 */
 
-		Canvas2D *canvas(glm::vec3 &posWorld);
+		Canvas2D *canvas(glm::vec3& posWorld);
 
 		/**
 		 * Convenience function to return the 3D canvas of the first terrain.
@@ -176,6 +241,10 @@ namespace Pix {
 		Canvas2D *canvas();
 
 	};
+
+	//
+	///////// INLINE IMPLEMENTATION
+	//
 
 	inline Camera *World::camera() { return pCamera; }
 
@@ -190,6 +259,22 @@ namespace Pix {
 		}
 
 		return 0;
+	}
+
+	inline glm::mat4 World::getProjectionMatrix() {
+		return projectionMatrix;
+	}
+
+	inline bool World::hasTerrain(glm::vec3 &posWorld) {
+
+		if (vTerrains.size()==1)
+			return vTerrains[0]->contains(posWorld);
+
+		for (Terrain *terrain:vTerrains)
+			if (terrain->contains(posWorld))
+				return true;
+
+		return false;
 	}
 
 	inline Canvas2D *World::canvas(glm::vec3 &posWorld) {

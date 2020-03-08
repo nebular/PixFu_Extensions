@@ -38,13 +38,16 @@ include_directories(Sprites/headers)
 
 add_library(pixFu_ext SHARED
         World/core/Camera.cpp
+        World/core/CameraPicker.cpp
         World/core/ObjectCluster.cpp
         World/core/ObjectShader.cpp
         World/core/ObjLoader.cpp
         World/core/Terrain.cpp
         World/core/TerrainShader.cpp
         World/core/World.cpp
+        World/core/WorldObject.cpp
         World/worlds/ballworld/Ball.cpp
+        World/worlds/ballworld/BallObject.cpp
         World/worlds/ballworld/BallWorld.cpp
         World/worlds/ballworld/BallWorldMap.cpp
         World/worlds/ballworld/BallPlayer.cpp

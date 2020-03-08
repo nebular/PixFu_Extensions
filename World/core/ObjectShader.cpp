@@ -12,7 +12,8 @@
 
 namespace Pix {
 
-	ObjectShader::ObjectShader(const std::string& name) : Shader(std::move(name)) {}
+	ObjectShader::ObjectShader(const std::string& name)
+	: Shader(std::move(name)) {}
 
 	void ObjectShader::bindAttributes() {
 		bindAttribute(0, "position");
@@ -37,10 +38,11 @@ namespace Pix {
 	}
 
 	void ObjectShader::loadViewMatrix(Camera *camera) {
+
 		glm::mat4 viewMatrix = camera->getViewMatrix();
 		setMat4("viewMatrix", (float *) &viewMatrix);
 
-		glm::mat4 invViewMatrix = glm::affineInverse(viewMatrix);
+		glm::mat4& invViewMatrix = camera->getInvViewMatrix();
 		setMat4("invViewMatrix", (float *) &invViewMatrix);
 
 		mFrustum = new Frustum(mProjectionMatrix * viewMatrix);
@@ -51,6 +53,9 @@ namespace Pix {
 		mProjectionMatrix = projection;
 		mFrustum = nullptr;
 	}
-
+	
+	void ObjectShader::setTint(glm::vec4 tint) {
+		setVec4("tintMode", tint.x, tint.y, tint.z, tint.w);
+	}
 
 }

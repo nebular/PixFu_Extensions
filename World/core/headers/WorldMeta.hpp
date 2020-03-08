@@ -16,6 +16,7 @@
 #include "Font.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
+#include "glm/vec4.hpp"
 
 namespace Pix {
 
@@ -147,6 +148,14 @@ namespace Pix {
 		const float RIDEHEIGHT_SEAMLESS = 5;	// ignore this height difference
 	} ObjectTerrainBehavior_t;
 
+	static constexpr int NO_SPLINE = -1;
+	static constexpr int INFINITE = -1;
+
+	typedef const struct sObjectTrajectory {
+		int splineId = NO_SPLINE;
+		int iterations = INFINITE;
+		float lerp = 0.7F;
+	} ObjectTrajectory_t;
 
 	/**
 	 *
@@ -181,6 +190,9 @@ namespace Pix {
 
 		/** Intrinsic Animation */
 		const ObjectAnimation_t animation = {};
+
+		/** Intrinsit trajectory */
+		const ObjectTrajectory_t trajectory = {};
 
 		/** Whether object is static */
 		const bool ISSTATIC = false;
@@ -264,104 +276,4 @@ namespace Pix {
 	} TerrainConfig_t;
 
 
-	/**
-	 Base class for any object in the world. This is an abstract class.
-	 You will extend this class to provide physics to your objects.
-	 */
-
-	class World;
-
-	class WorldObjectBase {
-
-		static int instanceCounter;
-
-	protected:
-
-		/** World Configuration */
-		const WorldConfig_t &WORLD;
-
-	public:
-
-		const unsigned CLASSID;
-
-		/** Object ID */
-		const int ID;
-
-		/** Object Classname (maps to resources) */
-		const std::string CLASS;
-
-		inline WorldObjectBase(const WorldConfig_t &worldConfig, std::string objectClass, unsigned classId, int overrideId = -1) :
-				WORLD(worldConfig),
-				CLASSID(classId),
-				ID(overrideId >= 0 ? overrideId : instanceCounter++),
-				CLASS(objectClass) {}
-
-		inline virtual ~WorldObjectBase() = default;
-
-		/**
-		 * Return object position
-		 * @return The object position
-		 */
-		virtual glm::vec3 &pos() = 0;
-
-		/**
-		 * Return object rotation around xyz axis
-		 * @return The rotation vector in radians
-		 */
-		virtual glm::vec3 &rot() = 0;
-
-		/**
-		 * Return object radius
-		 * @return Radius in World Coordinates
-		 */
-		virtual float radius() = 0;
-
-		/**
-		 * Return object radius
-		 * @return Radius in World Coordinates
-		 */
-		virtual float drawRadius() = 0;
-
-	};
-
-	/**
-	 * Convenience class for a static world object without any physics. Will just get rendered
-	 * in a static location.
-	 */
-
-	class WorldObject : public WorldObjectBase {
-
-
-	protected:
-
-		float fRadiusAnimator = 0;
-
-		// Object Location
-		ObjectLocation_t LOCATION;
-
-	public:
-
-		static constexpr unsigned CLASSID_CODE = 1;
-
-		// Object metadata
-		const ObjectProperties_t CONFIG;
-
-		inline WorldObject(const WorldConfig_t &worldConfig, const ObjectProperties_t objectMeta, ObjectLocation_t location,
-						   unsigned int classid = CLASSID_CODE, int overrideId = -1) :
-				WorldObjectBase(worldConfig, objectMeta.CLASSNAME, classid, overrideId),
-				LOCATION(std::move(location)),
-				CONFIG(std::move(objectMeta))
-				{}
-
-		inline virtual glm::vec3 &pos() override { return LOCATION.position; }
-
-		inline virtual glm::vec3 &rot() override { return LOCATION.rotation; }
-
-		inline virtual float radius() override { return CONFIG.radius; }
-
-		inline virtual float drawRadius() override { return CONFIG.radius * CONFIG.drawRadiusMultiplier / 1000.0F; }
-
-		/** process animations */
-		virtual void process(World *world, float fElapsedTime);
-	};
 }
