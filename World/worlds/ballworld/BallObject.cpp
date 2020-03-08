@@ -15,6 +15,7 @@ namespace Pix {
 	: Ball(world->CONFIG, meta, location) {
 		if (meta.trajectory.splineId != NO_SPLINE) {
 			pSpline = &world->map()->vecSplines[meta.trajectory.splineId];
+
 		}
 	}
 
