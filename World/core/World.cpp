@@ -31,16 +31,16 @@ namespace Pix {
 	/** Object database */
 	std::map<int, ObjectDbEntry_t> ObjectDb::Database;
 
-
 	World::World(WorldConfig_t &config)
-			: CONFIG(config) {
-		if (config.debugMode == DEBUG_WIREFRAME)
-			LayerVao::DRAWMODE = GL_LINES;
+			: FuExtension(true),								// require add on constructor
+			  CONFIG(config) {
+					if (config.debugMode == DEBUG_WIREFRAME)
+						LayerVao::DRAWMODE = GL_LINES;
 	};
 
 	World::~World() {
 
-		if (DBG) LogV(TAG, "Destroying planet");
+		if (DBG) LogV(TAG, "Destroying World");
 		for (Terrain *terrain : vTerrains) {
 			delete terrain;
 		}
@@ -58,7 +58,6 @@ namespace Pix {
 		add(object, setHeight);
 		return object;
 	}
-
 
 	void World::add(WorldObject *object, bool setHeight) {
 
@@ -174,6 +173,32 @@ namespace Pix {
 
 	}
 
+	WorldObject *World::select(glm::vec3& ray, bool exclusive) {
+		WorldObject *selected = nullptr;
+		iterateObjects([this, &ray, &selected, exclusive](WorldObject *obj) {
+			// only select first one (simple behavior)
+			// future might return a vector
+			glm::vec3 pos = pCamera->getPosition();
+			bool sel = obj->checkRayCollision(pos, ray);
+
+			if (exclusive) {
+				obj->setSelected(sel);
+			} else {
+				// on multiselect, toggle on reclick selected
+				if (sel) obj->setSelected(!obj->isSelected());
+			}
+
+			if (sel && selected==nullptr) selected = obj;
+		});
+		return selected;
+	}
+
+	void World::selectAll(bool stat) {
+		iterateObjects([stat](WorldObject *obj) {
+			obj->setSelected(stat);
+		});
+	}
+
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
 										 float scale, bool flipX = true, bool flipY = false, bool flipZ = false) {
 
@@ -201,33 +226,7 @@ namespace Pix {
 		matrix = glm::rotate(matrix, rzrads, {0.0F, 0.0F, 1.0F});
 		matrix = glm::scale(matrix, {scale, scale, scale});
 		return matrix * flipMatrix;
-	}
-
-	WorldObject *World::select(glm::vec3& ray, bool exclusive) {
-		WorldObject *selected = nullptr;
-		iterateObjects([this, &ray, &selected, exclusive](WorldObject *obj) {
-			// only select first one (simple behavior)
-			// future might return a vector
-			glm::vec3 pos = pCamera->getPosition();
-			bool sel = obj->checkRayCollision(pos, ray);
-
-			if (exclusive) {
-				obj->setSelected(sel);
-			} else {
-				// on multiselect, toggle on reclick selected
-				if (sel) obj->setSelected(!obj->isSelected());
-			}
-
-			if (sel && selected==nullptr) selected = obj;
-		});
-		return selected;
-	}
-
-	void World::selectAll(bool stat) {
-		iterateObjects([stat](WorldObject *obj) {
-			obj->setSelected(stat);
-		});
-	}
+}
 
 };
 

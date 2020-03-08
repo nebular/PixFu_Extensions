@@ -31,24 +31,44 @@ namespace Pix {
 
 		static std::string TAG;
 
+		/** Shader for terrain */
 		TerrainShader *pShader;
+		
+		/** Shader for objects */
 		ObjectShader *pShaderObjects;
 
-
+		/** World Light */
 		Light *pLight;
+
+		/** World Camera */
 		Camera *pCamera;
 
+		/** Object Clusters */
 		std::map<std::string, ObjectCluster *> mClusters;
 
 	protected:
 
+		/** The current projection matrix */
 		glm::mat4 projectionMatrix;
 
+		/** Object Clusters */
 		std::vector<ObjectCluster *> vObjects;
-		std::vector<Terrain *> vTerrains;
 		
+		/** Terrains */
+		std::vector<Terrain *> vTerrains;
+
+		/**
+		 * Intits the extension
+		 * @param engine The FU engine
+		 */
 		virtual bool init(Fu *engine);
 
+		/**
+		 * Ticks the extension
+		 * @param engine The FU engine
+		 * @param fElapsedTime The frame time
+		 */
+		
 		virtual void tick(Fu *engine, float fElapsedTime);
 
 		/**
@@ -95,42 +115,56 @@ namespace Pix {
 
 		virtual WorldObject *add(int oid, bool setHeight);
 		
+		/**
+		 * Iterates all world objects
+		 * @param callback The callback
+		 */
+
 		template<typename Func>
 		void iterateObjects(Func callback) {
 			for (ObjectCluster *cluster:vObjects) {
 				std::for_each(cluster->vInstances.begin(), cluster->vInstances.end(), callback);
 			}
 		}
-		
-
 
 	public:
 
+		/** Do not transform, use vertex data as-is */
 		static constexpr Transformation_t TRANSFORM_NONE = {};
+
+		/** Flip X axis */
 		static constexpr Transformation_t TRANSFORM_FLIPX = {
 				{0, 0, 0},                // global translation
 				{0, 0, 0},                // global rotation
 				1.0,                    // global scale
 				true, false, false        // global xyz flip
 		};
+
+		/** Flip X and Y axis */
 		static constexpr Transformation_t TRANSFORM_FLIPXY = {
 				{0, 0, 0},                // global translation
 				{0, 0, 0},                // global rotation
 				1.0,                    // global scale
 				true, true, false        // global xyz flip
 		};
+
+		/** Flip Y axis */
 		static constexpr Transformation_t TRANSFORM_FLIPY = {
 				{0, 0, 0},                // global translation
 				{0, 0, 0},                // global rotation
 				1.0,                    // global scale
 				false, true, false        // global xyz flip
 		};
+
+		/** Flip Z axis */
 		static constexpr Transformation_t TRANSFORM_FLIPZ = {
 				{0, 0, 0},                // global translation
 				{0, 0, 0},                // global rotation
 				1.0,                    // global scale
 				false, false, true        // global xyz flip
 		};
+
+		/** Flip Z axis and rotates PI/2 */
 		static constexpr Transformation_t TRANSFORM_FLIPZ_ROT = {
 				{0, 0, 0},                // global translation
 				{0, M_PI / 2, 0},            // global rotation
@@ -138,6 +172,7 @@ namespace Pix {
 				false, false, 0        // global xyz flip
 		};
 
+		/** Immutable config */
 		const WorldConfig_t CONFIG;
 
 		World(WorldConfig_t& config);
@@ -204,9 +239,12 @@ namespace Pix {
 		 * @return The 3D canvas
 		 */
 		Canvas2D *canvas();
-		
 
 	};
+
+	//
+	///////// INLINE IMPLEMENTATION
+	//
 
 	inline Camera *World::camera() { return pCamera; }
 

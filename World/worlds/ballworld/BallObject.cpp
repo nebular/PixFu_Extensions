@@ -20,7 +20,6 @@ namespace Pix {
 
 	void BallObject::driveSpline(float fElapsedTime) {
 
-		constexpr float LERPSPLINE = 0.1;
 		constexpr float followspeed = 80;
 		
 		if (fPosition > pSpline->fTotalSplineLength) fPosition = 0;
