@@ -12,6 +12,8 @@
 #include "glm/gtx/fast_square_root.hpp"
 
 namespace Pix {
+	
+	CameraPicker *CameraPicker::pInstance = nullptr;
 
 	CameraPicker::CameraPicker(World *world) {
 		pWorld = world;

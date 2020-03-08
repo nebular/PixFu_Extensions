@@ -120,7 +120,9 @@ namespace Pix {
 		glm::vec3 &pos2 = b2->mPosition;
 
 		// Distance between balls TODO
-		const float fDistance = glm::fastSqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
+//		const float fDistance = glm::fastSqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
+//											  + (pos1.z - pos2.z) * (pos1.z - pos2.z));
+		const float fDistance = sqrt((pos1.x - pos2.x) * (pos1.x - pos2.x)
 											  + (pos1.z - pos2.z) * (pos1.z - pos2.z));
 
 		// Normal

@@ -150,6 +150,7 @@ namespace Pix {
 
 		float fIntendedSpeed = speed();
 
+//		float fActualDistance = glm::fastSqrt(
 		float fActualDistance = sqrtf(
 				(mPosition.x - origPos.x) * (mPosition.x - origPos.x)
 				+ (mPosition.z - origPos.z) * (mPosition.z - origPos.z));

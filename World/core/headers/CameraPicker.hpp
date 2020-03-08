@@ -24,7 +24,8 @@ namespace Pix {
 
 		static constexpr int 	RECURSION_COUNT = 200;
 		static constexpr float 	RAY_RANGE = 3000;
-
+		static CameraPicker *pInstance;
+		
 		float fLastMouseX, fLastMouseY;
 
 		glm::vec3 currentRay;
@@ -48,11 +49,24 @@ namespace Pix {
 		bool intersectionInRange(float start, float finish, glm::vec3& ray);
 		bool isUnderGround(glm::vec3& testPoint);
 
-		public:
+		private:
 			CameraPicker(World *world);
+		
+		public:
+			static void enable(World *world);
+			static CameraPicker *instance();
 			glm::vec3 *getCurrentTerrainPoint();
 			glm::vec3& getCurrentRay();
 			bool init(Fu *engine) override;
 			void tick(Fu *engine, float fElapsedTime) override;
 	};
+
+	inline void CameraPicker::enable(World *world) {
+		pInstance = new CameraPicker(world);
+	}
+
+	inline CameraPicker *CameraPicker::instance() {
+		return pInstance;
+	}
+
 }
