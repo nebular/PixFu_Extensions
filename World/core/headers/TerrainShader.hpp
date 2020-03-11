@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Shader.hpp"
+#include "Material.hpp"
 #include "glm/mat4x4.hpp"
 
 namespace Pix {
@@ -29,7 +30,7 @@ namespace Pix {
 
 		void loadTransformationMatrix(glm::mat4 &matrix);
 
-		void loadLight(Light *light);
+		void loadLight(const Light& light);
 
 		void loadViewMatrix(Camera *camera);
 

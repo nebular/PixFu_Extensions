@@ -31,6 +31,10 @@ namespace Pix {
 		pLoader->LoadObject(*Vertices, *Indices);
 	}
 
+	ObjLoader::~ObjLoader() {
+		delete pLoader;
+	}
+
 	unsigned ObjLoader::meshCount() {
 		return (unsigned) pLoader->LoadedMeshes.size();
 	}
@@ -49,6 +53,14 @@ namespace Pix {
 
 	unsigned ObjLoader::indicesCount(int mesh) {
 		return (unsigned) pLoader->LoadedMeshes[mesh].Indices.size();
+	}
+
+	Material& ObjLoader::material(int mesh) {
+		return pLoader->LoadedMeshes[mesh].MeshMaterial;
+	}
+
+	std::vector<Material>& ObjLoader::materials() {
+		return pLoader->LoadedMaterials;
 	}
 }
 

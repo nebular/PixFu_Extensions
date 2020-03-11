@@ -15,6 +15,7 @@
 
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
+#include "Fu.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCSimplifyInspection"
@@ -40,10 +41,8 @@ namespace Pix {
 		// load object model
 		pLoader = new ObjLoader(std::string(PATH_OBJECTS) + "/" + NAME + "/" + NAME + ".obj");
 
-		// load mesh texxtures TODO parse materials properly
-		for (int i = 0; i < pLoader->meshCount(); i++) {
-			if (DBG) LogV(TAG, SF("- texture %s, name %d", NAME.c_str(), i));
-			vTextures.emplace_back(new Texture2D("objects/" + NAME + "/" + NAME + "-" + std::to_string(i) + ".png"));
+		for (int i = 0; i< pLoader->meshCount(); i++) {
+		  pLoader->material(i).init(NAME);
 		}
 
 		mPlacer = PLACER.toMatrix();
@@ -61,8 +60,7 @@ namespace Pix {
 	}
 
 	ObjectCluster::~ObjectCluster() {
-		delete pTexture;
-		pTexture = nullptr;
+		delete pLoader;
 		if (DBG) LogV(TAG, SF("Destroyed ObjectCluster %s", NAME.c_str()));
 	}
 
@@ -70,14 +68,19 @@ namespace Pix {
 
 		if (!bInited) init();
 
+		shader->setFloat("iTime", (float) Fu::METRONOME);
+
 		int frustumHits = 0;
 
 		bool oneMesh = vMeshes.size() == 1;
 
 		if (oneMesh) {
-			shader->textureUnit("modelTexture", vTextures[0]);
-			shader->loadShineVariables(1, 0.7F);
-			vTextures[0]->bind();
+
+			constexpr int MESH = 0;
+			
+			Material& material = pLoader->material(MESH);
+			material.load(shader);
+			material.bind(shader);
 			bind(0);
 		}
 
@@ -141,9 +144,9 @@ namespace Pix {
 
 		for (int i = 0; i < vMeshes.size(); i++) {
 
-			shader->textureUnit("modelTexture", vTextures[i]);
-			shader->loadShineVariables(1, 0.7F);
-			vTextures[i]->bind();
+			Material& material = pLoader->material(i);
+			material.load(shader);
+			material.bind(shader);
 			bind(i);
 
 			for (Visible_t visible: vVisibles) {
@@ -171,7 +174,7 @@ namespace Pix {
 					pLoader->vertices(i), pLoader->verticesCount(i),
 					pLoader->indices(i), pLoader->indicesCount(i)
 			);
-			vTextures[i]->upload(); // todo materials
+			pLoader->material(i).upload();
 		}
 		bInited = true;
 	}

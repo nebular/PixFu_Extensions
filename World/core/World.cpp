@@ -85,8 +85,6 @@ namespace Pix {
 
 		pShader = new TerrainShader(CONFIG.shaderName);
 		pShaderObjects = new ObjectShader(CONFIG.shaderName + "_objects");
-
-		pLight = new Light(CONFIG.lightPosition, CONFIG.lightColor);
 		pCamera = new Camera();
 
 		pCamera->setHeight(CONFIG.perspective.C_HEIGHT);
@@ -106,7 +104,7 @@ namespace Pix {
 		);
 
 		pShader->loadProjectionMatrix(projectionMatrix);
-		//		pShader->loadLight(pLight);
+		CONFIG.light.load(pShader);
 
 		pShader->stop();
 
@@ -119,8 +117,7 @@ namespace Pix {
 			pShaderObjects->use();
 			pShaderObjects->bindAttributes();
 			pShaderObjects->loadProjectionMatrix(projectionMatrix);
-			// light is updated every frame
-			// pShaderObjects->loadLight(pLight);
+			CONFIG.light.load(pShaderObjects);
 			pShaderObjects->stop();
 		}
 
@@ -140,8 +137,8 @@ namespace Pix {
 
 		pShader->use();
 		pShader->loadViewMatrix(pCamera);
-		pShader->loadLight(pLight); //
-
+		CONFIG.light.update(pShader);
+	
 		for (Terrain *terrain:vTerrains) {
 			terrain->render(pShader);
 		}
@@ -153,7 +150,7 @@ namespace Pix {
 			// configure object shader
 			pShaderObjects->use();
 			pShaderObjects->loadViewMatrix(pCamera);
-			pShaderObjects->loadLight(pLight);
+			CONFIG.light.update(pShaderObjects);
 
 			// draw each cluster
 			for (ObjectCluster *object:vObjects) {
@@ -225,6 +222,24 @@ namespace Pix {
 		matrix = glm::scale(matrix, {scale, scale, scale});
 		return matrix * flipMatrix;
 	}
+
+	void Light::load(Shader *shader) const {
+		glm::vec3 l = mPosition;
+		shader->setVec3("lightPosition", l.x, l.y, l.z);
+		glm::vec3 c = mAmbient;
+		shader->setVec3("light.ambient", c.x, c.y, c.z);
+		glm::vec3 d= mDiffuse;
+		shader->setVec3("light.diffuse",  d.x, d.y, d.z);
+		glm::vec3 s= mSpecular;
+		shader->setVec3("light.specular", s.x, s.y, s.z);
+		shader->setFloat("light.ka", ka);
+	}
+
+	void Light::update(Shader *shader) const {
+		glm::vec3 l = mPosition;
+		shader->setVec3("lightPosition", l.x, l.y, l.z);
+	}
+
 
 };
 

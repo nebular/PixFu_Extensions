@@ -9,6 +9,7 @@
 #include "World.hpp"
 #include "Terrain.hpp"
 #include "Config.hpp"
+#include "Fu.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCSimplifyInspection"
@@ -18,29 +19,24 @@
 namespace Pix {
 
 	std::string Terrain::TAG = "Terrain";
+	constexpr int MESH = 0;
 
 	Terrain::Terrain(WorldConfig_t planetConfig, TerrainConfig_t config)
 			: CONFIG(config), PLANET(std::move(planetConfig)) {
 
 		std::string path = std::string(PATH_LEVELS) + "/" + config.name;
 
-		if (config.staticMesh == nullptr) {
+		// load resources
+		pLoader = new ObjLoader(path + "/" + config.name + ".obj");
+	
+		// at the moment terrain is single mesh
+		pLoader->material(MESH).init(config.name, std::string(PATH_LEVELS));
 
-			// load resources
-			pLoader = new ObjLoader(path + "/" + config.name + ".obj");
-			pTexture = new Texture2D(path + "/" + config.name + ".png");
-			pHeightMap = Drawable::fromFile(path + "/" + config.name + ".heights.png");
+		pHeightMap = Drawable::fromFile(path + "/" + config.name + ".heights.png");
 
-		} else {
-
-			pLoader = new ObjLoader(config.staticMesh);
-			pTexture = new Texture2D(2000, 2000);
-			pTexture->buffer()->clear(Pix::Colors::GREEN.scale(0.3F));
-			pHeightMap = nullptr;
-
-		}
-
-		mSize = {pTexture->width(), pTexture->height()};
+		// first texture determines the map size
+		Texture2D *t= pLoader->material(0).textureKd;
+		mSize = {t->width(), t->height()};
 
 		// 3d canvas
 		if (PLANET.withCanvas) {
@@ -55,10 +51,7 @@ namespace Pix {
 	};
 
 	Terrain::~Terrain() {
-		if (pTexture != nullptr) {
-			delete pTexture;
-			pTexture = nullptr;
-		}
+		delete pLoader;
 		if (PLANET.withCanvas) {
 			delete pDirtCanvas;
 			delete pDirtTexture;
@@ -81,9 +74,13 @@ namespace Pix {
 	void Terrain::render(TerrainShader *shader) {
 
 		if (!bInited) init(shader);
+		
+		shader->setFloat("iTime", (float)Fu::METRONOME);
 
-		shader->textureUnit("modelTexture", pTexture);
-		shader->loadShineVariables(1, 0.7F);
+		
+		Material& material = pLoader->material(MESH);
+		material.load(shader);
+		material.bind(shader);
 
 		if (pDirtTexture != nullptr) {
 			if (pDirtTexture->buffer()->clearDirty()) pDirtTexture->update();
@@ -106,7 +103,7 @@ namespace Pix {
 				pLoader->vertices(), pLoader->verticesCount(),
 				pLoader->indices(), pLoader->indicesCount());
 
-		pTexture->upload();
+		pLoader->material(0).upload();
 		if (pDirtTexture != nullptr) pDirtTexture->upload();
 
 		bInited = true;

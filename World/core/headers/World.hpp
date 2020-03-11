@@ -37,9 +37,6 @@ namespace Pix {
 		/** Shader for objects */
 		ObjectShader *pShaderObjects = nullptr;
 
-		/** World Light */
-		Light *pLight = nullptr;
-
 		/** World Camera */
 		Camera *pCamera = nullptr;
 

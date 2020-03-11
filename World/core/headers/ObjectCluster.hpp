@@ -30,13 +30,10 @@ namespace Pix {
 
 		static std::string TAG;
 
-		Texture2D *pTexture;
-
 		bool bInited = false;
 		ObjLoader *pLoader;
 
 		std::vector<Visible_t> vVisibles;
-		std::vector<Texture2D *> vTextures;
 		glm::mat4 mPlacer;
 // todo		std::vector<WorldObject *> vInstances;
 

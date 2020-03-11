@@ -8,10 +8,13 @@
 
 #include "ObjectShader.hpp"
 #include "Frustum.hpp"
+#include "Material.hpp"
+
 #include "glm/gtc/matrix_inverse.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
+
 namespace Pix {
 
 	ObjectShader::ObjectShader(std::string name)
@@ -23,20 +26,18 @@ namespace Pix {
 		bindAttribute(2, "textureCoordinates");
 	}
 
-	void ObjectShader::loadShineVariables(float damper, float reflectivity) {
-		setFloat("shineDamper", damper);
-		setFloat("reflectivity", reflectivity);
-	}
+	// depecated
+//	void ObjectShader::loadShineVariables(float damper, float reflectivity) {
+//		setFloat("shineDamper", damper);
+//		setFloat("reflectivity", reflectivity);
+//	}
 
 	void ObjectShader::loadTransformationMatrix(glm::mat4 &matrix) {
 		setMat4("transformationMatrix", (float *) &matrix);
 	}
 
-	void ObjectShader::loadLight(Light *light) {
-		glm::vec3 l = light->position();
-		glm::vec3 c = light->getColour();
-		setVec3("lightPosition", l.x, l.y, l.z);
-		setVec3("lightColour", c.x, c.y, c.z);
+	void ObjectShader::loadLight(const Light& light) {
+		light.load(this);
 	}
 
 	void ObjectShader::loadViewMatrix(Camera *camera) {

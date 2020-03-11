@@ -20,6 +20,8 @@
 
 namespace Pix {
 
+	class Shader;
+
 	// convenience to create a transformation matrix
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
 										 float scale, bool flipX, bool flipY, bool flipZ);
@@ -71,6 +73,19 @@ namespace Pix {
 		DEBUG_NONE, DEBUG_GRID, DEBUG_COLLISIONS, DEBUG_WIREFRAME
 	} WorldDebug_t;
 
+	struct Light {
+
+		glm::vec3 mPosition;
+		const glm::vec3 mAmbient = {1,1,1};
+		const glm::vec3 mDiffuse = {0.9,0.9,0.9};
+		const glm::vec3 mSpecular= {0.8,0.8,0.8};
+		float ka = 0.15;	// ambient light k
+
+	public:
+		void load(Shader *shader) const;
+		void update(Shader *shader) const;
+	};
+
 	/**
 	 * World configuration object. It is used to instantiate the world class and
 	 * contains the root parameters: lighting, background ...
@@ -81,12 +96,9 @@ namespace Pix {
 		/** global background color */
 		const glm::vec3 backgroundColor = {0.8, 0.8, 1};
 
-		/** light position */
-		const glm::vec3 lightPosition = {20000, 20000, 2000};
-
-		/** light color */
-		const glm::vec3 lightColor = {0.8, 0.8, 0.93};
-
+		/** Light */
+		const Light light = { {20000,20000,2000}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
+		
 		/** debug mode */
 		const WorldDebug_t debugMode = DEBUG_NONE;
 
@@ -106,7 +118,7 @@ namespace Pix {
 		const FontInfo_t withFont = {};
 
 		/** determines which shader to use (assets) */
-		const std::string shaderName = "world";
+		const std::string shaderName = "illumworld";
 
 	} WorldConfig_t;
 

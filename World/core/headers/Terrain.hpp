@@ -20,7 +20,6 @@ namespace Pix {
 
 		static std::string TAG;
 
-		Texture2D *pTexture = nullptr;        // Terrain texture
 		Texture2D *pDirtTexture = nullptr;    // 3D canvas texture
 		Canvas2D *pDirtCanvas = nullptr;    // 3D canvas over the texture
 		Drawable *pHeightMap = nullptr;        // Height Map
@@ -66,9 +65,9 @@ namespace Pix {
 		int zPixels();
 	};
 
-	inline int Terrain::xPixels() { return pTexture->width(); }
+	inline int Terrain::xPixels() { return mSize.x; }
 
-	inline int Terrain::zPixels() { return pTexture->height(); }
+	inline int Terrain::zPixels() { return mSize.y; }
 
 	inline float Terrain::getHeight(glm::vec3 &posWorld3d) {
 		return (pHeightMap != nullptr)

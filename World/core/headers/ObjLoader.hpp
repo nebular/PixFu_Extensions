@@ -14,6 +14,7 @@
 #include <string>
 
 #include "WorldMeta.hpp"
+#include "Material.hpp"
 
 namespace objl {
 	class Loader;
@@ -24,7 +25,7 @@ namespace Pix {
 	class ObjLoader {
 
 		objl::Loader *pLoader;
-
+		
 	public:
 
 		/**
@@ -39,6 +40,8 @@ namespace Pix {
 		 */
 
 		ObjLoader(const Static3DObject_t *object);
+
+		~ObjLoader();
 
 		/**
 		 * Return object vertices
@@ -74,6 +77,10 @@ namespace Pix {
 		 */
 
 		unsigned meshCount();
+		
+		std::vector<Material>& materials();
+		Material& material(int mesh);
+
 	};
 
 }

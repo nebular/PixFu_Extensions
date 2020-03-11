@@ -21,20 +21,17 @@ namespace Pix {
 		bindAttribute(2, "textureCoordinates");
 	}
 
-	void TerrainShader::loadShineVariables(float damper, float reflectivity) {
-		setFloat("shineDamper", damper);
-		setFloat("reflectivity", reflectivity);
-	}
+//	void TerrainShader::loadShineVariables(float damper, float reflectivity) {
+//		setFloat("shineDamper", damper);
+//		setFloat("reflectivity", reflectivity);
+//	}
 
 	void TerrainShader::loadTransformationMatrix(glm::mat4 &matrix) {
 		setMat4("transformationMatrix", (float *) &matrix);
 	}
 
-	void TerrainShader::loadLight(Light *light) {
-		glm::vec3 l = light->position();
-		glm::vec3 c = light->getColour();
-		setVec3("lightPosition", l.x, l.y, l.z);
-		setVec3("lightColour", c.x, c.y, c.z);
+	void TerrainShader::loadLight(const Light& light) {
+		light.load(this);
 	}
 
 	void TerrainShader::loadViewMatrix(Camera *camera) {

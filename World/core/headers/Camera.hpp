@@ -457,39 +457,7 @@ namespace Pix {
 
 	inline void Camera::toggleTargetMode() { bTargetMode = !bTargetMode; }
 
-	class Light {
-
-		glm::vec3 mPosition;
-		glm::vec3 mColour;
-
-	public:
-
-		Light(glm::vec3 position, glm::vec3 colour);
-
-		glm::vec3 &position();
-
-		void setPosition(glm::vec3 position);
-
-		glm::vec3 getColour();
-
-		void setColour(glm::vec3 colour);
-
-
-	};
-
-	inline Light::Light(glm::vec3 position, glm::vec3 colour) {
-		mPosition = position;
-		mColour = colour;
-	}
-
-	inline glm::vec3 &Light::position() { return mPosition; }
-
-	inline void Light::setPosition(glm::vec3 position) { mPosition = position; }
-
-	inline glm::vec3 Light::getColour() { return mColour; }
-
-	inline void Light::setColour(glm::vec3 colour) { mColour = colour; }
-
+	
 
 }
 

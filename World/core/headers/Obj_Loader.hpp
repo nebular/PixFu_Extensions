@@ -19,6 +19,8 @@
 
 #include <cmath>
 
+#include "Material.hpp"
+
 // Print progress to console while loading (large models)
 #define OBJL_CONSOLE_OUTPUT
 
@@ -143,44 +145,6 @@ namespace objl {
 		Vector2 TextureCoordinate;
 	};
 
-	struct Material {
-		Material() {
-			name;
-			Ns = 0.0f;
-			Ni = 0.0f;
-			d = 0.0f;
-			illum = 0;
-		}
-
-		// Material Name
-		std::string name;
-		// Ambient Color
-		Vector3 Ka;
-		// Diffuse Color
-		Vector3 Kd;
-		// Specular Color
-		Vector3 Ks;
-		// Specular Exponent
-		float Ns;
-		// Optical Density
-		float Ni;
-		// Dissolve
-		float d;
-		// Illumination
-		int illum;
-		// Ambient Texture Map
-		std::string map_Ka;
-		// Diffuse Texture Map
-		std::string map_Kd;
-		// Specular Texture Map
-		std::string map_Ks;
-		// Specular Hightlight Map
-		std::string map_Ns;
-		// Alpha Texture Map
-		std::string map_d;
-		// Bump Map
-		std::string map_bump;
-	};
 
 	// Structure: Mesh
 	//
@@ -206,7 +170,7 @@ namespace objl {
 		std::vector<unsigned int> Indices;
 
 		// Material
-		Material MeshMaterial;
+		Pix::Material MeshMaterial;
 	};
 
 	// Namespace: Math
@@ -381,6 +345,9 @@ namespace objl {
 
 		~Loader() {
 			LoadedMeshes.clear();
+			LoadedMaterials.clear();
+			LoadedIndices.clear();
+			LoadedVertices.clear();
 		}
 
 
@@ -654,7 +621,7 @@ namespace objl {
 		// Loaded Index Positions
 		std::vector<unsigned int> LoadedIndices;
 		// Loaded Material Objects
-		std::vector<Material> LoadedMaterials;
+		std::vector<Pix::Material> LoadedMaterials;
 
 	private:
 		// Generate vertices from a list of positions,
@@ -914,7 +881,7 @@ namespace objl {
 			if (!file.is_open())
 				return false;
 
-			Material tempMaterial;
+			Pix::Material tempMaterial;
 
 			bool listening = false;
 
@@ -938,7 +905,7 @@ namespace objl {
 						LoadedMaterials.push_back(tempMaterial);
 
 						// Clear Loaded Material
-						tempMaterial = Material();
+						tempMaterial = Pix::Material();
 
 						if (curline.size() > 7) {
 							tempMaterial.name = algorithm::tail(curline);
@@ -955,9 +922,9 @@ namespace objl {
 					if (temp.size() != 3)
 						continue;
 
-					tempMaterial.Ka.X = std::stof(temp[0]);
-					tempMaterial.Ka.Y = std::stof(temp[1]);
-					tempMaterial.Ka.Z = std::stof(temp[2]);
+					tempMaterial.Ka.x = std::stof(temp[0]);
+					tempMaterial.Ka.y = std::stof(temp[1]);
+					tempMaterial.Ka.z = std::stof(temp[2]);
 				}
 				// Diffuse Color
 				if (algorithm::firstToken(curline) == "Kd") {
@@ -967,9 +934,9 @@ namespace objl {
 					if (temp.size() != 3)
 						continue;
 
-					tempMaterial.Kd.X = std::stof(temp[0]);
-					tempMaterial.Kd.Y = std::stof(temp[1]);
-					tempMaterial.Kd.Z = std::stof(temp[2]);
+					tempMaterial.Kd.x = std::stof(temp[0]);
+					tempMaterial.Kd.y = std::stof(temp[1]);
+					tempMaterial.Kd.z = std::stof(temp[2]);
 				}
 				// Specular Color
 				if (algorithm::firstToken(curline) == "Ks") {
@@ -979,9 +946,9 @@ namespace objl {
 					if (temp.size() != 3)
 						continue;
 
-					tempMaterial.Ks.X = std::stof(temp[0]);
-					tempMaterial.Ks.Y = std::stof(temp[1]);
-					tempMaterial.Ks.Z = std::stof(temp[2]);
+					tempMaterial.Ks.x = std::stof(temp[0]);
+					tempMaterial.Ks.y = std::stof(temp[1]);
+					tempMaterial.Ks.z = std::stof(temp[2]);
 				}
 				// Specular Exponent
 				if (algorithm::firstToken(curline) == "Ns") {
@@ -1023,6 +990,34 @@ namespace objl {
 				if (algorithm::firstToken(curline) == "map_Bump" || algorithm::firstToken(curline) == "map_bump" ||
 					algorithm::firstToken(curline) == "bump") {
 					tempMaterial.map_bump = algorithm::tail(curline);
+				}
+				
+				// Extensions: Texture UV animation Region
+				if (algorithm::firstToken(curline) == "AnR") {
+					std::vector<std::string> temp;
+					algorithm::split(algorithm::tail(curline), temp, " ");
+
+					if (temp.size() != 4)
+						continue;
+
+					tempMaterial.AnR.x = std::stof(temp[0]);
+					tempMaterial.AnR.y = std::stof(temp[1]);
+					tempMaterial.AnR.z = std::stof(temp[2]);
+					tempMaterial.AnR.w = std::stof(temp[3]);
+				}
+			
+				
+				// Extensions: Texture UV animation Config
+				if (algorithm::firstToken(curline) == "AnC") {
+					std::vector<std::string> temp;
+					algorithm::split(algorithm::tail(curline), temp, " ");
+
+					if (temp.size() != 3)
+						continue;
+
+					tempMaterial.AnC.x = std::stof(temp[0]);
+					tempMaterial.AnC.y = std::stof(temp[1]);
+					tempMaterial.AnC.z = std::stof(temp[2]);
 				}
 			}
 

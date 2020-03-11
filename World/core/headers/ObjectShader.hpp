@@ -10,6 +10,8 @@
 
 #include "Camera.hpp"
 #include "Shader.hpp"
+#include "Material.hpp"
+
 #include "glm/mat4x4.hpp"
 #include "glm/vec4.hpp"
 
@@ -31,11 +33,9 @@ namespace Pix {
 
 		void bindAttributes();
 
-		void loadShineVariables(float damper, float reflectivity);
-
 		void loadTransformationMatrix(glm::mat4 &matrix);
 
-		void loadLight(Light *light);
+		void loadLight(const Light& light);
 
 		void loadViewMatrix(Camera *camera);
 
