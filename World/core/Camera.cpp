@@ -2,8 +2,8 @@
 //  Camera.hpp
 //  PixFu World Extensoin
 //
-//  An abstract camera class that processes input and calculates the corresponding Euler Angles,
-//	Vectors and Matrices for use in OpenGL
+//  An abstract camera class that processes input and calculates the corresponding
+//  Euler Angles, Vectors and Matrices for use in OpenGL
 //
 //  I learnt everything from https://learnopengl.com/Getting-started/Camera
 //

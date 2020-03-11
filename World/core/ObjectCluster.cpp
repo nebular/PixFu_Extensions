@@ -1,6 +1,12 @@
 //
-//  World.cpp
-//  PixEngine
+//  ObjectCluster.cpp
+//  PixFu Engine
+//
+//  An objectCluster groups objcts of the same type. They share mesh and material, so
+//  are rendered very fast one after another, after configuring the mesh and textures
+// 	one time only.
+//
+//  The World Object automatically creates clusters as new objects are added.
 //
 //  Created by rodo on 17/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.

@@ -71,17 +71,27 @@ namespace Pix {
 		/** Animation Config has the deltas to apply and the last component to enable/disable */
 		glm::vec3 AnC = {0,0,0};
 
+		/** Material Texture, only Kd supported at the moment! */
 		Texture2D *textureKd = nullptr;
 
 		~Material();
+
+		/** Initialize the material and load the texture from disk */
 		void init(std::string NAME, std::string FOLDER="objects");
+		/** Load the material properties into the shader */
 		void load(Shader *shader);
-		void bind(Shader *shader);
+		/** Upload the texture to the gfx card */
 		void upload();
+		/** Bind the uploaded  material texture for drawing */
+		void bind(Shader *shader);
+		
 	};
 
 	inline Material::~Material() {
-		delete textureKd;
+		if (textureKd != nullptr) {
+			delete textureKd;
+			textureKd = nullptr;
+		}
 	}
 
 	inline void Material::upload() {

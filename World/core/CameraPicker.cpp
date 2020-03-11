@@ -1,7 +1,10 @@
 //
 //  MousePicker.cpp
-//  PixFu
+//  PixFu Engine
 //
+//  A 3D mouse implementation
+//
+//  Tutorial and explanations in:
 //  http://antongerdelan.net/opengl/raycasting.html
 //
 //  Created by rodo on 07/03/2020.

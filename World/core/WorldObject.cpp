@@ -17,6 +17,7 @@ namespace Pix {
 	// Point P
 	// return : Point Q, the cloesest point on [AB] from P
 	glm::vec3 ClosestPoint(glm::vec3 A, glm::vec3 B, glm::vec3 P) {
+
 		glm::vec3 AB    = B - A;
 		auto ab2       = glm::dot(AB,AB);
 		glm::vec3 AP       = P - A;
@@ -29,13 +30,16 @@ namespace Pix {
 		// calculate the closest point
 		glm::vec3 Q = A + AB * t;
 		return Q;
+
 	}
 
 	bool PointInSphere(glm::vec3 P, float r, glm::vec3 Q) {
+
 		glm::vec3 PQ = Q - P;
 		auto pq2 = glm::dot(PQ,PQ);
 		float r2  = r * r;
 		return !(pq2 > r2);
+
 	}
 
 

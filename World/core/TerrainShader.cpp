@@ -1,6 +1,8 @@
 //
 //  TerrainShader.cpp
-//  PixEngine
+//  PixFu Engine
+//
+//  The Terrain Shader
 //
 //  Created by rodo on 16/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.

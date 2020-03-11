@@ -1,3 +1,6 @@
+// World.cpp
+// PixFu Engine
+//
 // Base class for a 3d world
 //
 // Provides methods to add terrains and objects

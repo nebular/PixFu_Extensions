@@ -1,6 +1,8 @@
 //
-//  World.cpp
-//  PixEngine
+//  Terrain.cpp
+//  PixFu Engine
+//
+//  The terrain - A textured OBJ model with heightmap
 //
 //  Created by rodo on 17/02/2020.
 //  Copyright © 2020 rodo. All rights reserved.
