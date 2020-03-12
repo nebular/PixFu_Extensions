@@ -11,6 +11,7 @@
 #include "Shader.hpp"
 #include "Material.hpp"
 #include "WorldMeta.hpp"
+#include "Lighting.hpp"
 
 #include "glm/mat4x4.hpp"
 

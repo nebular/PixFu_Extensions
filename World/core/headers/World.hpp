@@ -14,6 +14,7 @@
 #include "WorldMeta.hpp"
 #include "Terrain.hpp"
 #include "ObjectCluster.hpp"
+#include "Lighting.hpp"
 
 #include <vector>
 #include <map>
