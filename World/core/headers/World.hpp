@@ -59,6 +59,7 @@ namespace Pix {
 
 		/** Point Lights */
 		std::vector<PointLight> vPointLights;
+		std::vector<SpotLight> vSpotLights;
 
 		/**
 		 * Intits the extension
@@ -119,7 +120,8 @@ namespace Pix {
 		virtual WorldObject *add(int oid, bool setHeight);
 
 		void addLight(PointLight& p);
-		
+		void addLight(SpotLight& p);
+
 		void loadLights(Shader *shader);
 
 		/**

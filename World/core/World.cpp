@@ -245,12 +245,24 @@ namespace Pix {
 		bLightsChanged = true;
 	}
 
+	void World::addLight(SpotLight& p) {
+		vSpotLights.emplace_back(p);
+		bLightsChanged = true;
+	}
+
 	void World::loadLights(Shader *shader) {
 		const int MAXLIGHTS = 4;
 		for (int i = 0, l = (int)vPointLights.size(); i<MAXLIGHTS; i++) {
 			if (i<l) vPointLights.at(i).load(shader, i);
 			else {
 				std::string lex = std::string(SF("pointLights[%d]", i));
+				shader->setInt(lex+".enabled", 0);
+			}
+		}
+		for (int i = 0, l = (int)vSpotLights.size(); i<MAXLIGHTS; i++) {
+			if (i<l) vSpotLights.at(i).load(shader, i);
+			else {
+				std::string lex = std::string(SF("spotLights[%d]", i));
 				shader->setInt(lex+".enabled", 0);
 			}
 		}
@@ -273,6 +285,31 @@ namespace Pix {
 
 	void PointLight::update(Shader *shader, int index) const {
 		std::string lex = std::string(SF("pointLights[%d]", index));
+		shader->setVec3(lex+".position", mPosition);
+		shader->setFloat(lex+".ka", ka); // interesting for animation
+	}
+
+
+	void SpotLight::load(Shader *shader, int index, bool enable) const {
+		std::string lex = std::string(SF("spotLights[%d]", index));
+		shader->setInt(lex+".enabled", enable?1:0);
+		if (enable) {
+			shader->setVec3(lex+".position", mPosition / 1000.0f);
+			shader->setVec3(lex+".direction", mDirection);
+			shader->setVec3(lex+".ambient", mAmbient);
+			shader->setVec3(lex+".diffuse",  mDiffuse);
+			shader->setVec3(lex+".specular", mSpecular);
+			shader->setFloat(lex+".constant", constant);
+			shader->setFloat(lex+".quadratic", quadratic);
+			shader->setFloat(lex+".linear", linear);
+			shader->setFloat(lex+".cutOff", cutOff);
+			shader->setFloat(lex+".outerCutOff", outerCutOff);
+			shader->setFloat(lex+".ka", ka);
+		}
+	}
+
+	void SpotLight::update(Shader *shader, int index) const {
+		std::string lex = std::string(SF("spotLights[%d]", index));
 		shader->setVec3(lex+".position", mPosition);
 		shader->setFloat(lex+".ka", ka); // interesting for animation
 	}
