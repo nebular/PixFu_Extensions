@@ -73,9 +73,9 @@ namespace Pix {
 		DEBUG_NONE, DEBUG_GRID, DEBUG_COLLISIONS, DEBUG_WIREFRAME
 	} WorldDebug_t;
 
-	struct Light {
+	struct DirLight {
 
-		glm::vec3 mPosition;
+		glm::vec3 mDirection;
 		const glm::vec3 mAmbient = {1,1,1};
 		const glm::vec3 mDiffuse = {0.9,0.9,0.9};
 		const glm::vec3 mSpecular= {0.8,0.8,0.8};
@@ -83,9 +83,26 @@ namespace Pix {
 
 	public:
 		void load(Shader *shader) const;
-		void update(Shader *shader) const;
 	};
 
+	struct PointLight {
+		glm::vec3 mPosition;
+		const glm::vec3 mAmbient = {1.0,1.0,1.0};
+		const glm::vec3 mDiffuse = {0.8,0.8,0.8};
+		const glm::vec3 mSpecular= {1.0,1.0,1.0};
+		/** Kept at 1 */
+		const float constant = 1.0;
+		/** Linear Attetnuation */
+		const float linear = 5.8f;
+		
+		const float quadratic = 15.8;
+		float ka = 0;	// ambient light k
+		bool enabled = true;
+
+	public:
+		void load(Shader *shader, int index, bool enable=true) const;
+		void update(Shader *shader, int index) const;
+	};
 	/**
 	 * World configuration object. It is used to instantiate the world class and
 	 * contains the root parameters: lighting, background ...
@@ -97,7 +114,7 @@ namespace Pix {
 		const glm::vec3 backgroundColor = {0.8, 0.8, 1};
 
 		/** Light */
-		const Light light = { {20000,20000,2000}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
+		const DirLight light = { {-0.2, -1, -0.3}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
 		
 		/** debug mode */
 		const WorldDebug_t debugMode = DEBUG_NONE;
@@ -118,7 +135,7 @@ namespace Pix {
 		const FontInfo_t withFont = {};
 
 		/** determines which shader to use (assets) */
-		const std::string shaderName = "illumworld";
+		const std::string shaderName = "luxworld";
 
 	} WorldConfig_t;
 

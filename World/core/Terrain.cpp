@@ -78,7 +78,6 @@ namespace Pix {
 		if (!bInited) init(shader);
 		
 		shader->setFloat("iTime", (float)Fu::METRONOME);
-
 		
 		Material& material = pLoader->material(MESH);
 		material.load(shader);

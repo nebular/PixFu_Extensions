@@ -43,6 +43,9 @@ namespace Pix {
 		/** Object Clusters */
 		std::map<std::string, ObjectCluster *> mClusters;
 
+		/** Change in number of lights */
+		bool bLightsChanged = false;
+
 	protected:
 
 		/** The current projection matrix */
@@ -53,6 +56,9 @@ namespace Pix {
 
 		/** Terrains */
 		std::vector<Terrain *> vTerrains;
+
+		/** Point Lights */
+		std::vector<PointLight> vPointLights;
 
 		/**
 		 * Intits the extension
@@ -111,6 +117,10 @@ namespace Pix {
 		 */
 
 		virtual WorldObject *add(int oid, bool setHeight);
+
+		void addLight(PointLight& p);
+		
+		void loadLights(Shader *shader);
 
 		/**
 		 * Iterates all world objects

@@ -35,7 +35,7 @@ namespace Pix {
 
 		void loadTransformationMatrix(glm::mat4 &matrix);
 
-		void loadLight(const Light& light);
+		void loadLight(const DirLight& light);
 
 		void loadViewMatrix(Camera *camera);
 

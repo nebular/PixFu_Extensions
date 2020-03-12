@@ -30,7 +30,7 @@ namespace Pix {
 
 		/** Whether terrain has been inited */
 		bool bInited = false;
-
+		
 		/** Inits the terrain */
 		void init(TerrainShader *shader);
 

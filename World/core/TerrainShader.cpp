@@ -32,7 +32,7 @@ namespace Pix {
 		setMat4("transformationMatrix", (float *) &matrix);
 	}
 
-	void TerrainShader::loadLight(const Light& light) {
+	void TerrainShader::loadLight(const DirLight& light) {
 		light.load(this);
 	}
 

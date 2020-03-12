@@ -38,7 +38,7 @@ namespace Pix {
 		setMat4("transformationMatrix", (float *) &matrix);
 	}
 
-	void ObjectShader::loadLight(const Light& light) {
+	void ObjectShader::loadLight(const DirLight& light) {
 		light.load(this);
 	}
 

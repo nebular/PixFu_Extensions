@@ -16,6 +16,7 @@
 #include "Fu.hpp"
 #include "Config.hpp"
 #include "OpenGL.h"
+#include "Utils.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
@@ -108,7 +109,6 @@ namespace Pix {
 
 		pShader->loadProjectionMatrix(projectionMatrix);
 		CONFIG.light.load(pShader);
-
 		pShader->stop();
 
 		if (pShaderObjects != nullptr) {
@@ -140,8 +140,11 @@ namespace Pix {
 
 		pShader->use();
 		pShader->loadViewMatrix(pCamera);
-		CONFIG.light.update(pShader);
-	
+		
+		if (bLightsChanged) {
+			loadLights(pShader);
+		}
+
 		for (Terrain *terrain:vTerrains) {
 			terrain->render(pShader);
 		}
@@ -153,8 +156,11 @@ namespace Pix {
 			// configure object shader
 			pShaderObjects->use();
 			pShaderObjects->loadViewMatrix(pCamera);
-			CONFIG.light.update(pShaderObjects);
-
+			if (bLightsChanged) {
+				loadLights(pShader);
+				loadLights(pShaderObjects);
+				bLightsChanged = false;
+			}
 			// draw each cluster
 			for (ObjectCluster *object:vObjects) {
 				object->render(pShaderObjects);
@@ -162,7 +168,7 @@ namespace Pix {
 
 			pShaderObjects->stop();
 			if (DBG) OpenGlUtils::glError("terrain tick");
-		}
+		} else bLightsChanged = false;
 
 		glDisable(GL_DEPTH_TEST);
 
@@ -226,23 +232,50 @@ namespace Pix {
 		return matrix * flipMatrix;
 	}
 
-	void Light::load(Shader *shader) const {
-		glm::vec3 l = mPosition;
-		shader->setVec3("lightPosition", l.x, l.y, l.z);
-		glm::vec3 c = mAmbient;
-		shader->setVec3("light.ambient", c.x, c.y, c.z);
-		glm::vec3 d= mDiffuse;
-		shader->setVec3("light.diffuse",  d.x, d.y, d.z);
-		glm::vec3 s= mSpecular;
-		shader->setVec3("light.specular", s.x, s.y, s.z);
-		shader->setFloat("light.ka", ka);
+	void DirLight::load(Shader *shader) const {
+		shader->setVec3("dirLight.direction", mDirection);
+		shader->setVec3("dirLight.ambient", mAmbient);
+		shader->setVec3("dirLight.diffuse",  mDiffuse);
+		shader->setVec3("dirLight.specular", mSpecular);
+		shader->setFloat("dirLight.ka", ka);
 	}
 
-	void Light::update(Shader *shader) const {
-		glm::vec3 l = mPosition;
-		shader->setVec3("lightPosition", l.x, l.y, l.z);
+	void World::addLight(PointLight& p) {
+		vPointLights.emplace_back(p);
+		bLightsChanged = true;
 	}
 
+	void World::loadLights(Shader *shader) {
+		const int MAXLIGHTS = 4;
+		for (int i = 0, l = (int)vPointLights.size(); i<MAXLIGHTS; i++) {
+			if (i<l) vPointLights.at(i).load(shader, i);
+			else {
+				std::string lex = std::string(SF("pointLights[%d]", i));
+				shader->setInt(lex+".enabled", 0);
+			}
+		}
+	}
+
+	void PointLight::load(Shader *shader, int index, bool enable) const {
+		std::string lex = std::string(SF("pointLights[%d]", index));
+		shader->setInt(lex+".enabled", enable?1:0);
+		if (enable) {
+			shader->setVec3(lex+".position", mPosition / 1000.0f);
+			shader->setVec3(lex+".ambient", mAmbient);
+			shader->setVec3(lex+".diffuse",  mDiffuse);
+			shader->setVec3(lex+".specular", mSpecular);
+			shader->setFloat(lex+".constant", constant);
+			shader->setFloat(lex+".quadratic", quadratic);
+			shader->setFloat(lex+".linear", linear);
+			shader->setFloat(lex+".ka", ka);
+		}
+	}
+
+	void PointLight::update(Shader *shader, int index) const {
+		std::string lex = std::string(SF("pointLights[%d]", index));
+		shader->setVec3(lex+".position", mPosition);
+		shader->setFloat(lex+".ka", ka); // interesting for animation
+	}
 
 };
 
