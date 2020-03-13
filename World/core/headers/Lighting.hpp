@@ -13,7 +13,7 @@
 
 #pragma once
 #include <cmath>
-#include "Shader.hpp"
+#include "WorldShader.hpp"
 #include "glm/vec3.hpp"
 
 namespace Pix {
@@ -26,14 +26,14 @@ namespace Pix {
 	struct DirLight {
 
 		/** Light Direction */
-		glm::vec3 mDirection;
+		glm::vec3 direction;
 		
 		/** Ambient Color */
-		const glm::vec3 mAmbient = {0.15,0.15,0.15};
+		const glm::vec3 ambient = {0.15F,0.15F,0.15F};
 		/** Diffuse Color */
-		const glm::vec3 mDiffuse = {0.9,0.9,0.9};
+		const glm::vec3 diffuse = {0.9F,0.9F,0.9F};
 		/** Specular Color */
-		const glm::vec3 mSpecular= {0.8,0.8,0.8};
+		const glm::vec3 specular= {0.8F,0.8F,0.8F};
 
 	};
 
@@ -41,17 +41,17 @@ namespace Pix {
 		/** Light Position */
 		glm::vec3 position;
 		/** Ambient Color */
-		const glm::vec3 ambient = {0.1,0.1,0.1};
+		const glm::vec3 ambient = {0.1F,0.1F,0.1F};
 		/** Diffuse Color */
-		const glm::vec3 diffuse = {0.8,0.8,0.8};
+		const glm::vec3 diffuse = {0.8F,0.8F,0.8F};
 		/** Specular Color */
-		const glm::vec3 specular= {1.0,1.0,1.0};
+		const glm::vec3 specular= {1.0F,1.0F,1.0F};
 		/** "Kept at 1" they say ! :S */
-		const float constant = 1.0;
+		const float constant = 1.0F;
 		/** Linear Attenuation (r/distance) */
-		const float linear = 5.8f;
+		const float linear = 5.8F;
 		/** Quadratic Attenuation (r/distance) */
-		const float quadratic = 15.8;
+		const float quadratic = 15.8F;
 		/** Whether */
 		bool enabled = true;
 	};
@@ -69,32 +69,32 @@ namespace Pix {
 		float outerCutOff = 15.5*M_PI/180;;
 		
 		/** Ambient Color */
-		const glm::vec3 ambient = {0.05,0.05,0.05};
+		const glm::vec3 ambient = {0.05F,0.05F,0.05F};
 		/** Diffuse Color */
-		const glm::vec3 diffuse = {0.8,0.8,0.8};
+		const glm::vec3 diffuse = {0.8F,0.8F,0.8F};
 		/** Specular Color */
-		const glm::vec3 specular= {1.0,1.0,1.0};
+		const glm::vec3 specular= {1.0F,1.0F,1.0F};
 		
 		/** Kept at 1 */
-		const float constant = 1.0;
+		const float constant = 1.0F;
 		
 		/** Linear Attetnuation */
-		const float linear = 5.09f;
+		const float linear = 5.09F;
 		/** Quadratic Attetnuation */
-		const float quadratic = 5.032;
+		const float quadratic = 5.032F;
 		/** Whether */
 		bool enabled = true;
 	};
 	
 	constexpr DirLight DIRLIGHT_AFTERNOON = {
-		{1,-1,1},					// rays direction
-		{0.15,0.15,0.15},			// 15% ambient
-		{1,1,1},					// diffuse
-		{0.5,0.5,0.5}				// specular
+		{1.0F,-1.0F,1.0F},			// rays direction
+		{0.15F,0.15F,0.15F},		// 15% ambient
+		{1.0F,1.0F,1.0F},			// diffuse
+		{0.5F,0.5F,0.5F}			// specular
 	};
 
 
-	class LightingShader : public Shader {
+	class LightingShader : public WorldShader {
 		
 		// cached locators for quickest update
 		

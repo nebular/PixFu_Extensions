@@ -78,12 +78,8 @@ namespace Pix {
 
 		/** Initialize the material and load the texture from disk */
 		void init(std::string NAME, std::string FOLDER="objects");
-		/** Load the material properties into the shader */
-		void load(Shader *shader);
 		/** Upload the texture to the gfx card */
 		void upload();
-		/** Bind the uploaded  material texture for drawing */
-		void bind(Shader *shader);
 		
 	};
 

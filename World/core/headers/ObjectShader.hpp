@@ -22,10 +22,6 @@ namespace Pix {
 
 	class ObjectShader : public LightingShader {
 
-		GLuint LOC_TRANSFORMATIONMATRIX;
-		GLuint LOC_VIEWMATRIX;
-		GLuint LOC_INVVIEWMATRIX;
-		GLuint LOC_PROJECTIONMATRIX;
 		GLuint LOC_TINTMODE;
 
 		// keey this for frustum calculations
@@ -40,14 +36,14 @@ namespace Pix {
 
 		void bindAttributes();
 
-		void loadTransformationMatrix(glm::mat4 &matrix);
+		void loadViewMatrix(Camera *camera) override;
 
-		void loadViewMatrix(Camera *camera);
-
-		void loadProjectionMatrix(glm::mat4 &projection);
+		void loadProjectionMatrix(glm::mat4 &projection) override;
 
 		void setTint(glm::vec4 tint);
 
-		Frustum *frustum() { return mFrustum; }
+		Frustum *frustum();
 	};
+
+	inline Frustum *ObjectShader::frustum() { return mFrustum; }
 }

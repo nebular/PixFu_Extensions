@@ -24,23 +24,11 @@ namespace Pix {
 
 	class TerrainShader : public LightingShader {
 		
-		GLuint LOC_TRANSFORMATIONMATRIX;
-		GLuint LOC_VIEWMATRIX;
-		GLuint LOC_INVVIEWMATRIX;
-		GLuint LOC_PROJECTIONMATRIX;
-
 	public:
 
 		TerrainShader(const std::string& name);
 
 		void bindAttributes();
 
-		void loadShineVariables(float damper, float reflectivity);
-
-		void loadTransformationMatrix(glm::mat4 &matrix);
-
-		void loadViewMatrix(Camera *camera);
-
-		void loadProjectionMatrix(glm::mat4 &projection);
 	};
 }

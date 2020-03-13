@@ -17,7 +17,7 @@
 namespace Pix {
 	
 	LightingShader::LightingShader(const std::string& name, int maxLights)
-	: Shader(name) {
+	: WorldShader(name) {
 		
 		// cache all locators
 
@@ -59,10 +59,10 @@ namespace Pix {
 	}
 
 	void LightingShader::loadLight(const DirLight& light) const {
-		setVec3(DL_DIRECTION, light.mDirection);
-		setVec3(DL_AMBIENT,   light.mAmbient);
-		setVec3(DL_DIFFUSE,   light.mDiffuse);
-		setVec3(DL_SPECULAR,  light.mSpecular);
+		setVec3(DL_DIRECTION, light.direction);
+		setVec3(DL_AMBIENT,   light.ambient);
+		setVec3(DL_DIFFUSE,   light.diffuse);
+		setVec3(DL_SPECULAR,  light.specular);
 	}
 
 	void LightingShader::loadLight(PointLight& light, int index, bool enable) const {

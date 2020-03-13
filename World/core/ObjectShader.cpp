@@ -22,10 +22,6 @@ namespace Pix {
 	ObjectShader::ObjectShader(std::string name)
 	: LightingShader(name) {
 		// cache locators
-		LOC_TRANSFORMATIONMATRIX = getLocator("transformationMatrix");
-		LOC_VIEWMATRIX = getLocator("viewMatrix");
-		LOC_INVVIEWMATRIX = getLocator("invViewMatrix");
-		LOC_PROJECTIONMATRIX = getLocator("projectionMatrix");
 		LOC_TINTMODE = getLocator("tintMode");
 	}
 
@@ -34,11 +30,7 @@ namespace Pix {
 		bindAttribute(1, "normal");
 		bindAttribute(2, "textureCoordinates");
 	}
-
-	void ObjectShader::loadTransformationMatrix(glm::mat4 &matrix) {
-		setMat4(LOC_TRANSFORMATIONMATRIX, (float *) &matrix);
-	}
-
+	
 	void ObjectShader::loadViewMatrix(Camera *camera) {
 
 		glm::mat4 viewMatrix = camera->getViewMatrix();
@@ -55,7 +47,6 @@ namespace Pix {
 		mProjectionMatrix = projection;
 		mFrustum = nullptr;
 	}
-	
 	void ObjectShader::setTint(glm::vec4 tint) {
 		setVec4(LOC_TINTMODE, tint.x, tint.y, tint.z, tint.w);
 	}

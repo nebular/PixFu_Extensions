@@ -80,8 +80,8 @@ namespace Pix {
 		shader->setFloat("iTime", (float)Fu::METRONOME);
 		
 		Material& material = pLoader->material(MESH);
-		material.load(shader);
-		material.bind(shader);
+		shader->loadMaterial(material);
+		shader->bindMaterial(material);
 
 		if (pDirtTexture != nullptr) {
 			if (pDirtTexture->buffer()->clearDirty()) pDirtTexture->update();

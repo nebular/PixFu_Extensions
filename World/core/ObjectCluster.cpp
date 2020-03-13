@@ -85,8 +85,8 @@ namespace Pix {
 			constexpr int MESH = 0;
 			
 			Material& material = pLoader->material(MESH);
-			material.load(shader);
-			material.bind(shader);
+			shader->loadMaterial(material);
+			shader->bindMaterial(material);
 			bind(0);
 		}
 
@@ -151,8 +151,8 @@ namespace Pix {
 		for (int i = 0; i < vMeshes.size(); i++) {
 
 			Material& material = pLoader->material(i);
-			material.load(shader);
-			material.bind(shader);
+			shader->loadMaterial(material);
+			shader->bindMaterial(material);
 			bind(i);
 
 			for (Visible_t visible: vVisibles) {

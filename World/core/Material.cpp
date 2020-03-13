@@ -28,24 +28,4 @@ namespace Pix {
 
 	}
 
-	void Material::load(Shader *shader) {
-		shader->setVec3("material.ambient", Ka.x, Ka.y, Ka.z);
-		shader->setVec3("material.diffuse", Kd.x, Kd.y, Kd.z);
-		shader->setVec3("material.specular", Ks.x, Ks.y, Ks.z);
-		shader->setFloat("material.shininess", Ns);
-		shader->setInt("material.illum", illum);
-		shader->setVec4("material.animRegion", AnR.x, AnR.y, AnR.z, AnR.w);
-		shader->setVec3("material.animConfig", AnC.x, AnC.y, AnC.z);
-	}
-
-	void Material::bind(Shader *shader) {
-		if (textureKd != nullptr) {
-			shader->setInt("material.hasTexture", 1);
-			shader->textureUnit("materialTexture", textureKd);
-			textureKd->bind();
-		} else {
-			shader->setInt("material.hasTexture", 0);
-		}
-	}
-
 }
