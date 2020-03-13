@@ -6,6 +6,7 @@
 
 #include "Ball.hpp"
 #include "BallPlayerFeatures.hpp"
+#include "Lighting.hpp"
 
 namespace Pix {
 
@@ -17,12 +18,14 @@ namespace Pix {
 		float fAcceleration = 0;
 		float fCalcDirection = 0;
 //		float fSteerAngle = 0;
+		
+		SpotLight *mFlashLight;
 
 	public:
 
 		float fSteerAngle = 0;
 
-		BallPlayer(World *world, ObjectProperties_t &objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location);
+		BallPlayer(World *world, ObjectProperties_t &objectMeta, BallPlayerFeatures_t features, ObjectLocation_t locationt, SpotLight *light = nullptr);
 
 		virtual void process(World *world, float fTime);
 
@@ -46,14 +49,14 @@ namespace Pix {
 
 	class BallPlayer4wheels : public BallPlayer {
 	public:
-		BallPlayer4wheels(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features = {}, ObjectLocation_t location = {});
+		BallPlayer4wheels(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features = {}, ObjectLocation_t location = {}, SpotLight *light = nullptr);
 
 		void process(World *world, float fTime);
 	};
 
 	inline BallPlayer4wheels::BallPlayer4wheels(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features,
-												ObjectLocation_t location)
-			: BallPlayer(world, objectMeta, features, location) {}
+												ObjectLocation_t location, SpotLight *light)
+			: BallPlayer(world, objectMeta, features, location, light) {}
 
 
 	class GameObject : public Ball {

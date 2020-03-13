@@ -20,7 +20,14 @@
 namespace Pix {
 
 	ObjectShader::ObjectShader(std::string name)
-	: Shader(name) {}
+	: LightingShader(name) {
+		// cache locators
+		LOC_TRANSFORMATIONMATRIX = getLocator("transformationMatrix");
+		LOC_VIEWMATRIX = getLocator("viewMatrix");
+		LOC_INVVIEWMATRIX = getLocator("invViewMatrix");
+		LOC_PROJECTIONMATRIX = getLocator("projectionMatrix");
+		LOC_TINTMODE = getLocator("tintMode");
+	}
 
 	void ObjectShader::bindAttributes() {
 		bindAttribute(0, "position");
@@ -28,39 +35,29 @@ namespace Pix {
 		bindAttribute(2, "textureCoordinates");
 	}
 
-	// depecated
-//	void ObjectShader::loadShineVariables(float damper, float reflectivity) {
-//		setFloat("shineDamper", damper);
-//		setFloat("reflectivity", reflectivity);
-//	}
-
 	void ObjectShader::loadTransformationMatrix(glm::mat4 &matrix) {
-		setMat4("transformationMatrix", (float *) &matrix);
-	}
-
-	void ObjectShader::loadLight(const DirLight& light) {
-		light.load(this);
+		setMat4(LOC_TRANSFORMATIONMATRIX, (float *) &matrix);
 	}
 
 	void ObjectShader::loadViewMatrix(Camera *camera) {
 
 		glm::mat4 viewMatrix = camera->getViewMatrix();
-		setMat4("viewMatrix", (float *) &viewMatrix);
+		setMat4(LOC_VIEWMATRIX, (float *) &viewMatrix);
 
 		glm::mat4& invViewMatrix = camera->getInvViewMatrix();
-		setMat4("invViewMatrix", (float *) &invViewMatrix);
+		setMat4(LOC_INVVIEWMATRIX, (float *) &invViewMatrix);
 
 		mFrustum = new Frustum(mProjectionMatrix * viewMatrix);
 	}
 
 	void ObjectShader::loadProjectionMatrix(glm::mat4 &projection) {
-		setMat4("projectionMatrix", (float *) &projection);
+		setMat4(LOC_PROJECTIONMATRIX, (float *) &projection);
 		mProjectionMatrix = projection;
 		mFrustum = nullptr;
 	}
 	
 	void ObjectShader::setTint(glm::vec4 tint) {
-		setVec4("tintMode", tint.x, tint.y, tint.z, tint.w);
+		setVec4(LOC_TINTMODE, tint.x, tint.y, tint.z, tint.w);
 	}
 
 }

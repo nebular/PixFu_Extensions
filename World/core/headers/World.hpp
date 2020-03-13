@@ -27,6 +27,7 @@ namespace Pix {
 	glm::mat4 createTransformationMatrix(glm::vec3 translation, float rxrads, float ryrads, float rzrads,
 										 float scale, bool flipX, bool flipY, bool flipZ);
 
+
 	// Base World class
 	class World : public FuExtension {
 
@@ -46,6 +47,8 @@ namespace Pix {
 
 		/** Change in number of lights */
 		bool bLightsChanged = false;
+		
+		LightMode_t mLightMode = LIGHTS_OFF;
 
 	protected:
 
@@ -59,8 +62,8 @@ namespace Pix {
 		std::vector<Terrain *> vTerrains;
 
 		/** Point Lights */
-		std::vector<PointLight> vPointLights;
-		std::vector<SpotLight> vSpotLights;
+		std::vector<PointLight *> vPointLights;
+		std::vector<SpotLight *> vSpotLights;
 
 		/**
 		 * Intits the extension
@@ -120,10 +123,11 @@ namespace Pix {
 
 		virtual WorldObject *add(int oid, bool setHeight);
 
-		void addLight(PointLight& p);
-		void addLight(SpotLight& p);
+		void addLight(PointLight *p);
+		void addLight(SpotLight *p);
 
-		void loadLights(Shader *shader);
+		void loadLights(LightingShader *shader);
+		void updateLights(LightingShader *shader);
 
 		/**
 		 * Iterates all world objects
@@ -189,6 +193,8 @@ namespace Pix {
 
 		virtual ~World();
 
+		void setLightMode (LightMode_t lightMode);
+		
 		/**
 		 Gets camera
 		 @return The world camera
@@ -313,6 +319,10 @@ namespace Pix {
 	inline WorldObject *World::add(int oid, bool setHeight) {
 		const ObjectDbEntry_t *entry = ObjectDb::get(oid);
 		return add(entry->first, entry->second, setHeight);
+	}
+
+	inline void World::setLightMode (LightMode_t lightMode) {
+		mLightMode = lightMode;
 	}
 
 }

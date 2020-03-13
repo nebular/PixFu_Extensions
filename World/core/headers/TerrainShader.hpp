@@ -14,6 +14,7 @@
 #include "Lighting.hpp"
 
 #include "glm/mat4x4.hpp"
+#include "OpenGL.h"
 
 namespace Pix {
 
@@ -21,7 +22,12 @@ namespace Pix {
 
 	class Light;
 
-	class TerrainShader : public Shader {
+	class TerrainShader : public LightingShader {
+		
+		GLuint LOC_TRANSFORMATIONMATRIX;
+		GLuint LOC_VIEWMATRIX;
+		GLuint LOC_INVVIEWMATRIX;
+		GLuint LOC_PROJECTIONMATRIX;
 
 	public:
 
@@ -32,8 +38,6 @@ namespace Pix {
 		void loadShineVariables(float damper, float reflectivity);
 
 		void loadTransformationMatrix(glm::mat4 &matrix);
-
-		void loadLight(const DirLight& light);
 
 		void loadViewMatrix(Camera *camera);
 

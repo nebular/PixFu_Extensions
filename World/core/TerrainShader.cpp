@@ -15,7 +15,12 @@
 
 namespace Pix {
 
-	TerrainShader::TerrainShader(const std::string& name) : Shader(name) {}
+	TerrainShader::TerrainShader(const std::string& name) : LightingShader(name) {
+		LOC_TRANSFORMATIONMATRIX = getLocator("transformationMatrix");
+		LOC_VIEWMATRIX = getLocator("viewMatrix");
+		LOC_INVVIEWMATRIX = getLocator("invViewMatrix");
+		LOC_PROJECTIONMATRIX = getLocator("projectionMatrix");
+	}
 
 	void TerrainShader::bindAttributes() {
 		bindAttribute(0, "position");
@@ -23,31 +28,19 @@ namespace Pix {
 		bindAttribute(2, "textureCoordinates");
 	}
 
-//	void TerrainShader::loadShineVariables(float damper, float reflectivity) {
-//		setFloat("shineDamper", damper);
-//		setFloat("reflectivity", reflectivity);
-//	}
-
 	void TerrainShader::loadTransformationMatrix(glm::mat4 &matrix) {
-		setMat4("transformationMatrix", (float *) &matrix);
-	}
-
-	void TerrainShader::loadLight(const DirLight& light) {
-		light.load(this);
+		setMat4(LOC_TRANSFORMATIONMATRIX, (float *) &matrix);
 	}
 
 	void TerrainShader::loadViewMatrix(Camera *camera) {
 		glm::mat4& viewMatrix = camera->getViewMatrix();
-		setMat4("viewMatrix", (float *) &viewMatrix);
+		setMat4(LOC_VIEWMATRIX, (float *) &viewMatrix);
 		glm::mat4& invViewMatrix = camera->getInvViewMatrix();
-		setMat4("invViewMatrix", (float *) &invViewMatrix);
-
-//		glm::mat4 invViewMatrix = glm::affineInverse(viewMatrix);
-//		setMat4("invViewMatrix", (float *) &invViewMatrix);
+		setMat4(LOC_INVVIEWMATRIX, (float *) &invViewMatrix);
 	}
 
 	void TerrainShader::loadProjectionMatrix(glm::mat4 &projection) {
-		setMat4("projectionMatrix", (float *) &projection);
+		setMat4(LOC_PROJECTIONMATRIX, (float *) &projection);
 	}
 
 

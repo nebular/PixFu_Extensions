@@ -11,9 +11,10 @@
 
 namespace Pix {
 
-	BallPlayer::BallPlayer(World *world, ObjectProperties_t &objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location)
+	BallPlayer::BallPlayer(World *world, ObjectProperties_t &objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location, SpotLight *light)
 			: Ball(world->CONFIG, objectMeta, location),
-			  FEATURES(new BallPlayerFeatures(objectMeta, features)) {
+			  FEATURES(new BallPlayerFeatures(objectMeta, features)),
+			  mFlashLight(light) {
 	}
 
 	/**
@@ -51,6 +52,11 @@ namespace Pix {
 		const float accAmount = fAcceleration * (1 - FEATURES->speedPercent(fSpeed));
 
 		mAcceleration = accAmount * head;
+
+		if (mFlashLight != nullptr) {
+			mFlashLight->position = mPosition;
+			mFlashLight->direction = glm::normalize(mSpeed);
+		}
 
 		// process the ball parameters
 		Ball::process(world, fElapsedTime);
@@ -184,6 +190,14 @@ namespace Pix {
 			mSpeed.x += mAcceleration.x * fElapsedTime;    // Update Velocity
 			mSpeed.z += mAcceleration.z * fElapsedTime;
 		}
+		
+		if (mFlashLight != nullptr) {
+			mFlashLight->position = { mPosition.x, mPosition.y+50, mPosition.z};
+			glm::vec3 lookdir =  mSpeed;
+			lookdir.y = 1;
+			mFlashLight->direction = glm::normalize(lookdir);
+		}
+
 	}
 
 	void BallPlayer::steer(float perc, float fElapsedTime) {

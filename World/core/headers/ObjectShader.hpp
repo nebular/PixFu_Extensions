@@ -12,6 +12,7 @@
 #include "Shader.hpp"
 #include "Material.hpp"
 
+#include "OpenGL.h"
 #include "glm/mat4x4.hpp"
 #include "glm/vec4.hpp"
 
@@ -19,7 +20,13 @@ namespace Pix {
 
 	class Frustum;
 
-	class ObjectShader : public Shader {
+	class ObjectShader : public LightingShader {
+
+		GLuint LOC_TRANSFORMATIONMATRIX;
+		GLuint LOC_VIEWMATRIX;
+		GLuint LOC_INVVIEWMATRIX;
+		GLuint LOC_PROJECTIONMATRIX;
+		GLuint LOC_TINTMODE;
 
 		// keey this for frustum calculations
 		glm::mat4 mProjectionMatrix;
@@ -34,8 +41,6 @@ namespace Pix {
 		void bindAttributes();
 
 		void loadTransformationMatrix(glm::mat4 &matrix);
-
-		void loadLight(const DirLight& light);
 
 		void loadViewMatrix(Camera *camera);
 

@@ -108,7 +108,7 @@ namespace Pix {
 		);
 
 		pShader->loadProjectionMatrix(projectionMatrix);
-		CONFIG.light.load(pShader);
+		pShader->loadLight(CONFIG.light);
 		pShader->stop();
 
 		if (pShaderObjects != nullptr) {
@@ -120,7 +120,7 @@ namespace Pix {
 			pShaderObjects->use();
 			pShaderObjects->bindAttributes();
 			pShaderObjects->loadProjectionMatrix(projectionMatrix);
-			CONFIG.light.load(pShaderObjects);
+			pShaderObjects->loadLight(CONFIG.light);
 			pShaderObjects->stop();
 		}
 
@@ -143,6 +143,8 @@ namespace Pix {
 		
 		if (bLightsChanged) {
 			loadLights(pShader);
+		} else {
+			updateLights(pShader);
 		}
 
 		for (Terrain *terrain:vTerrains) {
@@ -157,9 +159,10 @@ namespace Pix {
 			pShaderObjects->use();
 			pShaderObjects->loadViewMatrix(pCamera);
 			if (bLightsChanged) {
-				loadLights(pShader);
 				loadLights(pShaderObjects);
 				bLightsChanged = false;
+			} else {
+				updateLights(pShaderObjects);
 			}
 			// draw each cluster
 			for (ObjectCluster *object:vObjects) {
@@ -232,40 +235,42 @@ namespace Pix {
 		return matrix * flipMatrix;
 	}
 
-	void DirLight::load(Shader *shader) const {
-		shader->setVec3("dirLight.direction", mDirection);
-		shader->setVec3("dirLight.ambient", mAmbient);
-		shader->setVec3("dirLight.diffuse",  mDiffuse);
-		shader->setVec3("dirLight.specular", mSpecular);
-		shader->setFloat("dirLight.ka", ka);
-	}
-
-	void World::addLight(PointLight& p) {
+	void World::addLight(PointLight *p) {
 		vPointLights.emplace_back(p);
 		bLightsChanged = true;
 	}
 
-	void World::addLight(SpotLight& p) {
+	void World::addLight(SpotLight *p) {
 		vSpotLights.emplace_back(p);
 		bLightsChanged = true;
 	}
 
-	void World::loadLights(Shader *shader) {
-		const int MAXLIGHTS = 4;
-		for (int i = 0, l = (int)vPointLights.size(); i<MAXLIGHTS; i++) {
-			if (i<l) vPointLights.at(i).load(shader, i);
-			else {
-				std::string lex = std::string(SF("pointLights[%d]", i));
-				shader->setInt(lex+".enabled", 0);
-			}
+	void World::updateLights(LightingShader *shader) {
+
+		shader->setLightingMode(mLightMode);
+
+		if (mLightMode != LIGHTS_OFF) {
+			int i=0;
+			for (PointLight *p : vPointLights) shader->updateLight(*p, i++);
+			i=0;
+			for (SpotLight *p : vSpotLights) shader->updateLight(*p, i++);
 		}
-		for (int i = 0, l = (int)vSpotLights.size(); i<MAXLIGHTS; i++) {
-			if (i<l) vSpotLights.at(i).load(shader, i);
-			else {
-				std::string lex = std::string(SF("spotLights[%d]", i));
-				shader->setInt(lex+".enabled", 0);
-			}
+
+	}
+
+	void World::loadLights(LightingShader *shader) {
+
+		shader->setLightingMode(mLightMode);
+		
+		const int MAXLIGHTS = 4;
+
+		for (int i = 0, l = (int)vPointLights.size(), m = (int)vSpotLights.size(); i<MAXLIGHTS; i++) {
+			if (i<l) shader->loadLight(*vPointLights.at(i), i, true);
+			else shader->enableSpotLight(i, false);
+			if (i<m) shader->loadLight(*vSpotLights.at(i), i, true);
+			else shader->enablePointLight(i, false);
 		}
 	};
 }
+
 #pragma clang diagnostic pop

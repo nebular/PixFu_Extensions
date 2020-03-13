@@ -1,6 +1,11 @@
 //
 //  Lighting.cpp
-//  PixEngine
+//  PixFu Engine
+//
+//  Directional, Spot and Point Lights.
+//  Provides a base shader to extend that exports functions to update the lights
+//
+//  Implemented as taught in https://learnopengl.com/Lighting/Multiple-lights
 //
 //  Created by rodo on 12/03/2020.
 //  Copyright © 2020 rodo. All rights reserved.
@@ -10,51 +15,79 @@
 #include "Utils.hpp"
 
 namespace Pix {
+	
+	LightingShader::LightingShader(const std::string& name, int maxLights)
+	: Shader(name) {
+		
+		// cache all locators
 
-	void PointLight::load(Shader *shader, int index, bool enable) const {
-		std::string lex = std::string(SF("pointLights[%d]", index));
-		shader->setInt(lex+".enabled", enable?1:0);
-		if (enable) {
-			shader->setVec3(lex+".position", mPosition / 1000.0f);
-			shader->setVec3(lex+".ambient", mAmbient);
-			shader->setVec3(lex+".diffuse",  mDiffuse);
-			shader->setVec3(lex+".specular", mSpecular);
-			shader->setFloat(lex+".constant", constant);
-			shader->setFloat(lex+".quadratic", quadratic);
-			shader->setFloat(lex+".linear", linear);
-			shader->setFloat(lex+".ka", ka);
+		L_LIGHTMODE = getLocator("lightMode");
+
+		// cache directional light locators
+
+		DL_DIRECTION = getLocator("dirLight.direction");
+		DL_AMBIENT = getLocator("dirLight.ambient");
+		DL_DIFFUSE = getLocator("dirLight.diffuse");
+		DL_SPECULAR = getLocator("dirLight.specular");
+
+		for (int i = 0; i < maxLights; i++) {
+
+			// cache pointlight locators
+			// would really hurt a lot to do this string messing on every frame !!!
+			
+			std::string lex = std::string(SF("pointLights[%d]", index));
+			PL_POSITION.emplace_back(getLocator(lex+".position"));
+			PL_AMBIENT.emplace_back(getLocator(lex+".ambient"));
+			PL_DIFFUSE.emplace_back(getLocator(lex+".diffuse"));
+			PL_SPECULAR.emplace_back(getLocator(lex+".specular"));
+			PL_PARAMS.emplace_back(getLocator(lex+".params"));
+			PL_ENABLED.emplace_back(getLocator(lex+".enabled"));
+			SL_POSITION.emplace_back(getLocator(lex+".position"));
+			
+			// cache spotlight locators
+
+			lex = std::string(SF("spotLights[%d]", index));
+			SL_POSITION.emplace_back(getLocator(lex+".direction"));
+			SL_DIRECTION.emplace_back(getLocator(lex+".direction"));
+			SL_AMBIENT.emplace_back(getLocator(lex+".ambient"));
+			SL_DIFFUSE.emplace_back(getLocator(lex+".diffuse"));
+			SL_SPECULAR.emplace_back(getLocator(lex+".specular"));
+			SL_CUTOFF.emplace_back(getLocator(lex+".cutoff"));
+			SL_PARAMS.emplace_back(getLocator(lex+".params"));
+			SL_ENABLED.emplace_back(getLocator(lex+".enabled"));
 		}
 	}
 
-	void PointLight::update(Shader *shader, int index) const {
-		std::string lex = std::string(SF("pointLights[%d]", index));
-		shader->setVec3(lex+".position", mPosition);
-		shader->setFloat(lex+".ka", ka); // interesting for animation
+	void LightingShader::loadLight(const DirLight& light) const {
+		setVec3(DL_DIRECTION, light.mDirection);
+		setVec3(DL_AMBIENT,   light.mAmbient);
+		setVec3(DL_DIFFUSE,   light.mDiffuse);
+		setVec3(DL_SPECULAR,  light.mSpecular);
 	}
 
+	void LightingShader::loadLight(PointLight& light, int index, bool enable) const {
 
-	void SpotLight::load(Shader *shader, int index, bool enable) const {
-		std::string lex = std::string(SF("spotLights[%d]", index));
-		shader->setInt(lex+".enabled", enable?1:0);
+		setInt(PL_ENABLED[index], enable?1:0);
+		
 		if (enable) {
-			shader->setVec3(lex+".position", mPosition / 1000.0f);
-			shader->setVec3(lex+".direction", mDirection);
-			shader->setVec3(lex+".ambient", mAmbient);
-			shader->setVec3(lex+".diffuse",  mDiffuse);
-			shader->setVec3(lex+".specular", mSpecular);
-			shader->setFloat(lex+".constant", constant);
-			shader->setFloat(lex+".quadratic", quadratic);
-			shader->setFloat(lex+".linear", linear);
-			shader->setFloat(lex+".cutOff", cutOff);
-			shader->setFloat(lex+".outerCutOff", outerCutOff);
-			shader->setFloat(lex+".ka", ka);
+			setVec3(PL_POSITION[index], light.position / 1000.0f);
+			setVec3(PL_AMBIENT[index], 	light.ambient);
+			setVec3(PL_DIFFUSE[index],  light.diffuse);
+			setVec3(PL_SPECULAR[index], light.specular);
+			setVec3(PL_PARAMS[index], 	light.constant, light.linear, light.quadratic);
 		}
 	}
 
-	void SpotLight::update(Shader *shader, int index) const {
-		std::string lex = std::string(SF("spotLights[%d]", index));
-		shader->setVec3(lex+".position", mPosition);
-		shader->setFloat(lex+".ka", ka); // interesting for animation
+	void LightingShader::loadLight(SpotLight& light, int index, bool enable) const {
+		setInt(SL_ENABLED[index], light.enabled ? 1:0);
+		if (enable) {
+			setVec3(SL_POSITION[index],		light.position / 1000.0f);
+			setVec3(SL_DIRECTION[index], 	light.direction);
+			setVec3(SL_AMBIENT[index], 		light.ambient);
+			setVec3(SL_DIFFUSE[index], 		light.diffuse);
+			setVec3(SL_SPECULAR[index], 	light.specular);
+			setVec3(SL_PARAMS[index], 		light.constant, light.linear, light.quadratic);
+			setVec2(SL_CUTOFF[index], 		light.cutOff, light.outerCutOff);
+		}
 	}
-
 }
