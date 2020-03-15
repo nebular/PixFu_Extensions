@@ -86,7 +86,7 @@ namespace Pix {
 		const glm::vec3 backgroundColor = {0.8, 0.8, 1};
 
 		/** Light */
-		const DirLight light = { {-0.2, -1, -0.3}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
+		const DirLight light;
 		
 		/** debug mode */
 		const WorldDebug_t debugMode = DEBUG_NONE;

@@ -19,6 +19,8 @@ namespace Pix {
 
 	class WorldObject;
 
+	class Camera;
+
 	typedef struct sVisible {
 		WorldObject *object;
 		glm::mat4 transformMatrix;
@@ -55,7 +57,7 @@ namespace Pix {
 
 		void init();
 
-		void render(ObjectShader *shader);
+		void render(ObjectShader *shader, Camera *camera);
 	};
 
 }

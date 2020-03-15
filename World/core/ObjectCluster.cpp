@@ -70,7 +70,7 @@ namespace Pix {
 		if (DBG) LogV(TAG, SF("Destroyed ObjectCluster %s", NAME.c_str()));
 	}
 
-	void ObjectCluster::render(ObjectShader *shader) {
+	void ObjectCluster::render(ObjectShader *shader, Camera *camera) {
 
 		if (!bInited) init();
 
@@ -79,6 +79,8 @@ namespace Pix {
 		int frustumHits = 0;
 
 		bool oneMesh = vMeshes.size() == 1;
+
+		Frustum *frustum = camera->getFrustum();
 
 		if (oneMesh) {
 
@@ -98,12 +100,7 @@ namespace Pix {
 
 			float radius = object->drawRadius();
 
-			// our shader has a Frustum class initialized already initialized with the
-			// projection & view matrix, so we can now trivially check if an object will be
-			// visible.
-
-			Frustum *f = shader->frustum();
-			if (f == nullptr || f->IsBoxVisible(pos - radius, pos + radius)) {
+			if (frustum == nullptr || frustum->IsBoxVisible(pos - radius, pos + radius)) {
 
 				// the object is visible, so transform its model to the desired rotation,
 				// position and radius

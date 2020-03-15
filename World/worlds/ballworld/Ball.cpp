@@ -290,17 +290,12 @@ namespace Pix {
 //		auto toDeg = [] (float rad) { return (int)(rad*180/M_PI); };
 //		LogV(TAG, SF("angles %d %d", toDeg(fAngleTerrain.x), toDeg(fAngleTerrain.y)));
 
-		mRotation.x = -fAngleTerrain.x;
-		mRotation.z = -fAngleTerrain.y;
+//		mRotation.x = -fAngleTerrain.x;
+//		mRotation.z = -fAngleTerrain.y;
 
-//		mRotation.x += (mRotation.x - fAngleTerrain.x) * LERP * fTime;
-//		mRotation.z += (mRotation.z - fAngleTerrain.y) * LERP * fTime;
-
-		//		if (fabs((rotation.x-fAngleTerrain))>M_PI/2) rotation.x = fAngleTerrain;
-//		else rotation.x += (rotation.x - fAngleTerrain) * 0.5 * fTime;
-// TODO
-		//	std::cerr << "angle terr " << fAngleTerrain * 180 / 3.141592 << std::endl;
-		//	std::cerr << "height  terr " << height << " ply " << fHeight << std::endl;
+		float LERP = 10;
+		mRotation.x -= (mRotation.x - fAngleTerrain.x) * LERP * fTime;
+		mRotation.z -= (mRotation.z - fAngleTerrain.y) * LERP * fTime;
 
 		if (mPosition.y > cheight) {
 

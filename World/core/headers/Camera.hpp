@@ -20,6 +20,7 @@
 #include "glm/vec3.hpp"
 
 #include "Keyboard.hpp"
+#include "Frustum.hpp"
 #include "WorldMeta.hpp"
 #include "WorldObject.hpp"
 
@@ -122,6 +123,8 @@ namespace Pix {
 		glm::vec3 mUpVector = {};
 		/** Current camera Right Vector */
 		glm::vec3 mRightVector = {};
+		/** For frustum: current pojection matrix */
+		glm::mat4 mProjectionMatrix = {};
 		/** Optimizzation: current view matrix */
 		glm::mat4 mCurrentViewMatrix = {};
 		/** Optimizzation: current inverse view matrix */
@@ -153,6 +156,9 @@ namespace Pix {
 		/** Interpolated position (target mode) */
 		glm::vec3 mInterpolatedPosition = {};
 
+		/** Current frustum */
+		Frustum *mFrustum;
+		
 		// Mouse parameters
 		float mMouseSensitivity = 1;
 		float mMouseZoom = 1;
@@ -177,13 +183,15 @@ namespace Pix {
 		 * @param configuration The configuration struct
 		 */
 
-		Camera(const CameraConfig_t &configuration = CAM_INITIAL);
+		Camera(const glm::mat4& projectionMatrix, const CameraConfig_t &configuration = CAM_INITIAL);
 
 		/**
 		 * Update the camera
 		 */
 
 		void update(float fElapsedTime);
+
+		Frustum *getFrustum();
 
 		/**
 		 * Returns current View Matrix
@@ -369,6 +377,8 @@ namespace Pix {
 	inline glm::vec3 Camera::getPosition() { return mPosition * 1000.0f; }
 
 	inline glm::vec3 Camera::getFrontVector(float size) { return mFrontVector * size; }
+
+	inline Frustum *Camera::getFrustum() { return mFrustum; }
 
 	inline float Camera::getPitch() { return fPitch; }
 

@@ -89,10 +89,6 @@ namespace Pix {
 
 		pShader = new TerrainShader(CONFIG.shaderName);
 		pShaderObjects = new ObjectShader(CONFIG.shaderName + "_objects");
-		pCamera = new Camera();
-
-		pCamera->setHeight(CONFIG.perspective.C_HEIGHT);
-		pCamera->setPitch(CONFIG.perspective.C_PITCH);
 
 		pShader->use();
 		pShader->bindAttributes();
@@ -111,6 +107,10 @@ namespace Pix {
 		pShader->loadLight(CONFIG.light);
 		pShader->stop();
 
+		pCamera = new Camera(projectionMatrix);
+		pCamera->setHeight(CONFIG.perspective.C_HEIGHT);
+		pCamera->setPitch(CONFIG.perspective.C_PITCH);
+		
 		if (pShaderObjects != nullptr) {
 
 			for (ObjectCluster *object:vObjects) {
@@ -158,15 +158,17 @@ namespace Pix {
 			// configure object shader
 			pShaderObjects->use();
 			pShaderObjects->loadViewMatrix(pCamera);
+
 			if (bLightsChanged) {
 				loadLights(pShaderObjects);
 				bLightsChanged = false;
 			} else {
 				updateLights(pShaderObjects);
 			}
+
 			// draw each cluster
 			for (ObjectCluster *object:vObjects) {
-				object->render(pShaderObjects);
+				object->render(pShaderObjects, pCamera);
 			}
 
 			pShaderObjects->stop();
@@ -249,13 +251,34 @@ namespace Pix {
 
 		shader->setLightingMode(mLightMode);
 
+		int inFrustum = 0;
+		
 		if (mLightMode != LIGHTS_OFF) {
 			int i=0;
-			for (PointLight *p : vPointLights) shader->updateLight(*p, i++);
+			for (PointLight *p : vPointLights) {
+				if (pCamera->getFrustum()->IsBoxVisible(p->position/1000.0f, p->calcRadius(0.1)/1000.0f)) {
+					// light virtual sphere is visible
+					shader->enablePointLight(i, true);
+					shader->updateLight(*p, i);
+					inFrustum++;
+				} else {
+					shader->enablePointLight(i, false);
+				}
+				i++;
+			}
+				LogV(TAG, SF("%d pointlights in frustum", inFrustum));
 			i=0;
-			for (SpotLight *p : vSpotLights) shader->updateLight(*p, i++);
+			for (SpotLight *p : vSpotLights) {
+				if (true || pCamera->getFrustum()->IsBoxVisible(p->position/1000.0f, p->calcRadius(0.1)/1000.0f)) {
+					// light virtual sphere is visible
+					shader->enableSpotLight(i, true);
+					shader->updateLight(*p, i);
+				} else {
+					shader->enableSpotLight(i, false);
+				}
+				i++;
+			}
 		}
-
 	}
 
 	void World::loadLights(LightingShader *shader) {

@@ -27,6 +27,7 @@ namespace Pix {
 
 		// http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm
 		bool IsBoxVisible(const glm::vec3 &minp, const glm::vec3 &maxp) const;
+		bool IsBoxVisible(const glm::vec3 &center, float radius) const;
 
 	private:
 		enum Planes {
@@ -92,7 +93,11 @@ namespace Pix {
 
 	}
 
-// http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm
+	inline bool Frustum::IsBoxVisible(const glm::vec3 &center, float radius) const {
+		return IsBoxVisible(center - radius, center + radius);
+	}
+	
+	// http://iquilezles.org/www/articles/frustumcorrect/frustumcorrect.htm
 	inline bool Frustum::IsBoxVisible(const glm::vec3 &minp, const glm::vec3 &maxp) const {
 		// check box outside/inside of frustum
 		for (int i = 0; i < Count; i++) {

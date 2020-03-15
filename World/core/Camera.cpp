@@ -12,6 +12,7 @@
 //
 
 #include "Camera.hpp"
+#include "Frustum.hpp"
 #include "World.hpp"
 #include "BallPlayer.hpp"
 #include "Utils.hpp"
@@ -34,7 +35,8 @@ namespace Pix {
 	 * @param configuration The configuration object
 	 */
 
-	Camera::Camera(const CameraConfig_t &configuration) {
+	Camera::Camera(const glm::mat4& projectionMatrix, const CameraConfig_t &configuration)
+	: mProjectionMatrix(projectionMatrix) {
 		setConfig(configuration, false);
 	}
 
@@ -138,6 +140,7 @@ namespace Pix {
 		
 		mCurrentViewMatrix = glm::lookAt(mPosition, mPosition + mFrontVector, mUpVector);
 		mCurrentInvViewMatrix = glm::inverse(mCurrentViewMatrix);
+		mFrustum = new Frustum(mProjectionMatrix * mCurrentViewMatrix);
 	}
 
 	/**

@@ -55,7 +55,9 @@ namespace Pix {
 
 		if (mFlashLight != nullptr) {
 			mFlashLight->position = mPosition;
-			mFlashLight->direction = glm::normalize(mSpeed);
+			glm::vec3 direction = glm::normalize(mSpeed);
+			direction = glm::rotate(direction, (float)(-30*M_PI/180), glm::vec3 {0,1,0});
+			mFlashLight->direction = direction;
 		}
 
 		// process the ball parameters
@@ -192,9 +194,11 @@ namespace Pix {
 		}
 		
 		if (mFlashLight != nullptr) {
-			mFlashLight->position = { mPosition.x, mPosition.y+50, mPosition.z};
+			mFlashLight->position = { mPosition.x, mPosition.y, mPosition.z};
 			glm::vec3 lookdir =  mSpeed;
-			lookdir.y = 1;
+			lookdir.y = 0;
+			lookdir = glm::rotate(lookdir, mRotation.x, {1,0,0});
+			lookdir = glm::rotate(lookdir, mRotation.z, {0,0,1});
 			mFlashLight->direction = glm::normalize(lookdir);
 		}
 

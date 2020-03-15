@@ -31,22 +31,6 @@ namespace Pix {
 		bindAttribute(2, "textureCoordinates");
 	}
 	
-	void ObjectShader::loadViewMatrix(Camera *camera) {
-
-		glm::mat4 viewMatrix = camera->getViewMatrix();
-		setMat4(LOC_VIEWMATRIX, (float *) &viewMatrix);
-
-		glm::mat4& invViewMatrix = camera->getInvViewMatrix();
-		setMat4(LOC_INVVIEWMATRIX, (float *) &invViewMatrix);
-
-		mFrustum = new Frustum(mProjectionMatrix * viewMatrix);
-	}
-
-	void ObjectShader::loadProjectionMatrix(glm::mat4 &projection) {
-		setMat4(LOC_PROJECTIONMATRIX, (float *) &projection);
-		mProjectionMatrix = projection;
-		mFrustum = nullptr;
-	}
 	void ObjectShader::setTint(glm::vec4 tint) {
 		setVec4(LOC_TINTMODE, tint.x, tint.y, tint.z, tint.w);
 	}
