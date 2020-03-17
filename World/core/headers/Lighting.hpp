@@ -15,6 +15,7 @@
 #include <cmath>
 #include "WorldShader.hpp"
 #include "glm/vec3.hpp"
+#include "glm/gtx/fast_square_root.hpp"
 
 namespace Pix {
 
@@ -138,8 +139,8 @@ namespace Pix {
 			// qx2 + lx + (c - 1/a) = 0
 			// qx2 + lx +     d     = 0
 			// x = -l + sqrt((l*2 - 4*q*(c-1/a)))/(2 *q)
-			float d = params.constant - 1/targetAttenuation;
-			return  ( -params.linear + sqrt( params.linear*params.linear - 4 * params.quadratic * d  )) / 2 * params.quadratic;
+			float d = params.constant - 1 / targetAttenuation;
+			return  ( -params.linear + glm::fastSqrt( params.linear*params.linear - 4 * params.quadratic * d  )) / 2 * params.quadratic;
 		}
 		
 		inline static std::shared_ptr<PointLight> create(LightColor_t color, PointLightParams_t params, glm::vec3 position) {
@@ -178,10 +179,10 @@ namespace Pix {
 			// 1/att = qx2 + lx + c
 			// qx2 + lx + (c - 1/a) = 0
 			// qx2 + lx +     d     = 0
-			// x = -l + sqrt((l*2 - 4*q*(c-1/a)))/(2 *q)
+			// x = -l + sqrt((l*2 - 4*q*d))/(2 *q)
 
-			float d = params.constant - 1/targetAttenuation;
-			return ( -params.linear + sqrt( params.linear*params.linear - 4 * params.quadratic * d  )) / 2 * params.quadratic;
+			const float d = params.constant - 1 / targetAttenuation;
+			return ( -params.linear + glm::fastSqrt( params.linear*params.linear - 4 * params.quadratic * d  )) / 2 * params.quadratic;
 		}
 		
 		inline static std::shared_ptr<SpotLight> create(LightColor_t color, SpotLightParams_t params, glm::vec3 position, glm::vec3 direction) {

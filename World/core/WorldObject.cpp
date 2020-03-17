@@ -21,15 +21,17 @@ namespace Pix {
 
 	glm::vec3 ClosestPoint(glm::vec3 A, glm::vec3 B, glm::vec3 P) {
 
-		glm::vec3 AB    = B - A;
-		auto ab2       = glm::dot(AB,AB);
-		glm::vec3 AP       = P - A;
-		auto ap_dot_ab = glm::dot(AP,AB);
-		float t         = ap_dot_ab / ab2;
+		glm::vec3 AB		= B - A;
+		auto ab2			= glm::dot(AB,AB);
+		glm::vec3 AP		= P - A;
+		auto ap_dot_ab 		= glm::dot(AP,AB);
+		float t				= ap_dot_ab / ab2;
+
 		// the projection parameter on the line
 		// clamp parameter to segment extremities
 		if (t < 0.0F) t = 0.0F;
 		else if (t > 1.0F) t = 1.0F;
+
 		// calculate the closest point
 		glm::vec3 Q = A + AB * t;
 		return Q;
@@ -46,6 +48,7 @@ namespace Pix {
 	}
 
 	// https://gamedev.stackexchange.com/questions/21552/picking-objects-with-mouse-ray
+
 	bool WorldObject::checkRayCollision(glm::vec3& origin, glm::vec3& direction) {
 		glm::vec3 center = pos();
 		glm::vec3 closest = ClosestPoint(origin, origin+2000.0F*direction, center);
