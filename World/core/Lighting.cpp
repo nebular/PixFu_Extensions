@@ -21,14 +21,14 @@ namespace Pix {
 		
 		// cache all locators
 
-		L_LIGHTMODE = getLocator("lightMode");
+		L_LIGHTMODE  = getLocator("lightMode");
 
 		// cache directional light locators
 
 		DL_DIRECTION = getLocator("dirLight.direction");
-		DL_AMBIENT = getLocator("dirLight.ambient");
-		DL_DIFFUSE = getLocator("dirLight.diffuse");
-		DL_SPECULAR = getLocator("dirLight.specular");
+		DL_AMBIENT   = getLocator("dirLight.ambient");
+		DL_DIFFUSE   = getLocator("dirLight.diffuse");
+		DL_SPECULAR  = getLocator("dirLight.specular");
 
 		for (int i = 0; i < maxLights; i++) {
 
@@ -64,29 +64,29 @@ namespace Pix {
 		setVec3(DL_SPECULAR,  light.color.specular);
 	}
 
-	void LightingShader::loadLight(PointLight& light, int index, bool enable) const {
+	void LightingShader::loadLight(PointLight *light, int index, bool enable) const {
 
 		setInt(PL_ENABLED[index], enable?1:0);
 		
 		if (enable) {
-			setVec3(PL_POSITION[index], light.position / 1000.0f);
-			setVec3(PL_AMBIENT[index], 	light.color.ambient);
-			setVec3(PL_DIFFUSE[index],  light.color.diffuse);
-			setVec3(PL_SPECULAR[index], light.color.specular);
-			setVec3(PL_PARAMS[index], 	light.params.constant, light.params.linear, light.params.quadratic);
+			setVec3(PL_POSITION[index], light->position);
+			setVec3(PL_AMBIENT[index], 	light->color.ambient);
+			setVec3(PL_DIFFUSE[index],  light->color.diffuse);
+			setVec3(PL_SPECULAR[index], light->color.specular);
+			setVec3(PL_PARAMS[index], 	light->params.constant, light->params.linear, light->params.quadratic);
 		}
 	}
 
-	void LightingShader::loadLight(SpotLight& light, int index, bool enable) const {
-		setInt(SL_ENABLED[index], light.enabled ? 1:0);
+	void LightingShader::loadLight(SpotLight *light, int index, bool enable) const {
+		setInt(SL_ENABLED[index], light->enabled ? 1:0);
 		if (enable) {
-			setVec3(SL_POSITION[index],		light.position / 1000.0f);
-			setVec3(SL_DIRECTION[index], 	light.direction);
-			setVec3(SL_AMBIENT[index], 		light.color.ambient);
-			setVec3(SL_DIFFUSE[index], 		light.color.diffuse);
-			setVec3(SL_SPECULAR[index], 	light.color.specular);
-			setVec3(SL_PARAMS[index], 		light.params.constant, light.params.linear, light.params.quadratic);
-			setVec2(SL_CUTOFF[index], 		cosf(light.params.cutOff), cosf(light.params.outerCutOff));
+			setVec3(SL_POSITION[index],		light->position);
+			setVec3(SL_DIRECTION[index], 	light->direction);
+			setVec3(SL_AMBIENT[index], 		light->color.ambient);
+			setVec3(SL_DIFFUSE[index], 		light->color.diffuse);
+			setVec3(SL_SPECULAR[index], 	light->color.specular);
+			setVec3(SL_PARAMS[index], 		light->params.constant, light->params.linear, light->params.quadratic);
+			setVec2(SL_CUTOFF[index], 		cosf(light->params.cutOff), cosf(light->params.outerCutOff));
 		}
 	}
 }

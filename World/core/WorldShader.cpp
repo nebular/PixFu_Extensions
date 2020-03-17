@@ -48,4 +48,10 @@ namespace Pix {
 		}
 	}
 
+	void WorldShader::bindAttributes() {
+		bindAttribute(0, "position");
+		bindAttribute(1, "normal");
+		bindAttribute(2, "textureCoordinates");
+	}
+
 }

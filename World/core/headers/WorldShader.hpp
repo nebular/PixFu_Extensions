@@ -33,6 +33,7 @@ namespace Pix {
 		WorldShader (const std::string& name);
 		void loadMaterial(Material& m);
 		void bindMaterial(Material& m);
+		void bindAttributes();
 
 	};
 

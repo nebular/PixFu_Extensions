@@ -16,9 +16,10 @@
 #include "ObjectCluster.hpp"
 #include "Lighting.hpp"
 
-#include <vector>
 #include <map>
 #include <cmath>
+#include <vector>
+#include <memory>
 
 namespace Pix {
 
@@ -62,8 +63,8 @@ namespace Pix {
 		std::vector<Terrain *> vTerrains;
 
 		/** Point Lights */
-		std::vector<PointLight *> vPointLights;
-		std::vector<SpotLight *> vSpotLights;
+		std::vector<std::shared_ptr<PointLight>> vPointLights;
+		std::vector<std::shared_ptr<SpotLight>> vSpotLights;
 
 		/**
 		 * Intits the extension
@@ -116,15 +117,17 @@ namespace Pix {
 		/**
 		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
 		 * with that OID. Initial location from the DB is used.
+		 *
 		 * @param oid Object OID as inserted into the ObjecctDb
 		 * @param setHeight whether to set ground height
 		 * @return The object
+		 *
 		 */
 
 		virtual WorldObject *add(int oid, bool setHeight);
 
-		void addLight(PointLight *p);
-		void addLight(SpotLight *p);
+		void addLight(std::shared_ptr<PointLight> p);
+		void addLight(std::shared_ptr<SpotLight> p);
 
 		void loadLights(LightingShader *shader);
 		void updateLights(LightingShader *shader);

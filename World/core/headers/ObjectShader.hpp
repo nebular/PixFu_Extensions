@@ -8,12 +8,8 @@
 
 #pragma once
 
-#include "Camera.hpp"
-#include "Shader.hpp"
-#include "Material.hpp"
-
+#include "Lighting.hpp"
 #include "OpenGL.h"
-#include "glm/mat4x4.hpp"
 #include "glm/vec4.hpp"
 
 namespace Pix {
@@ -27,8 +23,6 @@ namespace Pix {
 	public:
 
 		ObjectShader(std::string name);
-
-		void bindAttributes();
 
 		void setTint(glm::vec4 tint);
 

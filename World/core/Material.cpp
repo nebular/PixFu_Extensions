@@ -23,7 +23,7 @@ namespace Pix {
 
 		if (map_Kd.size()>0) {
 			std::string filename = getName(map_Kd);
-			textureKd = new Texture2D(FOLDER+"/" + NAME + "/"+filename, true);
+			textureKd = new Texture2D(FOLDER + "/" + NAME + "/"+filename, true);
 		}
 
 	}

@@ -3,7 +3,7 @@
 //  PixFu Engine
 //
 //  Directional, Spot and Point Lights.
-//  Provides a base shader to extend that exports functions to update the lights
+//  Provides the different Light objects and a base shader to manage them.
 //
 //  Implemented as taught in https://learnopengl.com/Lighting/Multiple-lights
 //
@@ -38,15 +38,20 @@ namespace Pix {
 	constexpr LightColor_t LIGHTCOLOR_WHITE_COLD_AMBIENTMI = { {0.10,0.10,0.10}, {0.9F,0.9F, 0.9F}, {0.5F, 0.5F, 0.5F}};
 	constexpr LightColor_t LIGHTCOLOR_WHITE_COLD_AMBIENTHI = { {0.15,0.15,0.15}, {0.9F,0.9F, 0.9F}, {0.7F, 0.7F, 0.7F}};
 
-	constexpr LightColor_t LIGHTCOLOR_WHITE_WARM_NOAMBIENT = { {0,0,0}, 		 {1.0F, 1.0F, 0.8F}, {0.5F, 0.5F, 0.5F}};
-	constexpr LightColor_t LIGHTCOLOR_WHITE_WARM_AMBIENTLO = { {0.05,0.05,0.05}, {1.0F, 1.0F, 0.8F}, {0.5F, 0.5F, 0.5F}};
-	constexpr LightColor_t LIGHTCOLOR_WHITE_WARM_AMBIENTMI = { {0.10,0.10,0.10}, {1.0F, 1.0F, 0.8F}, {0.5F, 0.5F, 0.5F}};
-	constexpr LightColor_t LIGHTCOLOR_WHITE_WARM_AMBIENTHI = { {0.15,0.15,0.15}, {1.0F, 1.0F, 0.8F}, {0.7F, 0.7F, 0.7F}};
+	constexpr LightColor_t LIGHTCOLOR_NIGHT_NOAMBIENT = { {0,0,0}, 			{0.1F,0.1F, 0.1F}, {0.5F, 0.5F, 0.5F}};
+	constexpr LightColor_t LIGHTCOLOR_NIGHT_AMBIENTLO = { {0.05,0.05,0.05}, {0.1F,0.1F, 0.1F}, {0.5F, 0.5F, 0.5F}};
+	constexpr LightColor_t LIGHTCOLOR_NIGHT_AMBIENTMI = { {0.10,0.10,0.10}, {0.1F,0.1F, 0.1F}, {0.5F, 0.5F, 0.5F}};
+	constexpr LightColor_t LIGHTCOLOR_NIGHT_AMBIENTHI = { {0.15,0.15,0.15}, {0.1F,0.1F, 0.1F}, {0.7F, 0.7F, 0.7F}};
 
-	constexpr LightColor_t LIGHTCOLOR_RED_NOAMBIENT = { {0,0,0}, {0.9F,0.0f,0.0F}, {0.5F, 0.5F, 0.5F}};
-	constexpr LightColor_t LIGHTCOLOR_RED_AMBIENTLO = { {0.05,0.05,0.05}, {0.9F,0.0f,0.0F}, {0.5F, 0.5F, 0.5F}};
-	constexpr LightColor_t LIGHTCOLOR_RED_AMBIENTMI = { {0.10,0.10,0.10}, {0.9F,0.0f,0.0F}, {0.5F, 0.5F, 0.5F}};
-	constexpr LightColor_t LIGHTCOLOR_RED_AMBIENTHI = { {0.15,0.15,0.15}, {0.9F,0.0f,0.0F}, {0.7F, 0.7F, 0.7F}};
+	constexpr LightColor_t LIGHTCOLOR_WHITE_WARM_NOAMBIENT = { {0,0,0}, 		 {1.0F, 1.0F, 0.8F}, {0.5F, 0.5F, 0.4F}};
+	constexpr LightColor_t LIGHTCOLOR_WHITE_WARM_AMBIENTLO = { {0.05,0.05,0.04}, {1.0F, 1.0F, 0.8F}, {0.5F, 0.5F, 0.4F}};
+	constexpr LightColor_t LIGHTCOLOR_WHITE_WARM_AMBIENTMI = { {0.10,0.10,0.08}, {1.0F, 1.0F, 0.8F}, {0.5F, 0.5F, 0.4F}};
+	constexpr LightColor_t LIGHTCOLOR_WHITE_WARM_AMBIENTHI = { {0.15,0.15,0.12}, {1.0F, 1.0F, 0.8F}, {0.7F, 0.7F, 0.6F}};
+
+	constexpr LightColor_t LIGHTCOLOR_RED_NOAMBIENT = { {0,0,0}, {0.9F,0.0f,0.0F}, {0.5F, 0.5F, 0.4F}};
+	constexpr LightColor_t LIGHTCOLOR_RED_AMBIENTLO = { {0.05,0.05,0.05}, {0.9F,0.0f,0.0F}, {0.7F, 0.5F, 0.5F}};
+	constexpr LightColor_t LIGHTCOLOR_RED_AMBIENTMI = { {0.10,0.10,0.10}, {0.9F,0.0f,0.0F}, {0.7F, 0.5F, 0.5F}};
+	constexpr LightColor_t LIGHTCOLOR_RED_AMBIENTHI = { {0.15,0.15,0.15}, {0.9F,0.0f,0.0F}, {1.0F, 0.7F, 0.7F}};
 
 	constexpr LightColor_t LIGHTCOLOR_GREEN_NOAMBIENT = { {0,0,0}, 			{0.0F, 0.9F,0.0F}, {0.5F, 0.5F, 0.5F}};
 	constexpr LightColor_t LIGHTCOLOR_GREEN_AMBIENTLO = { {0.05,0.05,0.05}, {0.0F, 0.9F,0.0F}, {0.5F, 0.5F, 0.5F}};
@@ -117,13 +122,17 @@ namespace Pix {
 		/** PointLight parameters */
 		const PointLightParams_t params = POINTLIGHT_SMALL;
 		
-		/** Light Position */
+		/** Light Position : NORMALIZED (/1000.0f) (constructor does the translation) */
 		glm::vec3 position;
 
 		/** Whether */
 		bool enabled = true;
 		
-		float calcRadius(float targetAttenuation) const {
+		/**
+		 * The radius for what is considered Dark (The target attenuation)
+		 */
+
+		inline float calcRadius(float targetAttenuation) const {
 			// 1/att =  (constant + linear * distance + quadratic * (distance2);
 			// 1/att = qx2 + lx + c
 			// qx2 + lx + (c - 1/a) = 0
@@ -132,6 +141,13 @@ namespace Pix {
 			float d = params.constant - 1/targetAttenuation;
 			return  ( -params.linear + sqrt( params.linear*params.linear - 4 * params.quadratic * d  )) / 2 * params.quadratic;
 		}
+		
+		inline static std::shared_ptr<PointLight> create(LightColor_t color, PointLightParams_t params, glm::vec3 position) {
+			return std::make_shared<PointLight>(color, params, position);
+		}
+
+		PointLight(LightColor_t lcolor, PointLightParams_t lparams, glm::vec3 lposition)
+		: color(lcolor), params(lparams), position(lposition / 1000.0F) {}
 
 	};
 
@@ -149,8 +165,10 @@ namespace Pix {
 
 		/** Light Position */
 		glm::vec3 position;
+
 		/** Light Direction */
 		glm::vec3 direction;
+
 		/** Whether */
 		bool enabled = true;
 		
@@ -165,6 +183,14 @@ namespace Pix {
 			float d = params.constant - 1/targetAttenuation;
 			return ( -params.linear + sqrt( params.linear*params.linear - 4 * params.quadratic * d  )) / 2 * params.quadratic;
 		}
+		
+		inline static std::shared_ptr<SpotLight> create(LightColor_t color, SpotLightParams_t params, glm::vec3 position, glm::vec3 direction) {
+			return std::make_shared<SpotLight>(color, params, position, direction);
+		}
+		
+		SpotLight(LightColor_t lcolor, SpotLightParams_t lparams, glm::vec3 lposition, glm::vec3 ldirection)
+		: color(lcolor), params(lparams), position(lposition / 1000.0f), direction(ldirection) {}
+
 	};
 
 	constexpr DirLight DIRLIGHT_AFTERNOON = {
@@ -208,31 +234,32 @@ namespace Pix {
 		/** Loads the directional light */
 		void loadLight(const DirLight& light) const;
 		/** Loads a spotlight */
-		void loadLight(SpotLight& light, int index, bool enable) const;
+		void loadLight(SpotLight *light, int index, bool enable) const;
 		/** Loads a pointlight */
-		void loadLight(PointLight& light, int index, bool enable) const;
+		void loadLight(PointLight *light, int index, bool enable) const;
 		/** Updates a spotlight */
-		void updateLight(SpotLight& light, int index) const;
+		void updateLight(SpotLight *light, int index) const;
 		/** Updates a pointlight */
-		void updateLight(PointLight& light, int index) const;
+		void updateLight(PointLight *light, int index) const;
 		/** Enables/disables a spotlight (pre-configured, added, etc...) */
 		void enableSpotLight(int index, bool enable) const;
 		/** Enables/disables a pointlight (pre-configured, added, etc...) */
 		void enablePointLight(int index, bool enable) const;
 		/** Sets lighting mode */
 		void setLightingMode(LightMode_t lightMode) const;
+		
 	};
 
 	// this is a per-frame function so lets try to make it faster
-	inline void LightingShader::updateLight(PointLight& p, int index) const {
-		setVec3(PL_POSITION[index], p.position/1000.0f);
+	inline void LightingShader::updateLight(PointLight *p, int index) const {
+		setVec3(PL_POSITION[index], p->position);
 	}
 
 
 	// this is a per-frame function so lets try to make it faster
-	inline void LightingShader::updateLight(SpotLight& s, int index) const {
-		setVec3(SL_POSITION[index], s.position/1000.0f);
-		setVec3(SL_DIRECTION[index], s.direction);
+	inline void LightingShader::updateLight(SpotLight *s, int index) const {
+		setVec3(SL_POSITION[index], s->position);
+		setVec3(SL_DIRECTION[index], s->direction);
 	}
 
 	inline void LightingShader::setLightingMode(LightMode_t lightMode) const {
@@ -246,6 +273,5 @@ namespace Pix {
 	inline void LightingShader::enablePointLight(int index, bool enable) const {
 		setInt(PL_ENABLED[index], enable?1:0);
 	}
-
 
 }

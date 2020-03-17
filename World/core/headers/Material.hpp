@@ -5,6 +5,8 @@
 //  A parsed OBJ Material
 //  extracted from objl::OBJ_Loader
 //
+//  Includes proprietary fields for UV animation AnC, AnR
+//
 //  Created by rodo on 10/03/2020.
 //  Copyright © 2020 rodo. All rights reserved.
 //
@@ -65,10 +67,10 @@ namespace Pix {
 		// Bump Map
 		std::string map_bump;
 		
-		/** Animation Region is a rectangular region on the Texture to animate*/
+		/** Animation Region is a rectangular region on the Texture to animate */
 		glm::vec4 AnR = {0,0,0,0};
 		
-		/** Animation Config has the deltas to apply and the last component to enable/disable */
+		/** Animation Config has the deltas to apply, and the last component to enable/disable animation */
 		glm::vec3 AnC = {0,0,0};
 
 		/** Material Texture, only Kd supported at the moment! */

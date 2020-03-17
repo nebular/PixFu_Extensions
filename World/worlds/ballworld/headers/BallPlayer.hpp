@@ -19,13 +19,13 @@ namespace Pix {
 		float fCalcDirection = 0;
 //		float fSteerAngle = 0;
 		
-		SpotLight *mFlashLight;
+		std::shared_ptr<SpotLight> mFlashLight;
 
 	public:
 
 		float fSteerAngle = 0;
 
-		BallPlayer(World *world, ObjectProperties_t &objectMeta, BallPlayerFeatures_t features, ObjectLocation_t locationt, SpotLight *light = nullptr);
+		BallPlayer(World *world, ObjectProperties_t &objectMeta, BallPlayerFeatures_t features, ObjectLocation_t locationt, std::shared_ptr<SpotLight> light = nullptr);
 
 		virtual void process(World *world, float fTime);
 
@@ -49,13 +49,14 @@ namespace Pix {
 
 	class BallPlayer4wheels : public BallPlayer {
 	public:
-		BallPlayer4wheels(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features = {}, ObjectLocation_t location = {}, SpotLight *light = nullptr);
+
+		BallPlayer4wheels(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features = {}, ObjectLocation_t location = {}, std::shared_ptr<SpotLight> light = nullptr);
 
 		void process(World *world, float fTime);
 	};
 
 	inline BallPlayer4wheels::BallPlayer4wheels(World *world, ObjectProperties_t objectMeta, BallPlayerFeatures_t features,
-												ObjectLocation_t location, SpotLight *light)
+												ObjectLocation_t location, std::shared_ptr<SpotLight> light)
 			: BallPlayer(world, objectMeta, features, location, light) {}
 
 

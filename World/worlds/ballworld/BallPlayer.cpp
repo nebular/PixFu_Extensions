@@ -11,7 +11,7 @@
 
 namespace Pix {
 
-	BallPlayer::BallPlayer(World *world, ObjectProperties_t &objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location, SpotLight *light)
+	BallPlayer::BallPlayer(World *world, ObjectProperties_t &objectMeta, BallPlayerFeatures_t features, ObjectLocation_t location, std::shared_ptr<SpotLight> light)
 			: Ball(world->CONFIG, objectMeta, location),
 			  FEATURES(new BallPlayerFeatures(objectMeta, features)),
 			  mFlashLight(light) {
@@ -54,7 +54,7 @@ namespace Pix {
 		mAcceleration = accAmount * head;
 
 		if (mFlashLight != nullptr) {
-			mFlashLight->position = mPosition;
+			mFlashLight->position = mPosition / 1000.0f;
 			glm::vec3 direction = glm::normalize(mSpeed);
 			direction = glm::rotate(direction, (float)(-30*M_PI/180), glm::vec3 {0,1,0});
 			mFlashLight->direction = direction;
@@ -194,7 +194,7 @@ namespace Pix {
 		}
 		
 		if (mFlashLight != nullptr) {
-			mFlashLight->position = { mPosition.x, mPosition.y, mPosition.z};
+			mFlashLight->position = mPosition/1000.0f;
 			glm::vec3 lookdir =  mSpeed;
 			lookdir.y = 0;
 			lookdir = glm::rotate(lookdir, mRotation.x, {1,0,0});

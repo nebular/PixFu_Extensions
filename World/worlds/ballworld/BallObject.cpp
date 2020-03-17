@@ -20,7 +20,7 @@ namespace Pix {
 
 	}
 
-	void BallObject::driveSpline(float fElapsedTime) {
+	void BallObject::followSpline(float fElapsedTime) {
 
 		constexpr float followspeed = 80;
 
@@ -76,7 +76,7 @@ namespace Pix {
 			fTime = fSimTimeRemaining;
 		}
 
-		if (pSpline != nullptr) driveSpline(fTime);
+		if (pSpline != nullptr) followSpline(fTime);
 	}
 
 }

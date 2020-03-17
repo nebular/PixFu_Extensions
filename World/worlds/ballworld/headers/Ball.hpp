@@ -20,6 +20,7 @@
 #include "Drawable.hpp"
 #include "World.hpp"
 #include "BallWorld.hpp"
+#include "WorldObject.hpp"
 
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"

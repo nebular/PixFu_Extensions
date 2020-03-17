@@ -18,3 +18,4 @@ constexpr int LEVEL_MAXPLAYERS = 8;
 constexpr char PATH_LEVELS[] = "levels";
 constexpr char PATH_OBJECTS[] = "objects";
 
+constexpr float LIGHT_DARKNESS = 0.02;

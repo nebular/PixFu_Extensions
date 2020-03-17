@@ -24,12 +24,6 @@ namespace Pix {
 		// cache locators
 		LOC_TINTMODE = getLocator("tintMode");
 	}
-
-	void ObjectShader::bindAttributes() {
-		bindAttribute(0, "position");
-		bindAttribute(1, "normal");
-		bindAttribute(2, "textureCoordinates");
-	}
 	
 	void ObjectShader::setTint(glm::vec4 tint) {
 		setVec4(LOC_TINTMODE, tint.x, tint.y, tint.z, tint.w);

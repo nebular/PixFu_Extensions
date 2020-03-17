@@ -11,12 +11,15 @@
 //
 
 #include <utility>
-#include "World.hpp"
-#include "WorldMeta.hpp"
+#include <memory>
+
 #include "Fu.hpp"
 #include "Config.hpp"
 #include "OpenGL.h"
-#include "Utils.hpp"
+#include "Camera.hpp"
+#include "World.hpp"
+#include "WorldMeta.hpp"
+#include "WorldObject.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
@@ -177,7 +180,7 @@ namespace Pix {
 
 		glDisable(GL_DEPTH_TEST);
 
-		if (CONFIG.debugMode == DEBUG_COLLISIONS)
+		if (CONFIG.debugMode == DEBUG_COLLISIONS || CONFIG.debugMode == DEBUG_LIGHTS)
 			canvas()->blank();
 
 	}
@@ -237,12 +240,12 @@ namespace Pix {
 		return matrix * flipMatrix;
 	}
 
-	void World::addLight(PointLight *p) {
+	void World::addLight(std::shared_ptr<PointLight> p) {
 		vPointLights.emplace_back(p);
 		bLightsChanged = true;
 	}
 
-	void World::addLight(SpotLight *p) {
+	void World::addLight(std::shared_ptr<SpotLight> p) {
 		vSpotLights.emplace_back(p);
 		bLightsChanged = true;
 	}
@@ -251,32 +254,50 @@ namespace Pix {
 
 		shader->setLightingMode(mLightMode);
 
+		// TODO (better): We model each light as a sphere, centered on the light
+		// position, and with a radius. points after radius are considered dark.
+
 		int inFrustum = 0;
 		
 		if (mLightMode != LIGHTS_OFF) {
-			int i=0;
-			for (PointLight *p : vPointLights) {
-				if (pCamera->getFrustum()->IsBoxVisible(p->position/1000.0f, p->calcRadius(0.1)/1000.0f)) {
+
+			auto frustum = pCamera->getFrustum();
+			for (int i = 0, l = (int)vPointLights.size(); i<l; i++) {
+				auto p = vPointLights.at(i).get();
+
+				float radius = p->calcRadius(LIGHT_DARKNESS);
+
+				if (CONFIG.debugMode==DEBUG_LIGHTS) {
+					canvas()->drawCircle(p->position.x*1000, p->position.z*1000, radius, Pix::Colors::RED);
+					canvas()->drawCircle(p->position.x*1000, p->position.z*1000, radius+1, Pix::Colors::RED);
+					canvas()->drawCircle(p->position.x*1000, p->position.z*1000, radius+2, Pix::Colors::RED);
+				}
+
+//				if (frustum->IsBoxVisible(p->position, radius / 1000.0f)) {
 					// light virtual sphere is visible
 					shader->enablePointLight(i, true);
-					shader->updateLight(*p, i);
+					shader->updateLight(p, i);
 					inFrustum++;
-				} else {
-					shader->enablePointLight(i, false);
-				}
-				i++;
+//				} else {
+//					shader->enablePointLight(i, false);
+//				}
 			}
-				LogV(TAG, SF("%d pointlights in frustum", inFrustum));
-			i=0;
-			for (SpotLight *p : vSpotLights) {
-				if (true || pCamera->getFrustum()->IsBoxVisible(p->position/1000.0f, p->calcRadius(0.1)/1000.0f)) {
+
+			if (DBG) LogV(TAG, SF("%d pointlights in frustum", inFrustum));
+
+			for (int i=0, l = (int)vSpotLights.size(); i<l; i++) {
+				auto p = vSpotLights.at(i).get();
+				float radius = p->calcRadius(LIGHT_DARKNESS);
+				if (CONFIG.debugMode==DEBUG_LIGHTS) {
+					canvas()->drawCircle(p->position.x*1000, p->position.z*1000, radius, Pix::Colors::RED);
+				}
+//				if (true || frustum->IsBoxVisible(p->position, radius)) {
 					// light virtual sphere is visible
 					shader->enableSpotLight(i, true);
-					shader->updateLight(*p, i);
-				} else {
-					shader->enableSpotLight(i, false);
-				}
-				i++;
+					shader->updateLight(p, i);
+//				} else {
+//					shader->enableSpotLight(i, false);
+//				}
 			}
 		}
 	}
@@ -288,10 +309,12 @@ namespace Pix {
 		const int MAXLIGHTS = 4;
 
 		for (int i = 0, l = (int)vPointLights.size(), m = (int)vSpotLights.size(); i<MAXLIGHTS; i++) {
-			if (i<l) shader->loadLight(*vPointLights.at(i), i, true);
-			else shader->enableSpotLight(i, false);
-			if (i<m) shader->loadLight(*vSpotLights.at(i), i, true);
+			
+			if (i<l) shader->loadLight(vPointLights.at(i).get(), i, true);
 			else shader->enablePointLight(i, false);
+			
+			if (i<m) shader->loadLight(vSpotLights.at(i).get(), i, true);
+			else shader->enableSpotLight(i, false);
 		}
 	};
 }

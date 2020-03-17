@@ -8,14 +8,17 @@
 
 #include "WorldObject.hpp"
 #include "World.hpp"
+#include "Fu.hpp"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "err_typecheck_invalid_operands"
+
 namespace Pix {
 
 	// Segment (A, B)
 	// Point P
 	// return : Point Q, the cloesest point on [AB] from P
+
 	glm::vec3 ClosestPoint(glm::vec3 A, glm::vec3 B, glm::vec3 P) {
 
 		glm::vec3 AB    = B - A;
@@ -42,7 +45,6 @@ namespace Pix {
 
 	}
 
-
 	// https://gamedev.stackexchange.com/questions/21552/picking-objects-with-mouse-ray
 	bool WorldObject::checkRayCollision(glm::vec3& origin, glm::vec3& direction) {
 		glm::vec3 center = pos();
@@ -56,9 +58,7 @@ namespace Pix {
 		if (CONFIG.animation.enabled) {
 
 			// apply rotation
-			rot().x += CONFIG.animation.deltaRotationX * fElapsedTime;
-			rot().y += CONFIG.animation.deltaRotationY * fElapsedTime;
-			rot().z += CONFIG.animation.deltaRotationZ * fElapsedTime;
+			rot() += CONFIG.animation.deltaRotation * fElapsedTime;
 
 			// apply scale pulse
 			if (CONFIG.animation.scalePulse > 0)

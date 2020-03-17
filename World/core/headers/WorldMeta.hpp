@@ -72,7 +72,7 @@ namespace Pix {
 	} Transformation_t;
 
 	typedef enum eWorldDebug {
-		DEBUG_NONE, DEBUG_GRID, DEBUG_COLLISIONS, DEBUG_WIREFRAME
+		DEBUG_NONE, DEBUG_GRID, DEBUG_COLLISIONS, DEBUG_WIREFRAME, DEBUG_LIGHTS
 	} WorldDebug_t;
 
 	/**
@@ -123,9 +123,10 @@ namespace Pix {
 		/** animation is enabled */
 		bool enabled = false;
 		// delta animations on every axis
-		float deltaRotationX = 0, deltaRotationY = 0, deltaRotationZ = 0;
+		glm::vec3 deltaRotation = {0,0,0};
 		// sin() animation on scale (0.1 = 10% size variation)
 		float scalePulse = 0;
+		
 	} ObjectAnimation_t;
 
 	/**

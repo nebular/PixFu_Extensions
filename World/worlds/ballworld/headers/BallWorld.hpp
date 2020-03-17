@@ -47,7 +47,7 @@ namespace Pix {
 		 * @return The object
 		 */
 
-		WorldObject *add(int oid, ObjectLocation_t location, bool setHeight = true) override;
+		 WorldObject *add(int oid, ObjectLocation_t location, bool setHeight = true) override;
 
 		/**
 		 * Creates an object from irs OID. Object must have been inserted in the ObjectDb
@@ -77,9 +77,10 @@ namespace Pix {
 
 		virtual void tick(Pix::Fu *engine, float fElapsedTime) override;
 
-		void load(const std::string &levelName);
+		void load(const std::string& levelName);
 
 		BallWorldMap_t *map();
+		
 	};
 
 	inline BallWorldMap_t *BallWorld::map() { return pMap; }

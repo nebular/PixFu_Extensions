@@ -17,6 +17,7 @@
 #include "LayerVao.hpp"
 #include "ObjLoader.hpp"
 #include "ObjectCluster.hpp"
+#include "Camera.hpp"
 #include "Config.hpp"
 
 #include "glm/mat4x4.hpp"
